@@ -68,6 +68,55 @@ const Footer = () => {
               ))}
             </div>
           </div>
+          {/* Products & Services */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
+              Products
+            </h4>
+            <ul className="space-y-3">
+              {[
+                "Stock Trading",
+                "Portfolio Management",
+                "Digital Wallet",
+                "Market Analysis",
+                "Educational Resources",
+              ].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200 text-sm"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
+              Resources
+            </h4>
+            <ul className="space-y-3">
+              {[
+                "Market News",
+                "Trading Tutorials",
+                "Investment Guides",
+                "API Documentation",
+                "Webinars",
+              ].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200 text-sm"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Bottom Footer */}
