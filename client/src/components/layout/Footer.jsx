@@ -204,6 +204,34 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="border-t border-gray-300 my-8"></div>
+
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="text-gray-600 text-sm">
+            © {currentYear} EthioTrade Inc. All rights reserved.
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-6">
+            {[
+              "Privacy Policy",
+              "Terms of Service",
+              "Security",
+              "Compliance",
+              "EthSwitch",
+              "Fayda ID",
+            ].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="text-gray-600 text-sm">
