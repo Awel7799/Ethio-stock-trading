@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 export default function Navigation() {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false)
 
   const navigationItems = [
     { name: "Markets", href: "/markets" },
@@ -57,7 +58,7 @@ export default function Navigation() {
               </Link>
             ))}
           </div>
-          
+
           {/* Right side items */}
           <div className="flex items-center space-x-4 flex-shrink-0">
             {/* Notification Bell */}
@@ -84,7 +85,6 @@ export default function Navigation() {
               {/* Notification dot */}
               <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
             </button>
-
             {/* User Avatar */}
             <div className="relative">
               <button className="p-1 rounded-full hover:bg-gray-100 transition-colors duration-200">
@@ -97,6 +97,37 @@ export default function Navigation() {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
                 </div>
+              </button>
+            </div>
+           
+            {/* Mobile menu button */}
+            <div className="sm:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors duration-200"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {isOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  )}
+                </svg>
               </button>
             </div>
           </div>
