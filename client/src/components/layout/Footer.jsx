@@ -1,5 +1,6 @@
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+
   const socialIcons = {
     facebook: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -109,6 +110,7 @@ const Footer = () => {
               Ethiopia's first stock trading platform, bridging the gap between
               investors and the emerging capital market.
             </p>
+
             <div className="flex space-x-4">
               {Object.entries(socialIcons).map(([platform, icon]) => (
                 <a
@@ -122,6 +124,7 @@ const Footer = () => {
               ))}
             </div>
           </div>
+
           {/* Products & Services */}
           <div>
             <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
@@ -207,6 +210,7 @@ const Footer = () => {
         {/* Divider */}
         <div className="border-t border-gray-300 my-8"></div>
 
+        {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="text-gray-600 text-sm">
             © {currentYear} EthioTrade Inc. All rights reserved.
@@ -229,13 +233,6 @@ const Footer = () => {
                 {item}
               </a>
             ))}
-          </div>
-        </div>
-
-        {/* Bottom Footer */}
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-gray-600 text-sm">
-            © {currentYear} EthioTrade Inc. All rights reserved.
           </div>
         </div>
       </div>
