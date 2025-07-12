@@ -9,7 +9,7 @@ export default function Navigation() {
     { name: "Markets", href: "/markets" },
     { name: "Portfolio", href: "/portfolio" },
     { name: "Wallet", href: "/wallet" }, 
-    { name: "Profile", href: "/profile" },
+    { name: "Setting", href: "/setting" },
   ]
 
   // Function to check if the current path matches the nav item

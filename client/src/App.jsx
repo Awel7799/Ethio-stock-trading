@@ -17,7 +17,7 @@ function App() {
             <Route path="/markets" element={<Markets />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/wallet" element={<Wallet />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/Setting" element={<Profile />} />
           </Routes>
         </main>
         <Footer/>
