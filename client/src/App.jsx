@@ -1,11 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
-
-// Fixed: Import components from correct files
 import Markets from './pages/Market'
 import Portfolio from './pages/Portfolio'
 import Wallet from './pages/Wallet'
 import Profile from './pages/Profile'
+import Footer from './components/layout/Footer'
 
 function App() {
   return (
@@ -21,6 +20,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
+        <Footer/>
       </div>
     </Router>
   )
