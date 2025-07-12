@@ -1,9 +1,29 @@
-export default function App() {
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
+
+// Fixed: Import components from correct files
+import Markets from './pages/Market'
+import Portfolio from './pages/Portfolio'
+import Wallet from './pages/Wallet'
+import Profile from './pages/Profile'
+
+function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-green-600">
-        Tailwind is working 🎉
-      </h1>
-    </div>
-  );
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main>
+          <Routes>
+            <Route path="/" element={<Markets/>} />
+            <Route path="/markets" element={<Markets />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  )
 }
+
+export default App
