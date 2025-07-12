@@ -79,7 +79,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-b from-emerald-50 via-green-50 to-emerald-50 text-black">
+    <footer className="bg-gradient-to-b from-white via-green-50 to-white text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Company Information */}
