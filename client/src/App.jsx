@@ -1,3 +1,7 @@
+import StockDetailPage from './components/comman/stockDetailPage/stockDetailPage';
+import HoldingsCard from './components/market/holdingCards';
+
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
 
@@ -17,6 +21,8 @@ function App() {
         <Navigation />
         <main>
           <Routes>
+            <Route path="/stock/:symbol" element={<StockDetailPage />} />
+            <Route path="/holdings" element={<HoldingsCard />} />
             <Route path="/" element={<Markets/>} />
             <Route path="/markets" element={<Markets />} />
             <Route path="/portfolio" element={<Portfolio />} />

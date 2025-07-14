@@ -4,6 +4,8 @@ import PerformanceChart from "../components/market/performanceChart"
 import TopMovers from "../components/market/topMover"
 import NewsFeed from "../components/market/newsFeed"
 import HoldingsCard from "../components/market/holdingCards"
+import StockDetailPage from "../components/comman/stockDetailPage/stockDetailPage"
+
 
 export default function Markets() {
   return (
