@@ -34,7 +34,7 @@ const news = [
 const NewsFeed = () => {
   return (
     <div className="bg-transparent rounded-lg p-4  w-full  mx-auto ml-0 mt-6">
-      <h2 className="text-lg font-semibold mb-4">Market News</h2>
+      <h2 className="text-[40px] font-semibold mb-4">Market News</h2>
       <div className="flex flex-col gap-6">
         {news.map((article) => (
           <div
