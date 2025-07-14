@@ -1,5 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
+
+//import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
+
+// Fixed: Import components from correct files
+
 import Markets from './pages/Market'
 import Portfolio from './pages/Portfolio'
 import Wallet from './pages/Wallet'
@@ -10,7 +15,6 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
         <main>
           <Routes>
             <Route path="/" element={<Markets/>} />
