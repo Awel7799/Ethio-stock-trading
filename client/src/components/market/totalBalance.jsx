@@ -18,9 +18,9 @@ const TotalInvestmentCard = () => {
   }, []);
 */}
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-sm mx-auto text-center">
-      <h2 className="text-xl font-semibold text-gray-800">Total Balance</h2>
-      <p className="text-3xl font-bold text-green-600 mt-2">${balance}</p>
+    <div className="bg-transparent p-4 w-full max-w-sm mx-auto ml-0 mt-20 mb-20">
+      <h2 className="text-[35px] font-semibold text-gray-800">Total Balance</h2>
+      <p className="text-3xl font-bold  mt-2">${balance}</p>
       <p className="text-sm text-gray-500 mt-1">
         {change.value >= 0 ? '+' : '-'}${Math.abs(change.value).toFixed(2)} ({Math.abs(change.percent).toFixed(2)}%)
       </p>

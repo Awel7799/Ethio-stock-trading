@@ -8,14 +8,14 @@ import HoldingsCard from "../components/market/holdingCards"
 export default function Markets() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto ">
         <StockSearchBar />
         <TotalInvestmentCard />
         <div className="flex">
-          <div className="w-[70%]">
+          <div className="w-[65%]">
             <PerformanceChart />
           </div>
-          <div>
+          <div className="w-[30%]">
             <HoldingsCard />
           </div>
         </div>

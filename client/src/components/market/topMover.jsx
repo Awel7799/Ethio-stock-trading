@@ -28,13 +28,13 @@ const movers = [
 
 const TopMovers = () => {
   return (
-    <div className="bg-white rounded-lg p-4 shadow-md w-full max-w-3xl mx-auto mt-6">
-      <h2 className="text-lg font-semibold mb-4">Top Movers</h2>
-      <div className="flex flex-col gap-4">
+    <div className="bg-transparent rounded-lg p-4  w-[60%] max-w-3xl mx-auto mt-26 ml-0">
+      <h2 className="text-[40px] font-semibold mb-4">Top Movers</h2>
+      <div className="flex flex-wrap  gap-4">
         {movers.map((stock) => (
           <div
             key={stock.symbol}
-            className="flex justify-between items-center p-4 border rounded-md hover:shadow transition"
+            className="flex justify-between items-center ml-0 p-4 shadow-md rounded-md hover:shadow transition"
           >
             <div>
               <h3 className="text-md font-bold">{stock.symbol}</h3>
