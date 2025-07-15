@@ -342,5 +342,207 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   );
 };
 
+// Main Landing Page Component
+const TradeWiseLanding = () => {
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleSignUpClick = () => {
+    console.log("Sign up button clicked"); // Debug log
+    setShowSignUp(true);
+    setShowLogin(false);
+  };
+
+  const handleLoginClick = () => {
+    console.log("Login button clicked"); // Debug log
+    setShowLogin(true);
+    setShowSignUp(false);
+  };
+
+  const handleCloseModals = () => {
+    console.log("Closing modals"); // Debug log
+    setShowSignUp(false);
+    setShowLogin(false);
+  };
+
+  const handleSwitchToLogin = () => {
+    console.log("Switching to login"); // Debug log
+    setShowSignUp(false);
+    setShowLogin(true);
+  };
+
+  const handleSwitchToSignUp = () => {
+    console.log("Switching to sign up"); // Debug log
+    setShowLogin(false);
+    setShowSignUp(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <AnimatedBackground />
+
+      {/* Header */}
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 bg-black bg-opacity-30 backdrop-blur-sm">
+        <div className="flex items-center space-x-2">
+          <TrendingUp className="text-white w-8 h-8" />
+          <span className="text-white text-xl font-bold">TradeWise</span>
+        </div>
+
+        <nav className="hidden md:flex items-center space-x-8">
+          <a
+            href="#"
+            className="text-white hover:text-purple-300 transition-colors"
+          >
+            Products
+          </a>
+          <a
+            href="#"
+            className="text-white hover:text-purple-300 transition-colors"
+          >
+            Learn
+          </a>
+          <a
+            href="#"
+            className="text-white hover:text-purple-300 transition-colors"
+          >
+            Pricing
+          </a>
+          <a
+            href="#"
+            className="text-white hover:text-purple-300 transition-colors"
+          >
+            Support
+          </a>
+        </nav>
+
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handleSignUpClick}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105"
+          >
+            Sign up
+          </button>
+          <button
+            onClick={handleLoginClick}
+            className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300"
+          >
+            Log in
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20">
+        <div className="text-center max-w-4xl">
+          <h1 className="text-5xl md:text-6xl font-bold text-amber-50 mb-6 leading-tight">
+            Welcome to TradeWise
+          </h1>
+
+          <p className="text-xl md:text-2xl text-white  mb-8 font-light">
+            Your Gateway to Smart Trading
+          </p>
+
+          <p className="text-lg text-purple-200 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Experience the future of trading with our cutting-edge platform. Get
+            real-time market insights, advanced analytics, and powerful tools
+            designed to help you make informed trading decisions.
+          </p>
+
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div
+              className="bg-transparent backdrop-blur-lg
+ rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105"
+            >
+              <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-amber-50 mb-2">
+                Real-Time Analytics
+              </h3>
+              <p className="text-purple-200 text-sm">
+                Advanced market analysis and live trading signals
+              </p>
+            </div>
+
+            <div
+              className="bg-transparent backdrop-blur-lg
+ rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105"
+            >
+              <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PieChart className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-amber-50 mb-2">
+                Portfolio Management
+              </h3>
+              <p className="text-purple-200 text-sm">
+                Track and optimize your investments with ease
+              </p>
+            </div>
+
+            <div className="bg-transparent backdrop-blur-lg
+ rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105">
+              <div className="bg-cyan-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-amber-50 mb-2">
+                Expert Insights
+              </h3>
+              <p className="text-purple-200 text-sm">
+                Learn from professional traders and market experts
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+            <button
+              onClick={handleSignUpClick}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Start Trading Today
+            </button>
+            <button
+              onClick={handleLoginClick}
+              className="bg-gray-800 bg-opacity-50 px-8 py-3 rounded-full text-lg font-semibold hover:from-black hover:to-white text-amber-100 transition-all duration-200 transform hover:scale-105 shadow-lg">
+              Welcome Back
+            </button>
+          </div>
+        </div>
+      </main>
+
+      {/* Trust Indicators */}
+      <div className="relative z-10 flex items-center justify-center space-x-8 pb-8">
+        <div className="flex items-center space-x-2 text-emerald-400">
+          <CheckCircle className="w-4 h-4" />
+          <span className="text-sm">Trusted by 100K+ traders</span>
+        </div>
+        <div className="flex items-center space-x-2 text-blue-400">
+          <Shield className="w-4 h-4" />
+          <span className="text-sm">Bank-grade security</span>
+        </div>
+        <div className="flex items-center space-x-2 text-purple-400">
+          <Clock className="w-4 h-4" />
+          <span className="text-sm">24/7 support</span>
+        </div>
+      </div>
+
+      {/* Modals */}
+      {showSignUp && (
+        <SignUpForm
+          onClose={handleCloseModals}
+          onSwitchToLogin={handleSwitchToLogin}
+        />
+      )}
+
+      {showLogin && (
+        <LoginForm
+          onClose={handleCloseModals}
+          onSwitchToSignUp={handleSwitchToSignUp}
+        />
+      )}
+    </div>
+  );
+};
 
 
