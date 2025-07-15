@@ -1,6 +1,6 @@
 import StockDetailPage from './components/comman/stockDetailPage/stockDetailPage';
 import HoldingsCard from './components/market/holdingCards';
-
+import TradeWiseLanding from './components/landing/landingPage';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
@@ -9,26 +9,37 @@ import Portfolio from './pages/Portfolio'
 import Wallet from './pages/Wallet'
 import Profile from './pages/Profile'
 import Footer from './components/layout/Footer'
+
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Navigation/>
-        <main>
-          <Routes>
-            <Route path="/stock/:symbol" element={<StockDetailPage />} />
-            <Route path="/holdings" element={<HoldingsCard />} />
-            <Route path="/" element={<Markets/>} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/wallet" element={<Wallet />} />
-            <Route path="/Setting" element={<Profile />} />
-          </Routes>
-        </main>
-        <Footer/>
+        {/* Render navbar only after login (not on landing)*/}
+        <Routes>
+          <Route path="/" element={<TradeWiseLanding />} />
+          <Route
+            path="*"
+            element={
+              <>
+                <Navigation />
+                <main>
+                  <Routes>
+                    <Route path="/markets" element={<Markets />} />
+                    <Route path="/portfolio" element={<Portfolio />} />
+                    <Route path="/wallet" element={<Wallet />} />
+                    <Route path="/Setting" element={<Profile />} />
+                    <Route path="/holdings" element={<HoldingsCard />} />
+                    <Route path="/stock/:symbol" element={<StockDetailPage />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </>
+            }
+          />
+        </Routes>
       </div>
     </Router>
-  )
+  );
 }
 
 export default App
