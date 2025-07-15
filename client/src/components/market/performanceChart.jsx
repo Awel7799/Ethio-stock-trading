@@ -1,4 +1,4 @@
-// File: src/components/portfolio/PerformanceChart.jsx
+// File: src/components/market/PerformanceChart.jsx
 
 import { useState } from 'react';
 import {
