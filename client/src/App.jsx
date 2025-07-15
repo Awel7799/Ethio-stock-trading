@@ -5,7 +5,6 @@ import Portfolio from './pages/Portfolio'
 import Wallet from './pages/Wallet'
 import Profile from './pages/Profile'
 import Footer from './components/layout/Footer'
-
 function App() {
   return (
     <Router>
