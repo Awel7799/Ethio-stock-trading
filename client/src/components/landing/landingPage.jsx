@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+
 // Custom SVG Icons
 const TrendingUp = ({ className }) => (
   <svg
@@ -69,6 +71,7 @@ const CheckCircle = ({ className }) => (
     <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.86 0 3.58.57 5.01 1.54"></path>
   </svg>
 );
+
 // Animated background shapes component
 const AnimatedBackground = () => {
   const [shapes, setShapes] = useState([]);
@@ -126,6 +129,7 @@ const AnimatedBackground = () => {
     </div>
   );
 };
+
 // Sign Up Component
 const SignUpForm = ({ onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -545,4 +549,4 @@ const TradeWiseLanding = () => {
   );
 };
 
-
+export default TradeWiseLanding;
