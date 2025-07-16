@@ -4,9 +4,13 @@ import PerformanceChart from "../components/market/performanceChart"
 import TopMovers from "../components/market/topMover"
 import NewsFeed from "../components/market/newsFeed"
 import HoldingsCard from "../components/market/holdingCards"
+import Navigation from "../components/layout/Navbar"
+import Footer from "../components/layout/Footer"
 
 export default function Markets() {
   return (
+    <>
+    <Navigation/>
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <StockSearchBar />
@@ -22,6 +26,8 @@ export default function Markets() {
          <TopMovers />
          <NewsFeed />
       </div>
+      <Footer/>
     </div>
+    </>
   )
 }
