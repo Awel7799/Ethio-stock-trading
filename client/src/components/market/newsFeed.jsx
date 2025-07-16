@@ -1,14 +1,16 @@
 // File: src/components/market/NewsFeed.jsx
 
 import React from 'react';
-
+import newsImage from "../../asset/Depth 6, Frame 1 (1).png"
+import newsImage2 from "../../asset/Depth 6, Frame 1 (2).png"
+import newsImage3 from "../../asset/Depth 6, Frame 1.png"
 const news = [
   {
     id: 1,
     title: 'Tesla shares surge after record Q2 earnings',
     description:
       'Tesla posts record earnings and beats Wall Street expectations, sending the stock soaring.',
-    imageUrl: 'https://source.unsplash.com/random/300x200?tesla',
+    imageUrl: newsImage,
     source: 'CNBC',
   },
   {
@@ -16,7 +18,7 @@ const news = [
     title: 'Apple unveils new M3 chips in surprise launch',
     description:
       'Apple has announced its new generation M3 chip that boosts performance in all Mac devices.',
-    imageUrl: 'https://source.unsplash.com/random/300x200?apple',
+    imageUrl: newsImage2,
     source: 'Bloomberg',
   },
   {
@@ -24,20 +26,20 @@ const news = [
     title: 'Amazon enters the healthcare space',
     description:
       'Amazon is acquiring a major pharmacy startup to expand its services in the healthcare sector.',
-    imageUrl: 'https://source.unsplash.com/random/300x200?amazon',
+    imageUrl: newsImage3,
     source: 'TechCrunch',
   },
 ];
 
 const NewsFeed = () => {
   return (
-    <div className="bg-white rounded-lg p-4 shadow-md w-full max-w-3xl mx-auto mt-6">
-      <h2 className="text-lg font-semibold mb-4">Market News</h2>
+    <div className="bg-transparent rounded-lg p-4  w-full  mx-auto ml-0 mt-6">
+      <h2 className="text-[40px] font-semibold mb-4">Market News</h2>
       <div className="flex flex-col gap-6">
         {news.map((article) => (
           <div
             key={article.id}
-            className="flex items-start gap-4 border rounded-md p-4 hover:shadow transition"
+            className="flex items-start gap-4 shadow-md w-full rounded-md p-4 hover:shadow transition"
           >
             <img
               src={article.imageUrl}
