@@ -5,7 +5,7 @@ import Portfoliopage from './pages/Portfolio'
 import Wallet from './pages/Wallet'
 import Profile from './pages/Profile'
 import Footer from './components/layout/Footer'
-import TradeWiseLanding from './components/landing/landingPage'
+import TradeWiseLanding from './components/landing/TradeWiseLanding'
 function App() {
   return (
     <Router>
