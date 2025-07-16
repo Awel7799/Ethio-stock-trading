@@ -4,7 +4,6 @@ import Footer from "../components/layout/Footer";
 export default function Portfoliopage(){
     return(
         <div className="m-0 p-0">
-        <Navigation/>
         <Portfolio/>
         <Footer/>
         </div>

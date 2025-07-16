@@ -4,10 +4,7 @@ import WalletPage from "../components/wallet/wallet"
 export default function Wallet() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <Navigation/>
-      <WalletPage/>
-      <Footer/>
-      
+      <WalletPage/> 
     </div>
   )
 }
