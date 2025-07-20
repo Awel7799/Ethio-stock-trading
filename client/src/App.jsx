@@ -1,6 +1,6 @@
 import StockDetailPage from './components/comman/stockDetailPage/stockDetailPage';
 import HoldingsCard from './components/market/holdingCards';
-import TradeWiseLanding from './components/landing/landingPage';
+import TradeWiseLanding from './components/landing/TradeWiseLanding';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/layout/Navbar' // Fixed: Changed from Navbar to Navigation
