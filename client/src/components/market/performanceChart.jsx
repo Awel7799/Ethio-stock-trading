@@ -49,10 +49,10 @@ const PerformanceChart = () => {
   const data = sampleData[range];
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-md w-full">
+    <div className="bg-white rounded-lg p-4 shadow-md w-full max-w-3xl mx-auto">
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-semibold">Performance</h2>
-        <div className="flex gap-2 text-sm ">
+        <div className="flex gap-2 text-sm">
           {['1D', '1W', '1M', '3M', '1Y', 'ALL'].map(period => (
             <button
               key={period}
