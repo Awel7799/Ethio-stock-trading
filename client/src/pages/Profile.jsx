@@ -1,12 +1,10 @@
-import ProfileForm from "../components/setting/profileForm";
-import KYCform from "../components/setting/KYCform";
 import Button from "../components/comman/Button";
+import Sidebar from "../components/setting/Sidebar";
 export default function Profile() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <ProfileForm />
+      <Sidebar />
       <Button>change</Button>
-      <KYCform />
     </div>
   )
 };
