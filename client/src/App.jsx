@@ -6,7 +6,7 @@ import Navigation from './components/layout/Navbar' // Fixed: Changed from Navba
 import Markets from './pages/Market'
 import Portfolio from './pages/Portfolio'
 import Wallet from './pages/Wallet'
-import Profile from './pages/Profile'
+import Setting from './pages/Setting'
 import Footer from './components/layout/Footer'
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
                     <Route path="/markets" element={<Markets />} />
                     <Route path="/portfolio" element={<Portfolio />} />
                     <Route path="/wallet" element={<Wallet />} />
-                    <Route path="/Setting" element={<Profile />} />
+                    <Route path="/Setting" element={<Setting />} />
                     <Route path="/holdings" element={<HoldingsCard />} />
                     <Route path="/stock/:symbol" element={<StockDetailPage />} />
                   </Routes>
