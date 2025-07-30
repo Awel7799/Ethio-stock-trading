@@ -11,8 +11,8 @@ const holdings = [
 const HoldingsCard = () => {
   const navigate = useNavigate();
 
-  const handleClick = (symbol) => {
-    navigate(`/stock/${symbol}`);
+  const handleClick = (quantity) => {
+    navigate(`/stock/${quantity}`);
   };
 
   return (

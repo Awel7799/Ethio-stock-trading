@@ -1,46 +1,42 @@
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { fetchStockDetails } from '../../../services/stockAPI';
+
 const StockDetailPage = () => {
   const { symbol } = useParams();
-  const [stockData, setStockData] = useState(null);
-  const [userHolding, setUserHolding] = useState(null);
+  const [stock, setStock] = useState(null);
 
   useEffect(() => {
-    // Placeholder: simulate API call
-    const fetchStockDetails = async () => {
-      // Simulate fetching data for this stock
-      const fakeData = {
-        symbol,
-        name: "Apple Inc.",
-        price: 192.4,
-        dividend: "0.5%",
-        description: "Apple is a technology company...",
-        performance: [100, 120, 110, 130, 150], // for chart
-        news: [
-          { title: "Apple launches new iPhone", description: "Big update in September..." },
-        ],
-      };
-      setStockData(fakeData);
-
-      // Simulate user's holding
-      const fakeHolding = {
-        shares: 10,
-        avgPrice: 150,
-        gainLoss: "+42%",
-      };
-      setUserHolding(fakeHolding);
+    const loadData = async () => {
+      try {
+        const data = await fetchStockDetails(symbol);
+        setStock(data);
+      } catch (err) {
+        console.error('Failed to load stock details:', err);
+      }
     };
-
-    fetchStockDetails();
+    loadData();
   }, [symbol]);
 
-  if (!stockData) return <div>Loading...</div>;
+  if (!stock) return <div>Loading...</div>;
 
   return (
-     <div className="p-4">
-      <h1 className="text-2xl font-bold">Stock Detail Page</h1>
-      <p className="mt-2 text-lg">Symbol: {symbol}</p>
-      {/* Display chart, price, holdings info, news, etc. here */}
+    <div className="stock-detail-page">
+      <div className="header">
+        <img src={stock.logo} alt={`${stock.name} logo`} width={50} />
+        <h2>{stock.name}</h2>
+      </div>
+      <div className="price-info">
+        <h3>${stock.price}</h3>
+        <span style={{ color: stock.changesPercentage > 0 ? 'green' : 'red' }}>
+          ({stock.changesPercentage}%)
+        </span>
+      </div>
+
+      <div className="about">
+        <h4>About</h4>
+        <p>{stock.description}</p>
+      </div>
     </div>
   );
 };
