@@ -1,3 +1,4 @@
+
 "use client"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "./context/AuthContext"
@@ -206,7 +207,7 @@ function App() {
         <AppContent />
       </Router>
     </AuthProvider>
-  )
+  );
 }
 
 export default App
