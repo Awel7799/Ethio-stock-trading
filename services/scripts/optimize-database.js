@@ -1,45 +1,46 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-async function optimizeDatabase() {
+const optimizeDatabase = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    const db = mongoose.connection.db;
+    console.log('📊 Connected to database for optimization...');
 
-    console.log('🔍 Analyzing database performance...');
-
-    // Get collection stats
-    const collections = ['users', 'wallets', 'wallet_transactions', 'trade_orders', 'stocks'];
+    // Create indexes for better performance
+    const User = require('../models/User');
     
-    for (const collectionName of collections) {
-      const stats = await db.collection(collectionName).stats();
-      console.log(`📊 ${collectionName}:`, {
-        documents: stats.count,
-        avgObjSize: Math.round(stats.avgObjSize || 0),
-        totalIndexSize: Math.round((stats.totalIndexSize || 0) / 1024) + ' KB'
-      });
-    }
+    // Ensure indexes are created
+    await User.createIndexes();
+    console.log('✅ Database indexes created/verified');
 
-    // Check for missing indexes
-    console.log('\n🔍 Checking for slow operations...');
-    const slowOps = await db.admin().command({
-      currentOp: true,
-      "active": true,
-      "secs_running": { "$gt": 1 }
-    });
+    // Clean up expired refresh tokens
+    const result = await User.updateMany(
+      {},
+      {
+        $pull: {
+          refreshTokens: {
+            createdAt: { $lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+          }
+        }
+      }
+    );
+    
+    console.log(`🧹 Cleaned up expired tokens from ${result.modifiedCount} users`);
 
-    if (slowOps.inprog.length > 0) {
-      console.log('⚠️  Found slow operations:', slowOps.inprog.length);
-    } else {
-      console.log('✅ No slow operations found');
-    }
+    // Get database statistics
+    const stats = await mongoose.connection.db.stats();
+    console.log('📈 Database Statistics:');
+    console.log(`- Collections: ${stats.collections}`);
+    console.log(`- Data Size: ${(stats.dataSize / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`- Index Size: ${(stats.indexSize / 1024 / 1024).toFixed(2)} MB`);
 
-    await mongoose.connection.close();
-    console.log('📊 Database optimization check complete');
-
+    console.log('✅ Database optimization completed');
   } catch (error) {
-    console.error('❌ Optimization check failed:', error.message);
+    console.error('❌ Database optimization failed:', error);
+  } finally {
+    await mongoose.connection.close();
+    process.exit(0);
   }
-}
+};
 
 optimizeDatabase();
