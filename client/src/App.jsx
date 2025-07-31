@@ -1,4 +1,3 @@
-
 "use client"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "./context/AuthContext"
@@ -11,7 +10,7 @@ import Navigation from "./components/layout/Navbar"
 import Markets from "./pages/Market"
 import Portfolio from "./pages/Portfolio"
 import Wallet from "./pages/Wallet"
-import Profile from "./pages/Profile"
+import Setting from "./pages/Setting"
 import Footer from "./components/layout/Footer"
 
 // Loading component
@@ -165,7 +164,7 @@ const AppContent = () => {
         element={
           <ProtectedRoute>
             <AuthenticatedLayout>
-              <Profile />
+              <Setting />
             </AuthenticatedLayout>
           </ProtectedRoute>
         }
@@ -207,7 +206,7 @@ function App() {
         <AppContent />
       </Router>
     </AuthProvider>
-  );
+  )
 }
 
 export default App
