@@ -15,6 +15,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "lucide-react": "^0.535.0",
     "mongoose": "^8.16.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

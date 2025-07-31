@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchStockDetails } from '../../../services/stockAPI';
+import BuyStockForm from './BuyStockForm';
+import HoldingList from './HoldingList';
+import { ArrowLeft } from 'lucide-react';
 
-const StockDetailPage = () => {
+export default function StockDetailPage() {
+  const [editTarget, setEditTarget] = useState(null);
+  const [refreshFlag, setRefreshFlag] = useState(0);
   const { symbol } = useParams();
   const [stock, setStock] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    setEditTarget(null);
+    setRefreshFlag((f) => f + 1);
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -18,27 +29,108 @@ const StockDetailPage = () => {
     loadData();
   }, [symbol]);
 
-  if (!stock) return <div>Loading...</div>;
+  if (!stock) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500">Loading stock details...</div>
+      </div>
+    );
+  }
+
+  const priceChangePositive = Number(stock.changesPercentage) >= 0;
+  const formattedPrice = Number(stock.price).toFixed(2);
+  const formattedChange = Number(stock.changesPercentage).toFixed(2);
 
   return (
-    <div className="stock-detail-page">
-      <div className="header">
-        <img src={stock.logo} alt={`${stock.name} logo`} width={50} />
-        <h2>{stock.name}</h2>
-      </div>
-      <div className="price-info">
-        <h3>${stock.price}</h3>
-        <span style={{ color: stock.changesPercentage > 0 ? 'green' : 'red' }}>
-          ({stock.changesPercentage}%)
-        </span>
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      {/* Top bar */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+          className="p-2 rounded-full hover:bg-gray-100 transition"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <div className="flex items-center gap-3">
+          {stock.logo ? (
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+              <img src={stock.logo} alt={`${stock.name} logo`} className="w-full h-full object-contain" />
+            </div>
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold">
+              {symbol[0]}
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl font-semibold">{stock.name}</h1>
+            <div className="text-sm text-gray-500 uppercase">{symbol}</div>
+          </div>
+        </div>
       </div>
 
-      <div className="about">
-        <h4>About</h4>
-        <p>{stock.description}</p>
+      {/* Price card */}
+      <div className="bg-white shadow rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col">
+          <div className="text-4xl font-bold">${formattedPrice}</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div
+              className={`text-sm font-medium ${
+                priceChangePositive ? 'text-green-500' : 'text-red-500'
+              }`}
+            >
+              {priceChangePositive ? '+' : ''}
+              {formattedChange}%
+            </div>
+            <div className="text-xs text-gray-400">24h</div>
+          </div>
+        </div>
+        {/* Chart placeholder */}
+        <div className="flex-1">
+          <div className="h-24 sm:h-32 bg-gradient-to-r from-green-100 to-blue-100 rounded-xl flex items-center justify-center text-xs text-gray-400">
+            {/* Replace with real chart later */}
+            Chart placeholder
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="text-xs text-gray-500">Market status</div>
+          <div className="text-sm font-semibold">{stock.marketState || 'Open'}</div>
+        </div>
+      </div>
+
+      {/* Action area */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Buy form */}
+        <div className="lg:col-span-1">
+          <div className="bg-white shadow rounded-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-semibold">Buy {symbol}</div>
+              <div className="text-xs text-gray-400">Simulated</div>
+            </div>
+            <BuyStockForm onSuccess={handleSuccess} />
+          </div>
+        </div>
+
+        {/* Right: Details + holdings */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white shadow rounded-2xl p-5">
+            <div className="text-lg font-semibold mb-2">About {stock.name}</div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {stock.description || 'No description available.'}
+            </p>
+          </div>
+
+          <div className="bg-white shadow rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-lg font-semibold">Your Holdings</div>
+              <div className="text-sm text-gray-500">Updated just now</div>
+            </div>
+            <div>
+              <HoldingList onEdit={setEditTarget} key={refreshFlag} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default StockDetailPage;
+}
