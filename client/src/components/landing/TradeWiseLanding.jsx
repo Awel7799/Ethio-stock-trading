@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useAuth } from "../../context/AuthContext" // Use external AuthContext
+import { useState } from "react"
+import { useAuth } from "../../context/AuthContext" // Import external AuthContext
 
-// Keep all your existing SVG Icons
+// Keep all your existing SVG Icons (TrendingUp, PieChart, etc.)
 const TrendingUp = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -59,12 +59,11 @@ const EyeOff = ({ className }) => (
   </svg>
 )
 
-// Keep all your existing components but remove the internal AuthProvider and AuthContext
-
-// Animated background component
+// Keep all your existing components (AnimatedBackground, LoadingSpinner, SuccessMessage)
 const AnimatedBackground = () => {
   const [shapes, setShapes] = useState([])
-  useEffect(() => {
+
+  useState(() => {
     const generateShapes = () => {
       const newShapes = []
       for (let i = 0; i < 15; i++) {
@@ -103,7 +102,6 @@ const AnimatedBackground = () => {
   )
 }
 
-// Loading component
 const LoadingSpinner = () => (
   <div className="inline-flex items-center">
     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -111,7 +109,6 @@ const LoadingSpinner = () => (
   </div>
 )
 
-// Success Message Component
 const SuccessMessage = ({ message, onClose }) => (
   <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center">
     <CheckCircle className="w-5 h-5 mr-2" />
@@ -122,7 +119,7 @@ const SuccessMessage = ({ message, onClose }) => (
   </div>
 )
 
-// Sign Up Form Component
+// Sign Up Form Component - Use external AuthContext
 const SignUpForm = ({ onClose, onSwitchToLogin }) => {
   const { signUp } = useAuth() // Use external AuthContext
   const [formData, setFormData] = useState({
@@ -196,7 +193,7 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
     }
   }
 
-  // Keep all your existing JSX for the signup form
+  // Keep your existing signup form JSX
   return (
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
@@ -330,7 +327,7 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
   )
 }
 
-// Login Form Component
+// Login Form Component - Use external AuthContext
 const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   const { login } = useAuth() // Use external AuthContext
   const [formData, setFormData] = useState({
@@ -398,7 +395,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     }
   }
 
-  // Keep all your existing JSX for the login form
+  // Keep your existing login form JSX
   return (
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
@@ -500,7 +497,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   )
 }
 
-// Main Landing Page Component - REMOVE THE DASHBOARD LOGIC
+// Main Landing Page Component - ONLY LANDING PAGE, NO DASHBOARD
 const TradeWiseLanding = () => {
   const { user, isLoggedIn } = useAuth() // Use external AuthContext
   const [showSignUp, setShowSignUp] = useState(false)
@@ -566,7 +563,7 @@ const TradeWiseLanding = () => {
           {isLoggedIn ? (
             <>
               <span className="text-white">Welcome, {user?.firstName || "User"}!</span>
-              <span className="text-purple-300 text-sm">You'll be redirected to dashboard...</span>
+              <span className="text-purple-300 text-sm">Redirecting to dashboard...</span>
             </>
           ) : (
             <>
@@ -587,7 +584,7 @@ const TradeWiseLanding = () => {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Keep all your existing main content JSX */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20">
         <div className="text-center max-w-4xl">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">Welcome to TradeWise</h1>
@@ -596,6 +593,7 @@ const TradeWiseLanding = () => {
             Experience the future of trading with our cutting-edge platform. Get real-time market insights, advanced
             analytics, and powerful tools designed to help you make informed trading decisions.
           </p>
+
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105">
@@ -620,6 +618,7 @@ const TradeWiseLanding = () => {
               <p className="text-purple-200 text-sm">Learn from professional traders and market experts</p>
             </div>
           </div>
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
             <button
