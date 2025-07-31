@@ -1,4 +1,4 @@
-// routes/auth.js - SUPER SIMPLE VERSION (NO VALIDATION)
+// routes/auth.js 
 const express = require('express');
 const router = express.Router();
 const authController = require('../controller/authController');
@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/auth');
 
 console.log('📁 Auth routes loaded');
 
-// Auth Routes - NO VALIDATION MIDDLEWARE
+// Auth Routes 
 router.post('/signup', (req, res, next) => {
   console.log('🚀 POST /auth/signup route hit');
   authController.signUp(req, res, next);
