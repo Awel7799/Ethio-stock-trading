@@ -8,6 +8,7 @@ const cors = require('cors');
 const stockDetailRoutes = require('./routes/detailStockDetailRouter');
 const holdingRoutes = require('./routes/holdingRoutes');
 const buyRouter = require('./routes/buyRouter'); 
+const searchRouter = require('./routes/searchRouter');
 dotenv.config();
 
 const app = express();
@@ -26,6 +27,9 @@ app.use("/api/stocks", stockRoutes);
 app.use('/api/stocks', stockDetailRoutes);
 app.use('/api/holdings', holdingRoutes);
 app.use('/api', buyRouter);
+app.use('/api/search', searchRouter);
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
