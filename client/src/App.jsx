@@ -11,7 +11,7 @@ import Navigation from "./components/layout/Navbar"
 import Markets from "./pages/Market"
 import Portfolio from "./pages/Portfolio"
 import Wallet from "./pages/Wallet"
-import Profile from "./pages/Profile"
+import Profile from "./pages/Setting" 
 import Footer from "./components/layout/Footer"
 
 // Loading component
