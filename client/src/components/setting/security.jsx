@@ -52,7 +52,8 @@ function Security() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button type="submit" className="bg-black text-white px-4 py-2 rounded shadow">
           Save
-        </button>
+        </button> <br />
+        <button className="border">logout</button>
       </form>
     </div>
   );
