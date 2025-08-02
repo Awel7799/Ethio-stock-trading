@@ -5,17 +5,15 @@ const connectDB = async () => {
   try {
     console.log('🔌 Attempting to connect to MongoDB...');
     
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Removed deprecated options: useNewUrlParser and useUnifiedTopology
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📊 Database Name: ${conn.connection.name}`);
 
-    // Handle connection events
+    // Enhanced connection event handling
     mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB connection error:', err);
+      console.error('❌ MongoDB connection error:', err.message);
     });
 
     mongoose.connection.on('disconnected', () => {
@@ -35,7 +33,18 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    console.error('Please check your MONGODB_URI environment variable');
+    
+    // More specific error messages
+    if (error.message.includes('ECONNREFUSED')) {
+      console.error('➡️  Check if MongoDB service is running');
+    } else if (error.message.includes('ENOTFOUND')) {
+      console.error('➡️  Check your MongoDB URI format and cluster name');
+    } else if (error.message.includes('Authentication failed')) {
+      console.error('➡️  Verify your database credentials');
+    }
+    
+    console.error('➡️  Please check your MONGODB_URI environment variable');
+    console.error('➡️  Ensure your IP is whitelisted in MongoDB Atlas');
     process.exit(1);
   }
 };

@@ -1,3 +1,4 @@
+//services/config/jwt.js
 const jwt = require('jsonwebtoken');
 
 const JWT_CONFIG = {
