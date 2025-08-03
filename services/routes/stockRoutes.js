@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getTopMovers } = require('../controllers/stockController');
+const { getTopGainersLive } = require('../controllers/stockController');
 
-router.get('/:symbol', getTopMovers); // temporary usage, not by symbol
+// GET /api/stocks/gainers?limit=5
+router.get('/gainers', getTopGainersLive);
+
 module.exports = router;

@@ -4,7 +4,7 @@ import { fetchStockDetails } from '../../../services/stockAPI';
 import BuyStockForm from './BuyStockForm';
 import HoldingList from './HoldingList';
 import { ArrowLeft } from 'lucide-react';
-
+import StockChart from './StockChart';
 export default function StockDetailPage() {
   const [editTarget, setEditTarget] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -86,12 +86,10 @@ export default function StockDetailPage() {
           </div>
         </div>
         {/* Chart placeholder */}
-        <div className="flex-1">
-          <div className="h-24 sm:h-32 bg-gradient-to-r from-green-100 to-blue-100 rounded-xl flex items-center justify-center text-xs text-gray-400">
-            {/* Replace with real chart later */}
-            Chart placeholder
-          </div>
-        </div>
+        {/* Chart area */}
+            <div className="flex-1">
+                   <StockChart history={stock.history || []} />
+            </div>
         <div className="flex flex-col gap-2">
           <div className="text-xs text-gray-500">Market status</div>
           <div className="text-sm font-semibold">{stock.marketState || 'Open'}</div>

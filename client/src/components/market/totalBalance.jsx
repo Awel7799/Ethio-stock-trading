@@ -1,29 +1,106 @@
 import { useEffect, useState } from 'react';
 
+const formatCurrency = (n) => {
+  if (n == null || isNaN(n)) return '-';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  }).format(n);
+};
 
-const TotalInvestmentCard = () => {
-  const [balance, setBalance] = useState(1231);
-  const [change, setChange] = useState({ value: 23, percent: 34 });
-{/*
+const formatPercent = (n) => {
+  if (n == null || isNaN(n)) return '-';
+  return `${Math.abs(n).toFixed(2)}%`;
+};
+
+const TotalInvestmentCard = ({ userId }) => {
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await axios.get('/api/portfolio/summary');
-      setBalance(res.data.totalBalance);
-      setChange({
-        value: res.data.changeAmount,
-        percent: res.data.changePercent,
-      });
+    if (!userId) return;
+    let cancelled = false;
+
+    const fetchSummary = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const resp = await fetch(`http://localhost:3000/api/investments/user/${userId}`)
+        if (!resp.ok) {
+          const text = await resp.text();
+          throw new Error(`Fetch failed: ${resp.status} ${text}`);
+        }
+        const data = await resp.json();
+        if (!cancelled) setSummary(data);
+      } catch (e) {
+        if (!cancelled) setError(e.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
-    fetchData();
-  }, []);
-*/}
+
+    fetchSummary();
+    const interval = setInterval(fetchSummary, 30000); // refresh every 30s
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [userId]);
+
+  // derive display values
+  const totalInvested = summary?.totalInvested ?? 0;
+  const totalCurrentValue = summary?.totalCurrentValue ?? 0;
+  const gainLoss = summary?.totalGainLoss || { dollar: 0, percent: 0 };
+  const positive = gainLoss.dollar >= 0;
+
   return (
-    <div className="bg-transparent p-4 w-full max-w-sm mx-auto ml-0 mt-20 mb-20">
-      <h2 className="text-[35px] font-semibold text-gray-800">Total Balance</h2>
-      <p className="text-3xl font-bold  mt-2">${balance}</p>
-      <p className="text-sm text-gray-500 mt-1">
-        {change.value >= 0 ? '+' : '-'}${Math.abs(change.value).toFixed(2)} ({Math.abs(change.percent).toFixed(2)}%)
-      </p>
+    <div className="bg-white p-6 w-full max-w-md mx-auto rounded-2xl shadow-md">
+      <h2 className="text-[35px] font-semibold text-gray-800">Total Investment</h2>
+
+      {loading && <p className="text-sm text-gray-500 mt-2">Loading...</p>}
+      {error && (
+        <p className="text-sm text-red-600 mt-2">
+          Error: {error}
+        </p>
+      )}
+
+      {!loading && !error && summary && (
+        <>
+          <div className="mt-4">
+            <p className="text-sm text-gray-500">Total Invested</p>
+            <p className="text-lg font-medium">{formatCurrency(totalInvested)}</p>
+          </div>
+
+          <div className="mt-2">
+            <p className="text-sm text-gray-500">Current Value</p>
+            <p className="text-lg font-medium">{formatCurrency(totalCurrentValue)}</p>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-3">
+            <p className="text-2xl font-bold">
+              {formatCurrency(gainLoss.dollar)}
+            </p>
+            <p
+              className={`text-sm font-medium ${
+                positive ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              ({positive ? '+' : '-'}
+              {formatPercent(gainLoss.percent)})
+            </p>
+          </div>
+
+          <p className="text-sm mt-1">
+            {positive ? 'Gain' : 'Loss'} {positive ? '▲' : '▼'}
+          </p>
+        </>
+      )}
+
+      {!summary && !loading && !error && (
+        <p className="text-sm text-gray-500 mt-2">No investment data available.</p>
+      )}
     </div>
   );
 };

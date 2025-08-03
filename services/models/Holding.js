@@ -1,3 +1,4 @@
+// models/holding.js
 const mongoose = require('mongoose');
 
 const holdingSchema = new mongoose.Schema({
@@ -27,4 +28,5 @@ const holdingSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Holding', holdingSchema);
+// reuse existing model if already compiled (prevents OverwriteModelError)
+module.exports = mongoose.models.Holding || mongoose.model('Holding', holdingSchema);

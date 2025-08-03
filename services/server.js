@@ -9,12 +9,15 @@ const stockDetailRoutes = require('./routes/detailStockDetailRouter');
 const holdingRoutes = require('./routes/holdingRoutes');
 const buyRouter = require('./routes/buyRouter'); 
 const searchRouter = require('./routes/searchRouter');
+const investmentRoutes = require('./routes/investmentRoutes');
 dotenv.config();
+
 
 const app = express();
 app.use(cors());
 // Middleware to parse JSON
 app.use(express.json());
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -28,7 +31,7 @@ app.use('/api/stocks', stockDetailRoutes);
 app.use('/api/holdings', holdingRoutes);
 app.use('/api', buyRouter);
 app.use('/api/search', searchRouter);
-
+app.use('/api/investments', investmentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

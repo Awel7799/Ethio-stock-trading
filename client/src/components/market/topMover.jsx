@@ -7,7 +7,7 @@ const TopMovers = () => {
   useEffect(() => {
     const fetchMovers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/stocks/top-movers');
+        const response = await axios.get('http://localhost:3000/api/stocks/gainers?limit=5');
         setMovers(response.data);
       } catch (error) {
         console.error('Error fetching top movers:', error.message);

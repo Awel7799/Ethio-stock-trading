@@ -12,7 +12,7 @@ export default function Markets() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto ">
         <StockSearchBar />
-        <TotalInvestmentCard />
+        <TotalInvestmentCard userId="688ef237d6f78a73a12b002c" />
         <div className="flex">
           <div className="w-[65%]">
             <PerformanceChart />
