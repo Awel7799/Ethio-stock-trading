@@ -56,8 +56,8 @@ const TotalInvestmentCard = ({ userId }) => {
   const positive = gainLoss.dollar >= 0;
 
   return (
-    <div className="bg-white p-6 w-full max-w-md mx-auto rounded-2xl shadow-md">
-      <h2 className="text-[35px] font-semibold text-gray-800">Total Investment</h2>
+    <div className="bg-transparent p-6 w-full max-w-md mx-auto rounded-2xl mb-15 mt-10 ml-0">
+      <h2 className="text-[35px] font-semibold text-gray-800">Total balance</h2>
 
       {loading && <p className="text-sm text-gray-500 mt-2">Loading...</p>}
       {error && (

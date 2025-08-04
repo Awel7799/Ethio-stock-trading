@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const settingRoutes = require('./routes/settingRoutes'); // Import settings routes
+const settingRoutes = require('./routes/settingRoutes');
 const stockRoutes = require('./routes/stockRoutes');     // ✅ Import stock routes
 const cors = require('cors');
 const stockDetailRoutes = require('./routes/detailStockDetailRouter');

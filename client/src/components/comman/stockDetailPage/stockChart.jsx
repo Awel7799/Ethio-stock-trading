@@ -8,7 +8,7 @@ const StockChart = ({ history }) => {
   }));
 
   return (
-    <div className="mb-4 p-4 bg-white rounded shadow">
+    <div className="mb-4 p-4 bg-transparent rounded shadow">
       <h3 className="text-lg font-semibold mb-2">Performance (Last 30 days)</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>

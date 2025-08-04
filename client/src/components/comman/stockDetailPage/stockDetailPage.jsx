@@ -42,7 +42,7 @@ export default function StockDetailPage() {
   const formattedChange = Number(stock.changesPercentage).toFixed(2);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-4xl ml-5 mx-auto px-4 py-6 space-y-6">
       {/* Top bar */}
       <div className="flex items-center gap-3">
         <button
@@ -58,7 +58,7 @@ export default function StockDetailPage() {
               <img src={stock.logo} alt={`${stock.name} logo`} className="w-full h-full object-contain" />
             </div>
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold">
+            <div className="w-12 h-12 rounded-full bg-gray-200 block items-center justify-center text-xl font-semibold">
               {symbol[0]}
             </div>
           )}
@@ -70,12 +70,12 @@ export default function StockDetailPage() {
       </div>
 
       {/* Price card */}
-      <div className="bg-white shadow rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-transparent  rounded-2xl p-6 block flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col">
           <div className="text-4xl font-bold">${formattedPrice}</div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-3">
             <div
-              className={`text-sm font-medium ${
+              className={`text-sm mb-5 font-medium ${
                 priceChangePositive ? 'text-green-500' : 'text-red-500'
               }`}
             >
