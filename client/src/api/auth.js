@@ -1,11 +1,13 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+// API Configuration - Browser compatible
+// src/api/auth.js
+const API_BASE_URL = 'http://localhost:5000/api';
 
-// Token keys
+// Token management
 const TOKEN_KEY = 'tradewise_access_token';
 const REFRESH_TOKEN_KEY = 'tradewise_refresh_token';
 const USER_KEY = 'tradewise_user';
 
-// Token Getters
+// Get stored tokens
 export const getAccessToken = () => {
   try {
     return localStorage.getItem(TOKEN_KEY);
@@ -34,7 +36,7 @@ export const getUser = () => {
   }
 };
 
-// Token Setters
+// Store tokens
 export const setTokens = (accessToken, refreshToken, user) => {
   try {
     if (accessToken) localStorage.setItem(TOKEN_KEY, accessToken);
@@ -45,6 +47,7 @@ export const setTokens = (accessToken, refreshToken, user) => {
   }
 };
 
+// Clear tokens
 export const clearTokens = () => {
   try {
     localStorage.removeItem(TOKEN_KEY);
@@ -55,10 +58,10 @@ export const clearTokens = () => {
   }
 };
 
-// Unified request function
+// API request helper with automatic token refresh
 const apiRequest = async (url, options = {}) => {
   const accessToken = getAccessToken();
-
+  
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -70,75 +73,88 @@ const apiRequest = async (url, options = {}) => {
 
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, config);
-
+    
+    // Check if response is ok
     if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-
-      // Handle token expiration
+      // Handle different HTTP status codes
       if (response.status === 401) {
-        if (data.code === 'TOKEN_EXPIRED' || (data.message && data.message.includes('expired'))) {
+        const data = await response.json().catch(() => ({}));
+        
+        // Handle token expiration
+        if (data.code === 'TOKEN_EXPIRED' || data.message?.includes('expired')) {
           const refreshToken = getRefreshToken();
           if (refreshToken) {
             try {
               const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ refreshToken }),
               });
 
               if (refreshResponse.ok) {
                 const refreshData = await refreshResponse.json();
                 setTokens(refreshData.data.accessToken, refreshData.data.refreshToken, getUser());
-
-                // Retry original request
+                
+                // Retry original request with new token
                 config.headers.Authorization = `Bearer ${refreshData.data.accessToken}`;
                 const retryResponse = await fetch(`${API_BASE_URL}${url}`, config);
                 return await retryResponse.json();
+              } else {
+                // Refresh failed, redirect to login
+                clearTokens();
+                window.location.href = '/';
+                return { success: false, message: 'Session expired' };
               }
-            } catch (err) {
-              console.error('Token refresh error:', err);
+            } catch (refreshError) {
+              console.error('Token refresh error:', refreshError);
+              clearTokens();
+              window.location.href = '/';
+              return { success: false, message: 'Session expired' };
             }
-
-            clearTokens();
-            window.location.href = '/';
-            return { success: false, message: 'Session expired' };
           } else {
             clearTokens();
             window.location.href = '/';
             return { success: false, message: 'No refresh token available' };
           }
         }
-
+        
         return { success: false, message: 'Unauthorized' };
       }
-
-      return { success: false, message: data.message || `HTTP ${response.status}` };
+      
+      // Handle other HTTP errors
+      const errorData = await response.json().catch(() => ({}));
+      return { success: false, message: errorData.message || `HTTP ${response.status}` };
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('API request failed:', error);
     return { success: false, message: 'Network error. Please check your connection.' };
   }
 };
 
-// Auth API
+// Authentication API functions
 export const authAPI = {
+  // Sign Up
   signUp: async (userData) => {
     try {
       const response = await apiRequest('/auth/signup', {
         method: 'POST',
         body: JSON.stringify(userData),
       });
-
+      
       if (response.success) {
+        // Handle both possible response formats
         const accessToken = response.token || response.data?.accessToken;
         const refreshToken = response.data?.refreshToken;
         const user = response.user || response.data?.user;
-
+        
         setTokens(accessToken, refreshToken, user);
       }
-
+      
       return response;
     } catch (error) {
       console.error('Sign up error:', error);
@@ -146,21 +162,23 @@ export const authAPI = {
     }
   },
 
+  // Login
   login: async (credentials) => {
     try {
       const response = await apiRequest('/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
-
+      
       if (response.success) {
+        // Handle both possible response formats
         const accessToken = response.token || response.data?.accessToken;
         const refreshToken = response.data?.refreshToken;
         const user = response.user || response.data?.user;
-
+        
         setTokens(accessToken, refreshToken, user);
       }
-
+      
       return response;
     } catch (error) {
       console.error('Login error:', error);
@@ -168,25 +186,33 @@ export const authAPI = {
     }
   },
 
+  // Logout
   logout: async () => {
     try {
-      await apiRequest('/auth/logout', { method: 'POST' });
+      const response = await apiRequest('/auth/logout', {
+        method: 'POST',
+      });
+      
+      clearTokens();
+      return response;
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
       clearTokens();
-      return { success: true };
+      return { success: false, message: 'Logout failed' };
     }
   },
 
+  // Get Profile
   getProfile: async () => {
     return await apiRequest('/auth/profile');
   },
 
+  // Verify Token
   verifyToken: async () => {
     return await apiRequest('/auth/verify-token');
   },
 
+  // Refresh Token (if needed)
   refreshToken: async () => {
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
@@ -196,12 +222,14 @@ export const authAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ refreshToken }),
       });
 
       const data = await response.json();
-
+      
       if (response.ok && data.success) {
         setTokens(data.data.accessToken, data.data.refreshToken, getUser());
         return data;
@@ -214,10 +242,10 @@ export const authAPI = {
       clearTokens();
       return { success: false, message: 'Token refresh failed' };
     }
-  },
+  }
 };
 
-// Auto Token Expiry Check
+// Token expiry checker - runs every minute
 export const startTokenExpiryChecker = () => {
   const checkTokenExpiry = () => {
     const accessToken = getAccessToken();
@@ -225,7 +253,8 @@ export const startTokenExpiryChecker = () => {
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         const currentTime = Date.now() / 1000;
-
+        
+        // If token expires in less than 5 minutes, try to refresh
         if (payload.exp - currentTime < 300) {
           const refreshToken = getRefreshToken();
           if (refreshToken) {
@@ -243,16 +272,18 @@ export const startTokenExpiryChecker = () => {
     }
   };
 
+  // Check immediately and then every minute
   checkTokenExpiry();
-  setInterval(checkTokenExpiry, 60000); // every 1 min
+  setInterval(checkTokenExpiry, 60000);
 };
 
+// Check if user is authenticated
 export const isAuthenticated = () => {
   const token = getAccessToken();
   const user = getUser();
-
+  
   if (!token || !user) return false;
-
+  
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return payload.exp > Date.now() / 1000;
