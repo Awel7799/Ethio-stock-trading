@@ -9,7 +9,7 @@ import TradeWiseLanding from "./components/landing/TradeWiseLanding.jsx"
 import Navigation from "./components/layout/Navbar"
 import Markets from "./pages/Market"
 import Portfolio from "./pages/Portfolio"
-import Wallet from "./pages/Wallet"
+
 import Setting from "./pages/Setting"
 import Footer from "./components/layout/Footer"
 
@@ -148,7 +148,7 @@ const AppContent = () => {
         }
       />
 
-      <Route
+     {/* <Route
         path="/wallet"
         element={
           <ProtectedRoute>
@@ -157,7 +157,7 @@ const AppContent = () => {
             </AuthenticatedLayout>
           </ProtectedRoute>
         }
-      />
+      />*/}
 
       <Route
         path="/setting"
