@@ -1,7 +1,8 @@
+//controler/authControler.js
 const User = require("../models/User")
 const authService = require("../services/authService")
 
-// Sign Up Controller - NO VALIDATION
+// Sign Up Controller 
 const signUp = async (req, res) => {
   try {
     console.log("🚀 CONTROLLER: Sign up request body:", req.body)
