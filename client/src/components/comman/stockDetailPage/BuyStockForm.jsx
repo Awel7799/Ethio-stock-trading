@@ -1,41 +1,31 @@
-// src/components/BuyStockForm.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { buyStock } from '../../../services/buyService';
+import { useAuth } from '../../../context/AuthContext';
 
-
-export default function BuyStockForm({ initialSymbol = '' }) {
+export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
   const [mode, setMode] = useState('buy'); // 'buy' or 'sell'
-  const [stockSymbol, setStockSymbol] = useState(initialSymbol);
   const [quantity, setQuantity] = useState(1);
-  const [purchasePrice, setPurchasePrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const { user } = useAuth(); // ✅ Get user from AuthContext
 
   const isBuy = mode === 'buy';
 
-  const resetForm = () => {
-    setStockSymbol('');
-    setQuantity(1);
-    setPurchasePrice('');
-  };
+  const totalCost = quantity * currentPrice;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setResult(null);
 
-    // Basic client-side validation
-    if (!stockSymbol.trim()) {
-      setError('Stock symbol is required.');
+    if (!user?._id) {
+      setError('User not authenticated');
       return;
     }
+
     if (quantity <= 0) {
       setError('Quantity must be at least 1.');
-      return;
-    }
-    if (purchasePrice <= 0 || isNaN(purchasePrice)) {
-      setError('Valid price is required.');
       return;
     }
 
@@ -44,21 +34,23 @@ export default function BuyStockForm({ initialSymbol = '' }) {
       let data;
       if (isBuy) {
         data = await buyStock({
-          stockSymbol: stockSymbol.trim(),
+          stockSymbol: symbol,
           quantity: Number(quantity),
-          purchasePrice: Number(purchasePrice),
-          // userId: 'optional-objectid-if-you-want-to-supply',
+          purchasePrice: Number(currentPrice),
+          userId: user._id,
         });
       } else {
         data = await sellStock({
-          stockSymbol: stockSymbol.trim(),
+          stockSymbol: symbol,
           quantity: Number(quantity),
-          sellPrice: Number(purchasePrice), // naming for sell
-          // userId: 'optional-objectid-if-you-want-to-supply',
+          sellPrice: Number(currentPrice),
+          userId: user._id,
         });
       }
+
       setResult(data);
-      resetForm();
+      setQuantity(1);
+      if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message || (isBuy ? 'Buy failed' : 'Sell failed'));
     } finally {
@@ -67,11 +59,9 @@ export default function BuyStockForm({ initialSymbol = '' }) {
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2 style={{ margin: 0 }}>
-          {isBuy ? 'Buy' : 'Sell'} {stockSymbol || 'Stock'}
-        </h2>
+        <h2 style={{ margin: 0 }}>{isBuy ? 'Buy' : 'Sell'} {symbol}</h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => setMode('buy')}
@@ -107,25 +97,11 @@ export default function BuyStockForm({ initialSymbol = '' }) {
       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 12, marginTop: 8 }}>
         <div>
           <label>
-            Stock Symbol
-            <input
-              type="text"
-              value={stockSymbol}
-              onChange={(e) => setStockSymbol(e.target.value)}
-              placeholder="e.g. AAPL"
-              required
-              style={{ width: '100%', padding: 8, marginTop: 4 }}
-            />
-          </label>
-        </div>
-
-        <div>
-          <label>
             Quantity
             <input
               type="number"
-              value={quantity}
               min={1}
+              value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
               style={{ width: '100%', padding: 8, marginTop: 4 }}
@@ -135,17 +111,18 @@ export default function BuyStockForm({ initialSymbol = '' }) {
 
         <div>
           <label>
-            {isBuy ? 'Price per Unit' : 'Sell Price per Unit'}
+            Price per Unit
             <input
               type="number"
-              step="0.01"
-              value={purchasePrice}
-              onChange={(e) => setPurchasePrice(e.target.value)}
-              placeholder="e.g. 150.25"
-              required
-              style={{ width: '100%', padding: 8, marginTop: 4 }}
+              value={currentPrice}
+              disabled
+              style={{ width: '100%', padding: 8, marginTop: 4, backgroundColor: '#f0f0f0' }}
             />
           </label>
+        </div>
+
+        <div>
+          <strong>Total Cost:</strong> ${isNaN(totalCost) ? '0.00' : totalCost.toFixed(2)}
         </div>
 
         <button
@@ -181,38 +158,8 @@ export default function BuyStockForm({ initialSymbol = '' }) {
           }}
         >
           <h4>Success!</h4>
-
-          {isBuy ? (
-            <>
-              <p>
-                Bought <strong>{result.holding.quantity}</strong> of{' '}
-                <strong>{result.holding.stockSymbol}</strong> at average price{' '}
-                <strong>{result.holding.purchasePrice.toFixed(2)}</strong>.
-              </p>
-              <p>
-                Remaining simulated balance:{' '}
-                <strong>{result.availableBalance.toFixed(2)}</strong>
-              </p>
-              <pre style={{ background: '#efefef', padding: 8, borderRadius: 4, overflow: 'auto' }}>
-                {JSON.stringify(result.holding, null, 2)}
-              </pre>
-            </>
-          ) : (
-            <>
-              <p>
-                Sold <strong>{result.holding.quantity}</strong> of{' '}
-                <strong>{result.holding.stockSymbol}</strong> at price{' '}
-                <strong>{result.holding.sellPrice?.toFixed(2) || 'N/A'}</strong>.
-              </p>
-              <p>
-                Updated simulated balance:{' '}
-                <strong>{result.availableBalance.toFixed(2)}</strong>
-              </p>
-              <pre style={{ background: '#efefef', padding: 8, borderRadius: 4, overflow: 'auto' }}>
-                {JSON.stringify(result.holding, null, 2)}
-              </pre>
-            </>
-          )}
+          
+          
         </div>
       )}
     </div>

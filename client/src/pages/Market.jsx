@@ -4,7 +4,7 @@ import PerformanceChart from "../components/market/performanceChart";
 import TopMovers from "../components/market/topMover";
 import NewsFeed from "../components/market/newsFeed";
 import HoldingsCard from "../components/market/holdingCards";
-
+import HoldingList from "../components/comman/stockDetailPage/HoldingList";
 export default function Markets() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -19,7 +19,7 @@ export default function Markets() {
             <PerformanceChart />
           </div>
           <div className="md:w-1/3">
-            <HoldingsCard />
+            <HoldingList />
           </div>
         </div>
 

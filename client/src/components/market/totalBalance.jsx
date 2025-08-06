@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext'; // make sure this path is correct
 
 const formatCurrency = (n) => {
   if (n == null || isNaN(n)) return '-';
@@ -14,7 +15,10 @@ const formatPercent = (n) => {
   return `${Math.abs(n).toFixed(2)}%`;
 };
 
-const TotalInvestmentCard = ({ userId }) => {
+const TotalInvestmentCard = () => {
+  const { user } = useAuth(); // 🔹 get user from AuthContext
+  const userId = user?._id;   // 🔹 safely extract userId
+
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,7 +31,7 @@ const TotalInvestmentCard = ({ userId }) => {
       setLoading(true);
       setError(null);
       try {
-        const resp = await fetch(`http://localhost:3000/api/investments/user/${userId}`)
+        const resp = await fetch(`http://localhost:3000/api/investments/user/${userId}`);
         if (!resp.ok) {
           const text = await resp.text();
           throw new Error(`Fetch failed: ${resp.status} ${text}`);
@@ -42,14 +46,13 @@ const TotalInvestmentCard = ({ userId }) => {
     };
 
     fetchSummary();
-    const interval = setInterval(fetchSummary, 30000); // refresh every 30s
+    const interval = setInterval(fetchSummary, 30000);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
   }, [userId]);
 
-  // derive display values
   const totalInvested = summary?.totalInvested ?? 0;
   const totalCurrentValue = summary?.totalCurrentValue ?? 0;
   const gainLoss = summary?.totalGainLoss || { dollar: 0, percent: 0 };
@@ -57,8 +60,6 @@ const TotalInvestmentCard = ({ userId }) => {
 
   return (
     <div className="bg-transparent p-6 w-full max-w-md mx-auto rounded-2xl mb-15 mt-10 ml-0">
-     
-
       {loading && <p className="text-sm text-gray-500 mt-2">Loading...</p>}
       {error && (
         <p className="text-sm text-red-600 mt-2">
@@ -89,6 +90,7 @@ const TotalInvestmentCard = ({ userId }) => {
             >
               ({positive ? '+' : '-'}
               {formatPercent(gainLoss.percent)})
+
             </p>
           </div>
 

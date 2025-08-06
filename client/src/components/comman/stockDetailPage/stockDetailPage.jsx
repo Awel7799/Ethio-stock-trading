@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchStockDetails } from '../../../services/stockAPI';
 import BuyStockForm from './BuyStockForm';
-import HoldingList from './HoldingList';
 import { ArrowLeft } from 'lucide-react';
 import StockChart from './stockChart';
 export default function StockDetailPage() {
@@ -105,7 +104,12 @@ export default function StockDetailPage() {
               <div className="text-lg font-semibold">Buy {symbol}</div>
               <div className="text-xs text-gray-400">Simulated</div>
             </div>
-            <BuyStockForm onSuccess={handleSuccess} />
+            <BuyStockForm
+                onSuccess={handleSuccess}
+                symbol={symbol}
+                currentPrice={Number(stock.price)}
+              />
+
           </div>
         </div>
 
@@ -116,16 +120,6 @@ export default function StockDetailPage() {
             <p className="text-sm text-gray-600 leading-relaxed">
               {stock.description || 'No description available.'}
             </p>
-          </div>
-
-          <div className="bg-white shadow rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-lg font-semibold">Your Holdings</div>
-              <div className="text-sm text-gray-500">Updated just now</div>
-            </div>
-            <div>
-              <HoldingList onEdit={setEditTarget} key={refreshFlag} />
-            </div>
           </div>
         </div>
       </div>
