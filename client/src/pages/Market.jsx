@@ -5,12 +5,14 @@ import TopMovers from "../components/market/topMover";
 import NewsFeed from "../components/market/newsFeed";
 import HoldingsCard from "../components/market/holdingCards";
 import HoldingList from "../components/comman/stockDetailPage/HoldingList";
+import AIchat from "../components/AIChatBox/AIchat";
 export default function Markets() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Search and Summary */}
         <StockSearchBar />
+        <AIchat />
         <TotalInvestmentCard userId="688ef237d6f78a73a12b002c" />
 
         {/* Chart and Holdings */}

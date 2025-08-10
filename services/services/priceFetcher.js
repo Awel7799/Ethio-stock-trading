@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 const cache = {}; // { SYMBOL: { price: Number, timestamp: ms } }
-const TTL = 15 * 1000; // 15 seconds cache
+const TTL = 600 * 1000; // 15 seconds cache
 
 async function getQuote(symbol) {
   const upper = symbol.toUpperCase();

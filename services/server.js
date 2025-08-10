@@ -76,6 +76,7 @@ const buyRouter = require("./routes/buyRouter");
 const searchRouter = require("./routes/searchRouter");
 const investmentRoutes = require("./routes/investmentRoutes");
 const authRoutes = require('./routes/auth');
+const chatRouter = require('./routes/chatRoutes'); 
 
 app.use('/api/auth', authRoutes);
 app.use("/api/stocks", stockRoutes);
@@ -84,6 +85,8 @@ app.use("/api/holdings", holdingRoutes);
 app.use("/api", buyRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/investments", investmentRoutes);
+app.use("/api/chat", chatRouter);
+
 
 // === Auth Routes ===
 let authService, authenticate, authenticateRefreshToken, User;
