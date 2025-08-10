@@ -1,4 +1,4 @@
-// utils/priceFetcher.js
+// services/priceFetcher.js
 const axios = require('axios');
 
 const cache = {}; // { SYMBOL: { price: Number, timestamp: ms } }

@@ -1,4 +1,3 @@
-// src/services/holdings.js
 const BASE = 'http://localhost:3000/api/holdings';
 
 async function request(path = '', options = {}) {
@@ -6,8 +5,8 @@ async function request(path = '', options = {}) {
   let res;
   try {
     res = await fetch(url, {
-      headers: { 'Content-Type': 'application/json',  ...(options.headers || {})},
-      ...options
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      ...options,
     });
   } catch (networkErr) {
     console.error('Network error fetching', url, networkErr);
@@ -33,7 +32,7 @@ async function request(path = '', options = {}) {
 export const createHolding = (holding) =>
   request('/', { method: 'POST', body: JSON.stringify(holding) });
 
-export const getHoldings = () => request('/');
+export const getHoldings = (userId) => request(`/?userId=${userId}`);
 
 export const getHolding = (id) => request(`/${id}`);
 

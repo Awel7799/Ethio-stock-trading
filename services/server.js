@@ -77,6 +77,10 @@ const searchRouter = require("./routes/searchRouter");
 const investmentRoutes = require("./routes/investmentRoutes");
 const authRoutes = require('./routes/auth');
 const chatRouter = require('./routes/chatRoutes'); 
+const performanceRoutes = require('./routes/performanceRoutes');
+
+const { runDailySnapshotJob } = require('./jobs/savePerformanceSnapshots');
+runDailySnapshotJob();
 
 app.use('/api/auth', authRoutes);
 app.use("/api/stocks", stockRoutes);
@@ -86,6 +90,7 @@ app.use("/api", buyRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/investments", investmentRoutes);
 app.use("/api/chat", chatRouter);
+app.use('/api/performance', performanceRoutes);
 
 
 // === Auth Routes ===

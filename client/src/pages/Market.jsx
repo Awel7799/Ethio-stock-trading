@@ -13,7 +13,7 @@ export default function Markets() {
         {/* Search and Summary */}
         <StockSearchBar />
         <AIchat />
-        <TotalInvestmentCard userId="688ef237d6f78a73a12b002c" />
+        <TotalInvestmentCard />
 
         {/* Chart and Holdings */}
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
