@@ -4,6 +4,8 @@ import { fetchStockDetails } from '../../../services/stockAPI';
 import BuyStockForm from './BuyStockForm';
 import { ArrowLeft } from 'lucide-react';
 import StockChart from './stockChart';
+import StockPortfolioCard from './StockPortfolioCard';
+
 export default function StockDetailPage() {
   const [editTarget, setEditTarget] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -26,7 +28,7 @@ export default function StockDetailPage() {
       }
     };
     loadData();
-  }, [symbol]);
+  }, [symbol, refreshFlag]);
 
   if (!stock) {
     return (
@@ -54,10 +56,14 @@ export default function StockDetailPage() {
         <div className="flex items-center gap-3">
           {stock.logo ? (
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-              <img src={stock.logo} alt={`${stock.name} logo`} className="w-full h-full object-contain" />
+              <img
+                src={stock.logo}
+                alt={`${stock.name} logo`}
+                className="w-full h-full object-contain"
+              />
             </div>
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-200 block items-center justify-center text-xl font-semibold">
+            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold">
               {symbol[0]}
             </div>
           )}
@@ -69,7 +75,7 @@ export default function StockDetailPage() {
       </div>
 
       {/* Price card */}
-      <div className="bg-transparent  rounded-2xl p-6 block flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-transparent rounded-2xl p-6 block flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col">
           <div className="text-4xl font-bold">${formattedPrice}</div>
           <div className="flex items-center gap-2 mt-3">
@@ -84,11 +90,12 @@ export default function StockDetailPage() {
             <div className="text-xs text-gray-400">24h</div>
           </div>
         </div>
-        {/* Chart placeholder */}
+
         {/* Chart area */}
-            <div className="flex-1">
-                   <StockChart history={stock.history || []} />
-            </div>
+        <div className="flex-1">
+          <StockChart history={stock.history || []} />
+        </div>
+
         <div className="flex flex-col gap-2">
           <div className="text-xs text-gray-500">Market status</div>
           <div className="text-sm font-semibold">{stock.marketState || 'Open'}</div>
@@ -105,16 +112,16 @@ export default function StockDetailPage() {
               <div className="text-xs text-gray-400">Simulated</div>
             </div>
             <BuyStockForm
-                onSuccess={handleSuccess}
-                symbol={symbol}
-                currentPrice={Number(stock.price)}
-              />
-
+              onSuccess={handleSuccess}
+              symbol={symbol}
+              currentPrice={Number(stock.price)}
+            />
           </div>
         </div>
 
-        {/* Right: Details + holdings */}
+        {/* Right: Portfolio + About */}
         <div className="lg:col-span-2 space-y-6">
+          <StockPortfolioCard symbol={symbol} currentPrice={Number(stock.price)} />
           <div className="bg-white shadow rounded-2xl p-5">
             <div className="text-lg font-semibold mb-2">About {stock.name}</div>
             <p className="text-sm text-gray-600 leading-relaxed">

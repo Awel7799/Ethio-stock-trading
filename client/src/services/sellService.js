@@ -1,19 +1,27 @@
-// services/sellService.js
-import axios from 'axios';
+// src/services/sellService.js
+export async function sellStock({ stockSymbol, quantity, sellPrice, userId, purchaseDate }) {
+  const payload = {
+    stockSymbol,
+    quantity,
+    sellPrice,
+    purchaseDate: purchaseDate || new Date().toISOString(),
+    ...(userId ? { userId } : {}), // optional if backend can get from auth
+  };
 
-export async function sellStock({ userId, stockSymbol, quantity, sellPrice, purchaseDate }) {
-  try {
-    const response = await axios.post('/api/sell', {
-      userId,
-      stockSymbol,
-      quantity,
-      sellPrice,
-      purchaseDate: purchaseDate || new Date().toISOString(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.error || error.message || 'Sell request failed'
-    );
+  const res = await fetch('http://localhost:3000/api/sell', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const message = data.error || 'Failed to sell stock';
+    throw new Error(message);
   }
+
+  return data; // backend can return updated holding, balance, profitLoss, etc.
 }

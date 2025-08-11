@@ -1,149 +1,125 @@
-"use client"
+import React, { useEffect, useState } from 'react';
+import HoldingList from '../comman/stockDetailPage/HoldingList';
+import { fetchUserPortfolio } from '../../services/portfolioServices';
+import { useAuth } from '../../context/AuthContext';
 
-import { useState, useEffect } from "react"
-import PerformanceChart from "./PerformanceChart"
-import HoldingsCard from "../market/holdingCards"
-
-// Dummy data for holdings
-const holdingsData = [
-  { stock: "TechCorp", quantity: 10, value: 1000.0, profitLoss: 100.0 },
-  { stock: "HealthInc", quantity: 5, value: 500.0, profitLoss: -50.0 },
-  { stock: "FinServ", quantity: 20, value: 2000.0, profitLoss: 200.0 },
-  { stock: "RetailCo", quantity: 15, value: 1500.0, profitLoss: -150.0 },
-  { stock: "EnergyLtd", quantity: 8, value: 800.0, profitLoss: 80.0 },
-]
-
-// Dummy data for recent transactions
-const transactionsData = [
-  {
-    date: "2024-03-15",
-    type: "Buy",
-    stock: "TechCorp",
-    quantity: 5,
-    amount: 500.0,
-  },
-  {
-    date: "2024-03-10",
-    type: "Sell",
-    stock: "HealthInc",
-    quantity: 2,
-    amount: 200.0,
-  },
-  {
-    date: "2024-03-05",
-    type: "Buy",
-    stock: "FinServ",
-    quantity: 10,
-    amount: 1000.0,
-  },
-  {
-    date: "2024-02-28",
-    type: "Sell",
-    stock: "RetailCo",
-    quantity: 8,
-    amount: 800.0,
-  },
-]
-
-const Portfolio = () => {
-  const initialBalanceValue = 12345.67 // Starting numerical balance
-  const [currentBalance, setCurrentBalance] = useState(initialBalanceValue)
-  const [dailyChangePercentage, setDailyChangePercentage] = useState(0) // Initial change percentage
-  const [dailyChangeAmount, setDailyChangeAmount] = useState(0) // Initial change amount
+const Portfolio = ({ currentPrices }) => {
+  const { user, loading: authLoading } = useAuth();
+  const [portfolio, setPortfolio] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate a random percentage change between -0.5% and +0.5%
-      const randomPercentChange = Math.random() * 1 - 0.5 // e.g., -0.5 to 0.5
-      setDailyChangePercentage(randomPercentChange)
+    if (authLoading) return;
+    if (!user || !user._id) {
+      setError('User not logged in');
+      setPortfolio(null);
+      return;
+    }
 
-      setCurrentBalance((prevBalance) => {
-        const newBalance = prevBalance * (1 + randomPercentChange / 100)
-        const calculatedChangeAmount = newBalance - prevBalance // Calculate the actual dollar change
-        setDailyChangeAmount(calculatedChangeAmount)
-        return Number.parseFloat(newBalance.toFixed(2))
-      })
-    }, 5000) // Update every 5 seconds
+    setError(null);
+    setPortfolio(null);
 
-    return () => clearInterval(interval)
-  }, []) // Empty dependency array to run once on mount
+    fetchUserPortfolio(user._id, currentPrices)
+      .then(setPortfolio)
+      .catch((err) => setError(err.message));
+  }, [user, authLoading, currentPrices]);
 
-  const formattedBalance = currentBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })
-  const formattedChangeAmount = dailyChangeAmount.toLocaleString("en-US", { style: "currency", currency: "USD" })
-  const formattedChangePercentage = `${dailyChangePercentage >= 0 ? "+" : ""}${dailyChangePercentage.toFixed(2)}%`
+  if (authLoading) return <div className="text-center py-20 text-gray-500">Checking authentication...</div>;
+  if (error) return <div className="text-red-600 text-center py-20 font-semibold">{error}</div>;
+  if (!portfolio) return <div className="text-center py-20 text-gray-500">Loading portfolio...</div>;
 
-  const isPositiveChange = dailyChangePercentage >= 0
+  const {
+    walletBalance,
+    totalInvested,
+    currentPortfolioValue,
+    profitLoss,
+    holdings,
+    transactions,
+  } = portfolio;
+
+  const formattedCurrency = (val) =>
+    val.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+  function toNumber(value) {
+    if (value && typeof value.toNumber === 'function') return value.toNumber();
+    return Number(value);
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 ">
-      {/* Changed w-[100%] to w-full for clarity, functionally same */}
-      <div className="mx-auto bg-white rounded-lg shadow-md p-6 w-full">
-        {/* Top Section: Total Balance (Left) and Holdings Card (Right) */}
-        <div className="flex flex-col md:flex-row gap-6 mb-8">
-          {/* Total Balance Section */}
-          <div className="flex-shrink-0 w-full md:w-1/2">
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">Total Balance</h2>
-            <div className="flex flex-col items-start">
-              <p className={`text-4xl font-bold ${isPositiveChange ? "text-green-600" : "text-red-600"} mb-1`}>
-                {formattedBalance}
-              </p>
-              <p className={`text-sm font-medium ${isPositiveChange ? "text-green-500" : "text-red-500"}`}>
-                {dailyChangeAmount >= 0 ? "+" : ""}
-                {formattedChangeAmount} ({formattedChangePercentage})
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
 
-          {/* Holdings Component - Right */}
-          <div className="flex-grow w-fit md:w-1/2">
-            <HoldingsCard holdingsData={holdingsData} />
-          </div>
+        {/* Wallet & Balances Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <BalanceCard title="Wallet Balance" amount={walletBalance} icon="💰" />
+          <BalanceCard title="Total Invested" amount={totalInvested} icon="📈" />
+          <BalanceCard title="Current Portfolio Value" amount={currentPortfolioValue} icon="📊" />
+          <BalanceCard 
+            title="Profit / Loss" 
+            amount={profitLoss} 
+            icon={profitLoss >= 0 ? "📈" : "📉"} 
+            isProfit={profitLoss >= 0} 
+          />
         </div>
 
-        {/* Performance Chart */}
-        <div className="shadow-lg h-[60vh] border-gray-300 rounded-lg p-4 bg-white mb-8 w-full">
-          <PerformanceChart />
-        </div>
+        {/* Holdings */}
+        <section className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-blue-700 border-b-2 border-blue-300 pb-2">Holdings</h2>
+          <HoldingList holdings={holdings} />
+        </section>
 
-        {/* Recent Transactions Table */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h2>
-          <div className="overflow-x-auto border border-gray-200 shadow-md rounded-lg">
-            {" "}
-            {/* Added border and shadow here */}
-            <table className="min-w-full bg-white">
-              {" "}
-              {/* Removed border-gray-200 and rounded-lg from table, now on wrapper */}
+        {/* Transactions */}
+        <section className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-blue-700 border-b-2 border-blue-300 pb-2">Recent Transactions</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white rounded-lg">
               <thead>
-                <tr className="bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <th className="px-6 py-3 border-b border-gray-200">Date</th>
-                  <th className="px-6 py-3 border-b border-gray-200">Type</th>
-                  <th className="px-6 py-3 border-b border-gray-200">Stock</th>
-                  <th className="px-6 py-3 border-b border-gray-200">Quantity</th>
-                  <th className="px-6 py-3 border-b border-gray-200">Amount</th>
+                <tr className="bg-blue-100 text-left text-sm font-semibold text-blue-800 uppercase tracking-wide">
+                  <th className="px-6 py-3 border-b border-blue-200">Date</th>
+                  <th className="px-6 py-3 border-b border-blue-200">Type</th>
+                  <th className="px-6 py-3 border-b border-blue-200">Stock</th>
+                  <th className="px-6 py-3 border-b border-blue-200">Quantity</th>
+                  <th className="px-6 py-3 border-b border-blue-200">Amount</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-                {transactionsData.map((transaction, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {transaction.date}
+              <tbody>
+                {transactions.map((t, i) => (
+                  <tr
+                    key={i}
+                    className="hover:bg-blue-50 transition-colors duration-150 border-b border-blue-100"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {new Date(t.transactionDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.stock}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.quantity}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {transaction.amount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{t.type}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{t.stockSymbol}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{t.quantity}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">
+                      {formattedCurrency(toNumber(t.price) * t.quantity)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
+
       </div>
     </div>
-  )
+  );
+};
+
+// Small reusable card component for balances
+function BalanceCard({ title, amount, icon, isProfit }) {
+  return (
+    <div className={`bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-105`}>
+      <div className="text-4xl mb-3">{icon}</div>
+      <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
+      <p className={`text-3xl font-bold ${isProfit === undefined ? 'text-gray-900' : isProfit ? 'text-green-600' : 'text-red-600'}`}>
+        {amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+      </p>
+    </div>
+  );
 }
 
-export default Portfolio
+export default Portfolio;

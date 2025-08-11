@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { buyStock } from '../../../services/buyService';
+import { sellStock } from '../../../services/sellService'; // Create this service similar to buyStock
 import { useAuth } from '../../../context/AuthContext';
 
-export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
+export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
   const [mode, setMode] = useState('buy'); // 'buy' or 'sell'
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -29,18 +30,28 @@ export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
 
     setLoading(true);
     try {
-      const data = await buyStock({
-        userId: user._id,               // Pass userId here
-        stockSymbol: symbol,
-        quantity: Number(quantity),
-        purchasePrice: Number(currentPrice),
-      });
+      let data;
+      if (isBuy) {
+        data = await buyStock({
+          userId: user._id,
+          stockSymbol: symbol,
+          quantity: Number(quantity),
+          purchasePrice: Number(currentPrice),
+        });
+      } else {
+        data = await sellStock({
+          userId: user._id,
+          stockSymbol: symbol,
+          quantity: Number(quantity),
+          sellPrice: Number(currentPrice),
+        });
+      }
 
       setResult(data);
       setQuantity(1);
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err.message || 'Buy failed');
+      setError(err.message || `${isBuy ? 'Buy' : 'Sell'} failed`);
     } finally {
       setLoading(false);
     }
@@ -48,7 +59,41 @@ export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
-      <h2>Buy {symbol}</h2>
+      {/* Toggle Buttons */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+        <button
+          type="button"
+          onClick={() => setMode('buy')}
+          style={{
+            flex: 1,
+            padding: '8px',
+            background: isBuy ? '#2563eb' : '#f0f0f0',
+            color: isBuy ? 'white' : 'black',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          Buy
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('sell')}
+          style={{
+            flex: 1,
+            padding: '8px',
+            background: !isBuy ? '#dc2626' : '#f0f0f0',
+            color: !isBuy ? 'white' : 'black',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          Sell
+        </button>
+      </div>
+
+      <h2>{isBuy ? 'Buy' : 'Sell'} {symbol}</h2>
 
       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 12, marginTop: 8 }}>
         <label>
@@ -74,7 +119,8 @@ export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
         </label>
 
         <div>
-          <strong>Total Cost:</strong> ${isNaN(totalCost) ? '0.00' : totalCost.toFixed(2)}
+          <strong>{isBuy ? 'Total Cost' : 'Total Value'}:</strong> $
+          {isNaN(totalCost) ? '0.00' : totalCost.toFixed(2)}
         </div>
 
         <button
@@ -83,17 +129,21 @@ export default function BuyStockForm({ symbol, currentPrice, onSuccess }) {
           style={{
             padding: '10px 16px',
             cursor: loading ? 'not-allowed' : 'pointer',
-            background: '#2563eb',
+            background: isBuy ? '#2563eb' : '#dc2626',
             color: 'white',
             border: 'none',
             borderRadius: 6,
           }}
         >
-          {loading ? 'Buying...' : 'Buy'}
+          {loading ? (isBuy ? 'Buying...' : 'Selling...') : (isBuy ? 'Buy' : 'Sell')}
         </button>
       </form>
 
-      {error && <div style={{ marginTop: 12, color: 'crimson' }}><strong>Error:</strong> {error}</div>}
+      {error && (
+        <div style={{ marginTop: 12, color: 'crimson' }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
 
       {result && (
         <div

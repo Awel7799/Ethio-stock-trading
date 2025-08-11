@@ -73,24 +73,32 @@ const stockRoutes = require("./routes/stockRoutes");
 const stockDetailRoutes = require("./routes/detailStockDetailRouter");
 const holdingRoutes = require("./routes/holdingRoutes");
 const buyRouter = require("./routes/buyRouter");
+const sellRouter = require('./routes/sellRouter');
 const searchRouter = require("./routes/searchRouter");
 const investmentRoutes = require("./routes/investmentRoutes");
 const authRoutes = require('./routes/auth');
 const chatRouter = require('./routes/chatRoutes'); 
-const performanceRoutes = require('./routes/performanceRoutes');
+const stockPortfolioRouter = require('./routes/stockPortfolioRouter');
+const portfolioRouter = require('./routes/portfolioRouter');
 
-const { runDailySnapshotJob } = require('./jobs/savePerformanceSnapshots');
-runDailySnapshotJob();
+//const performanceRoutes = require('./routes/performanceRoutes');
+
+//const { runDailySnapshotJob } = require('./jobs/savePerformanceSnapshots');
+//runDailySnapshotJob();
 
 app.use('/api/auth', authRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/stocks", stockDetailRoutes);
 app.use("/api/holdings", holdingRoutes);
 app.use("/api", buyRouter);
+app.use('/api', sellRouter); // handles /api/sell
 app.use("/api/search", searchRouter);
 app.use("/api/investments", investmentRoutes);
 app.use("/api/chat", chatRouter);
-app.use('/api/performance', performanceRoutes);
+app.use('/api', stockPortfolioRouter);
+app.use('/api', portfolioRouter);
+
+//app.use('/api/performance', performanceRoutes);
 
 
 // === Auth Routes ===
