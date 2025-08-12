@@ -5,7 +5,7 @@ import BuyStockForm from './BuyStockForm';
 import { ArrowLeft } from 'lucide-react';
 import StockChart from './stockChart';
 import StockPortfolioCard from './StockPortfolioCard';
-
+import NewsFeed from '../../market/newsFeed';
 export default function StockDetailPage() {
   const [editTarget, setEditTarget] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -129,6 +129,7 @@ export default function StockDetailPage() {
             </p>
           </div>
         </div>
+        <NewsFeed />
       </div>
     </div>
   );

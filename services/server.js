@@ -80,6 +80,7 @@ const authRoutes = require('./routes/auth');
 const chatRouter = require('./routes/chatRoutes'); 
 const stockPortfolioRouter = require('./routes/stockPortfolioRouter');
 const portfolioRouter = require('./routes/portfolioRouter');
+const newsRoutes = require('./routes/newsRoutes.Js');
 
 //const performanceRoutes = require('./routes/performanceRoutes');
 
@@ -97,6 +98,7 @@ app.use("/api/investments", investmentRoutes);
 app.use("/api/chat", chatRouter);
 app.use('/api', stockPortfolioRouter);
 app.use('/api', portfolioRouter);
+app.use('/api/news', newsRoutes);
 
 //app.use('/api/performance', performanceRoutes);
 
