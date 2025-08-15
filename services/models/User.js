@@ -1,3 +1,4 @@
+//models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -23,7 +24,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required'],
-    unique: true,
+    unique: true, // This automatically creates an index
     lowercase: true,
     trim: true,
     match: [
@@ -60,8 +61,8 @@ const userSchema = new mongoose.Schema({
   timestamps: true // Adds createdAt and updatedAt automatically
 });
 
-// Index for better query performance
-userSchema.index({ email: 1 });
+// REMOVED: userSchema.index({ email: 1 }); 
+// The unique: true already creates this index, so this line was causing the duplicate
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

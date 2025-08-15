@@ -1,4 +1,3 @@
-
 "use client"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "./context/AuthContext"
@@ -11,14 +10,16 @@ import Navigation from "./components/layout/Navbar"
 import Markets from "./pages/Market"
 import Portfolio from "./pages/Portfolio"
 import Wallet from "./pages/Wallet"
-import Profile from "./pages/Setting" 
+import Setting from "./pages/Setting"
 import Footer from "./components/layout/Footer"
 
 // Loading component
 const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-    <p className="mt-4 text-gray-600">Loading...</p>
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
+      <p className="text-white text-lg">Loading TradeWise...</p>
+    </div>
   </div>
 )
 
@@ -27,8 +28,15 @@ const ProtectedRoute = ({ children }) => {
   const authContext = useAuth()
 
   if (!authContext) {
-    console.error("AuthContext is null/undefined")
-    return <div className="p-4 bg-red-100">Error: AuthContext not available</div>
+    console.error("❌ PROTECTEDROUTE: AuthContext is null/undefined")
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
+          <p className="text-red-500">AuthContext not available</p>
+        </div>
+      </div>
+    )
   }
 
   const { isLoggedIn, loading } = authContext
@@ -37,11 +45,13 @@ const ProtectedRoute = ({ children }) => {
   console.log("  - Loading:", loading)
   console.log("  - IsLoggedIn:", isLoggedIn)
 
+  // Show loading spinner while checking authentication
   if (loading) {
     console.log("🔒 PROTECTEDROUTE: Still loading, showing spinner")
     return <LoadingSpinner />
   }
 
+  // If not logged in, redirect to landing page
   if (!isLoggedIn) {
     console.log("🔒 PROTECTEDROUTE: Not logged in, redirecting to /")
     return <Navigate to="/" replace />
@@ -51,13 +61,20 @@ const ProtectedRoute = ({ children }) => {
   return children
 }
 
-// Public Route Component (redirect to markets if already logged in)
+// Public Route Component
 const PublicRoute = ({ children }) => {
   const authContext = useAuth()
 
   if (!authContext) {
-    console.error("AuthContext is null/undefined")
-    return <div className="p-4 bg-red-100">Error: AuthContext not available</div>
+    console.error("❌ PUBLICROUTE: AuthContext is null/undefined")
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
+          <p className="text-red-500">AuthContext not available</p>
+        </div>
+      </div>
+    )
   }
 
   const { isLoggedIn, loading } = authContext
@@ -65,13 +82,14 @@ const PublicRoute = ({ children }) => {
   console.log("🌐 PUBLICROUTE: Checking authentication")
   console.log("  - Loading:", loading)
   console.log("  - IsLoggedIn:", isLoggedIn)
-  console.log("  - Should redirect:", isLoggedIn && !loading)
 
+  // Show loading spinner while checking authentication
   if (loading) {
     console.log("🌐 PUBLICROUTE: Still loading, showing spinner")
     return <LoadingSpinner />
   }
 
+  // If logged in, redirect to markets page
   if (isLoggedIn) {
     console.log("🌐 PUBLICROUTE: User is logged in, redirecting to /markets")
     return <Navigate to="/markets" replace />
@@ -85,7 +103,7 @@ const PublicRoute = ({ children }) => {
 const AuthenticatedLayout = ({ children }) => (
   <>
     <Navigation />
-    <main>{children}</main>
+    <main className="min-h-screen">{children}</main>
     <Footer />
   </>
 )
@@ -94,7 +112,7 @@ const AuthenticatedLayout = ({ children }) => (
 const AppContent = () => {
   return (
     <Routes>
-      {/* Public Route - Landing Page (Full Screen) */}
+      {/* Public Route - Landing Page */}
       <Route
         path="/"
         element={
@@ -104,7 +122,7 @@ const AppContent = () => {
         }
       />
 
-      {/* Protected Routes - All other pages */}
+      {/* Protected Routes - All dashboard pages */}
       <Route
         path="/markets"
         element={
@@ -146,7 +164,7 @@ const AppContent = () => {
         element={
           <ProtectedRoute>
             <AuthenticatedLayout>
-              <Profile />
+              <Setting />
             </AuthenticatedLayout>
           </ProtectedRoute>
         }
@@ -188,7 +206,7 @@ function App() {
         <AppContent />
       </Router>
     </AuthProvider>
-  );
+  )
 }
 
 export default App

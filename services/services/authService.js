@@ -1,3 +1,4 @@
+//services/services/authService.js
 const jwt = require("jsonwebtoken")
 const User = require("../models/User")
 const mongoose = require("mongoose")
