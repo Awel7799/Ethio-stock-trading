@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "../../context/AuthContext" // Import external AuthContext
 
 // Keep all your existing SVG Icons (TrendingUp, PieChart, etc.)
@@ -59,45 +59,91 @@ const EyeOff = ({ className }) => (
   </svg>
 )
 
-// Keep all your existing components (AnimatedBackground, LoadingSpinner, SuccessMessage)
 const AnimatedBackground = () => {
-  const [shapes, setShapes] = useState([])
+  const [particles, setParticles] = useState([])
 
-  useState(() => {
-    const generateShapes = () => {
-      const newShapes = []
-      for (let i = 0; i < 15; i++) {
-        newShapes.push({
+  useEffect(() => {
+    const generateParticles = () => {
+      const newParticles = []
+      // Golden floating particles
+      for (let i = 0; i < 20; i++) {
+        newParticles.push({
           id: i,
           x: Math.random() * 100,
           y: Math.random() * 100,
-          size: Math.random() * 40 + 15,
-          color: ["bg-purple-500", "bg-blue-500", "bg-pink-500", "bg-cyan-500"][Math.floor(Math.random() * 4)],
-          opacity: Math.random() * 0.2 + 0.05,
-          duration: Math.random() * 15 + 8,
+          size: Math.random() * 8 + 3,
+          color: ["bg-yellow-400", "bg-amber-400", "bg-orange-400", "bg-yellow-300"][Math.floor(Math.random() * 4)],
+          opacity: Math.random() * 0.4 + 0.1,
+          duration: Math.random() * 20 + 10,
+          delay: Math.random() * 5,
         })
       }
-      setShapes(newShapes)
+      // Larger glowing orbs
+      for (let i = 20; i < 30; i++) {
+        newParticles.push({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 20 + 15,
+          color: "bg-gradient-to-r from-yellow-400 to-amber-500",
+          opacity: Math.random() * 0.2 + 0.05,
+          duration: Math.random() * 25 + 15,
+          delay: Math.random() * 8,
+        })
+      }
+      setParticles(newParticles)
     }
-    generateShapes()
+    generateParticles()
   }, [])
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {shapes.map((shape) => (
+      {/* Golden coins background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage:
+            'url("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/many_coins_on_each_other_and_same_of_them_are_getting_down_and_background_is_black_but_the_focus_on_nb4804sofwvq5rup2oed_3-jbDsna7mVV7BsTyiDBwO4bLyM7C9V0.png")',
+          filter: "brightness(0.6) contrast(1.4)",
+        }}
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-amber-900/20 to-black/60" />
+
+      {/* Animated golden particles */}
+      {particles.map((particle) => (
         <div
-          key={shape.id}
-          className={`absolute rounded-full ${shape.color} animate-pulse`}
+          key={particle.id}
+          className={`absolute rounded-full ${particle.color} animate-pulse shadow-lg`}
           style={{
-            left: `${shape.x}%`,
-            top: `${shape.y}%`,
-            width: `${shape.size}px`,
-            height: `${shape.size}px`,
-            opacity: shape.opacity,
-            animationDuration: `${shape.duration}s`,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            opacity: particle.opacity,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`,
+            boxShadow: "0 0 20px rgba(251, 191, 36, 0.3)",
+            transform: "translateY(0px)",
+            animation: `float ${particle.duration}s ease-in-out infinite ${particle.delay}s, glow ${particle.duration * 0.7}s ease-in-out infinite ${particle.delay}s`,
           }}
         />
       ))}
+
+      {/* CSS animations for floating and glowing effects */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          25% { transform: translateY(-20px) rotate(90deg); }
+          50% { transform: translateY(-10px) rotate(180deg); }
+          75% { transform: translateY(-30px) rotate(270deg); }
+        }
+        
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 60px rgba(251, 191, 36, 0.3); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -120,8 +166,36 @@ const SuccessMessage = ({ message, onClose }) => (
 )
 
 const ErrorMessage = ({ error, onRetry }) => {
+  const errorDetails = {
+    title: "",
+    message: "",
+    suggestions: [],
+    showRetry: false,
+    isAlert: false,
+  }
+
   const getErrorDetails = (errorMessage) => {
     if (!errorMessage) return null
+
+    // User doesn't exist
+    if (
+      errorMessage.includes("User not found") ||
+      errorMessage.includes("No user found") ||
+      errorMessage.includes("Account does not exist") ||
+      errorMessage.includes("404")
+    ) {
+      return {
+        title: "👤 Account Not Found",
+        message: "We couldn't find an account with this email address.",
+        suggestions: [
+          "Double-check your email address for typos",
+          "Try creating a new account instead",
+          "Make sure you're using the right email",
+        ],
+        showRetry: false,
+        isAlert: true, // Mark critical errors for alert display
+      }
+    }
 
     // Connection errors
     if (
@@ -138,12 +212,15 @@ const ErrorMessage = ({ error, onRetry }) => {
           "Try again in a few moments",
         ],
         showRetry: true,
+        isAlert: true, // Mark critical errors for alert display
       }
     }
 
     // Authentication errors
     if (
       errorMessage.includes("Invalid credentials") ||
+      errorMessage.includes("Wrong password") ||
+      errorMessage.includes("Incorrect password") ||
       errorMessage.includes("Unauthorized") ||
       errorMessage.includes("401")
     ) {
@@ -156,6 +233,7 @@ const ErrorMessage = ({ error, onRetry }) => {
           "Try using 'Forgot Password' if needed",
         ],
         showRetry: false,
+        isAlert: true, // Mark critical errors for alert display
       }
     }
 
@@ -170,6 +248,37 @@ const ErrorMessage = ({ error, onRetry }) => {
           "Use 'Forgot Password' if you can't remember your password",
         ],
         showRetry: false,
+        isAlert: true, // Mark critical errors for alert display
+      }
+    }
+
+    // Email format errors
+    if (errorMessage.includes("Invalid email") || errorMessage.includes("Email format")) {
+      return {
+        title: "📧 Invalid Email",
+        message: "The email address format is not valid.",
+        suggestions: [
+          "Make sure your email includes @ and a domain",
+          "Check for typos in your email address",
+          "Try a different email format",
+        ],
+        showRetry: false,
+        isAlert: false, // Mark non-critical errors for alert display
+      }
+    }
+
+    // Password too weak
+    if (errorMessage.includes("Password too weak") || errorMessage.includes("Password requirements")) {
+      return {
+        title: "🔒 Password Too Weak",
+        message: "Your password doesn't meet our security requirements.",
+        suggestions: [
+          "Use at least 8 characters",
+          "Include uppercase and lowercase letters",
+          "Add numbers and special characters",
+        ],
+        showRetry: false,
+        isAlert: false, // Mark non-critical errors for alert display
       }
     }
 
@@ -184,6 +293,7 @@ const ErrorMessage = ({ error, onRetry }) => {
           "Check our status page for updates",
         ],
         showRetry: true,
+        isAlert: true, // Mark all errors for alert display
       }
     }
 
@@ -198,6 +308,22 @@ const ErrorMessage = ({ error, onRetry }) => {
           "The server might be busy",
         ],
         showRetry: true,
+        isAlert: true, // Mark all errors for alert display
+      }
+    }
+
+    // Rate limiting
+    if (errorMessage.includes("Too many requests") || errorMessage.includes("Rate limit")) {
+      return {
+        title: "🚦 Too Many Attempts",
+        message: "You've made too many requests. Please wait a moment.",
+        suggestions: [
+          "Wait a few minutes before trying again",
+          "Avoid rapid repeated attempts",
+          "Contact support if this persists",
+        ],
+        showRetry: true,
+        isAlert: true, // Mark all errors for alert display
       }
     }
 
@@ -207,31 +333,52 @@ const ErrorMessage = ({ error, onRetry }) => {
       message: errorMessage,
       suggestions: ["Please try again", "If the problem persists, contact support", "Check your internet connection"],
       showRetry: true,
+      isAlert: true, // Mark all errors for alert display
     }
   }
 
-  const errorDetails = getErrorDetails(error)
-  if (!errorDetails) return null
+  useEffect(() => {
+    const details = getErrorDetails(error)
+    if (details && details.isAlert) {
+      const alertMessage = `${details.title}\n\n${details.message}\n\nWhat you can do:\n${details.suggestions.map((s) => `• ${s}`).join("\n")}`
+      alert(alertMessage)
+    }
+  }, [error])
 
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+    <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-6 shadow-lg">
+      {" "}
+      {/* Made more prominent with thicker border and larger padding */}
       <div className="flex items-start">
+        <div className="flex-shrink-0 mr-4">
+          {" "}
+          {/* Added error icon */}
+          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-lg">!</span>
+          </div>
+        </div>
         <div className="flex-1">
-          <h4 className="text-red-800 font-semibold text-sm mb-2">{errorDetails.title}</h4>
-          <p className="text-red-700 text-sm mb-3">{errorDetails.message}</p>
-          <div className="space-y-1">
-            <p className="text-red-600 text-xs font-medium">What you can do:</p>
-            <ul className="text-red-600 text-xs space-y-1">
+          <h4 className="text-red-800 font-bold text-lg mb-3">{errorDetails.title}</h4>{" "}
+          {/* Made title larger and bolder */}
+          <p className="text-red-700 text-base mb-4 font-medium">{errorDetails.message}</p> {/* Made message larger */}
+          <div className="space-y-2">
+            <p className="text-red-600 text-sm font-bold">What you can do:</p> {/* Made suggestions header bold */}
+            <ul className="text-red-600 text-sm space-y-2">
+              {" "}
+              {/* Added more spacing between suggestions */}
               {errorDetails.suggestions.map((suggestion, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="mr-2">•</span>
-                  <span>{suggestion}</span>
+                  <span className="mr-3 text-red-500 font-bold">•</span> {/* Made bullet points more prominent */}
+                  <span className="font-medium">{suggestion}</span> {/* Made suggestion text medium weight */}
                 </li>
               ))}
             </ul>
           </div>
           {errorDetails.showRetry && onRetry && (
-            <button onClick={onRetry} className="mt-3 text-red-700 hover:text-red-900 text-xs font-medium underline">
+            <button
+              onClick={onRetry}
+              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-md" // Made retry button more prominent
+            >
               Try Again
             </button>
           )}
@@ -312,7 +459,16 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
         }, 2000)
       } else {
         console.log("❌ LANDING: Signup failed:", result.message)
-        setErrors({ submit: result.message || "Sign up failed. Please try again." })
+        const errorMessage = result.message || "Sign up failed. Please try again."
+        setErrors({ submit: errorMessage })
+
+        setTimeout(() => {
+          if (errorMessage.includes("already exists") || errorMessage.includes("duplicate")) {
+            alert(
+              "👤 Account Already Exists\n\nAn account with this email already exists.\n\n• Try logging in instead\n• Use a different email address\n• Use 'Forgot Password' if needed",
+            )
+          }
+        }, 100)
       }
     } catch (error) {
       console.error("❌ LANDING: Sign up error:", error)
@@ -323,6 +479,12 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
         errorMessage = "ERR_CONNECTION_REFUSED - Cannot connect to server"
       }
       setErrors({ submit: errorMessage })
+
+      setTimeout(() => {
+        alert(
+          "🔌 Connection Problem\n\nWe're having trouble connecting to our servers.\n\n• Check your internet connection\n• The server might be temporarily down\n• Try again in a few moments",
+        )
+      })
     } finally {
       setLoading(false)
     }
@@ -333,18 +495,18 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-40 backdrop-blur-sm">
-        <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 relative shadow-2xl">
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 max-w-md w-full mx-4 relative shadow-2xl border border-amber-200">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-light transition-colors"
+            className="absolute top-4 right-4 text-amber-600 hover:text-amber-800 text-2xl font-light transition-colors"
             disabled={loading}
           >
             ×
           </button>
 
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h2>
-            <p className="text-gray-600">Join TradeWise and start your trading journey</p>
+            <h2 className="text-3xl font-bold text-amber-900 mb-2">Create Account</h2>
+            <p className="text-amber-700">Join TradeWise and start your trading journey</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -355,8 +517,8 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
                   placeholder="First Name"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                    errors.firstName ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                    errors.firstName ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                   }`}
                   disabled={loading}
                 />
@@ -369,8 +531,8 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
                   placeholder="Last Name"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                    errors.lastName ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                    errors.lastName ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                   }`}
                   disabled={loading}
                 />
@@ -384,8 +546,8 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                  errors.email ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  errors.email ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                 }`}
                 disabled={loading}
               />
@@ -398,15 +560,15 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                  errors.password ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  errors.password ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                 }`}
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
                 disabled={loading}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -420,15 +582,17 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                  errors.confirmPassword ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  errors.confirmPassword
+                    ? "border-red-500 bg-red-50"
+                    : "border-amber-300 focus:border-transparent bg-white"
                 }`}
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
                 disabled={loading}
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -439,16 +603,16 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transform hover:scale-[1.02]"
+              className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-black py-3 rounded-lg hover:from-amber-400 hover:to-yellow-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transform hover:scale-[1.02] shadow-lg"
             >
               {loading ? <LoadingSpinner /> : "Create Account"}
             </button>
           </form>
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-amber-700 mt-6">
             Already have an account?{" "}
             <button
               onClick={onSwitchToLogin}
-              className="text-purple-600 hover:text-purple-800 font-semibold transition-colors"
+              className="text-amber-600 hover:text-amber-800 font-semibold transition-colors"
               disabled={loading}
             >
               Sign in
@@ -462,7 +626,7 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
 
 // Login Form Component - Use external AuthContext
 const LoginForm = ({ onClose, onSwitchToSignUp }) => {
-  const { login } = useAuth() // Use external AuthContext
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -525,7 +689,20 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
         }, 1500)
       } else {
         console.log("[v0] Login failed:", result.message)
-        setErrors({ submit: result.message || "Login failed. Please check your credentials." })
+        const errorMessage = result.message || "Login failed. Please check your credentials."
+        setErrors({ submit: errorMessage })
+
+        setTimeout(() => {
+          if (errorMessage.includes("User not found") || errorMessage.includes("No user found")) {
+            alert(
+              "❌ Account Not Found\n\nWe couldn't find an account with this email address.\n\n• Double-check your email for typos\n• Try creating a new account instead",
+            )
+          } else if (errorMessage.includes("Invalid credentials") || errorMessage.includes("Wrong password")) {
+            alert(
+              "❌ Login Failed\n\nThe email or password you entered is incorrect.\n\n• Double-check your email and password\n• Try using 'Forgot Password' if needed",
+            )
+          }
+        }, 100)
       }
     } catch (error) {
       console.error("[v0] Login error:", error)
@@ -536,6 +713,12 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
         errorMessage = "ERR_CONNECTION_REFUSED - Cannot connect to server"
       }
       setErrors({ submit: errorMessage })
+
+      setTimeout(() => {
+        alert(
+          "🔌 Connection Problem\n\nWe're having trouble connecting to our servers.\n\n• Check your internet connection\n• The server might be temporarily down\n• Try again in a few moments",
+        )
+      }, 100)
     } finally {
       setLoading(false)
     }
@@ -546,18 +729,18 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-40 backdrop-blur-sm">
-        <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 relative shadow-2xl">
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 max-w-md w-full mx-4 relative shadow-2xl border border-amber-200">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-light transition-colors"
+            className="absolute top-4 right-4 text-amber-600 hover:text-amber-800 text-2xl font-light transition-colors"
             disabled={loading}
           >
             ×
           </button>
 
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your TradeWise account</p>
+            <h2 className="text-3xl font-bold text-amber-900 mb-2">Welcome Back</h2>
+            <p className="text-amber-700">Sign in to your TradeWise account</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -567,8 +750,8 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                  errors.email ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  errors.email ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                 }`}
                 disabled={loading}
               />
@@ -581,15 +764,15 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                  errors.password ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-transparent"
+                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  errors.password ? "border-red-500 bg-red-50" : "border-amber-300 focus:border-transparent bg-white"
                 }`}
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
                 disabled={loading}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -603,14 +786,14 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleChange}
-                  className="mr-2 rounded"
+                  className="mr-2 rounded accent-amber-500"
                   disabled={loading}
                 />
-                <span className="text-gray-600 text-sm">Remember me</span>
+                <span className="text-amber-700 text-sm">Remember me</span>
               </label>
               <button
                 type="button"
-                className="text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors"
+                className="text-amber-600 hover:text-amber-800 text-sm font-medium transition-colors"
                 disabled={loading}
               >
                 Forgot Password?
@@ -620,16 +803,16 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transform hover:scale-[1.02]"
+              className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-black py-3 rounded-lg hover:from-amber-400 hover:to-yellow-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transform hover:scale-[1.02] shadow-lg"
             >
               {loading ? <LoadingSpinner /> : "Sign In"}
             </button>
           </form>
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-amber-700 mt-6">
             Don't have an account?{" "}
             <button
               onClick={onSwitchToSignUp}
-              className="text-purple-600 hover:text-purple-800 font-semibold transition-colors"
+              className="text-amber-600 hover:text-amber-800 font-semibold transition-colors"
               disabled={loading}
             >
               Create account
@@ -646,6 +829,14 @@ const TradeWiseLanding = () => {
   const { user, isLoggedIn } = useAuth() // Use external AuthContext
   const [showSignUp, setShowSignUp] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleSignUpClick = () => {
     setShowSignUp(true)
@@ -679,27 +870,32 @@ const TradeWiseLanding = () => {
     setShowSignUp(true)
   }
 
-  // Keep all your existing landing page JSX
+  // Keep all your existing landing page JSX but add animation classes
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       <AnimatedBackground />
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 bg-black bg-opacity-30 backdrop-blur-sm">
+
+      <header
+        className={`relative z-10 flex items-center justify-between px-6 py-4 bg-black bg-opacity-40 backdrop-blur-sm border-b border-amber-500/20 transform transition-all duration-1000 ${
+          isLoaded ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
+      >
+        {/* ... existing header content ... */}
         <div className="flex items-center space-x-2">
-          <TrendingUp className="text-white w-8 h-8" />
+          <TrendingUp className="text-amber-400 w-8 h-8" />
           <span className="text-white text-xl font-bold">TradeWise</span>
         </div>
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="#features" className="text-white hover:text-purple-300 transition-colors">
+          <a href="#features" className="text-white hover:text-amber-300 transition-colors">
             Features
           </a>
-          <a href="#about" className="text-white hover:text-purple-300 transition-colors">
+          <a href="#about" className="text-white hover:text-amber-300 transition-colors">
             About
           </a>
-          <a href="#pricing" className="text-white hover:text-purple-300 transition-colors">
+          <a href="#pricing" className="text-white hover:text-amber-300 transition-colors">
             Pricing
           </a>
-          <a href="#contact" className="text-white hover:text-purple-300 transition-colors">
+          <a href="#contact" className="text-white hover:text-amber-300 transition-colors">
             Contact
           </a>
         </nav>
@@ -707,19 +903,19 @@ const TradeWiseLanding = () => {
           {isLoggedIn ? (
             <>
               <span className="text-white">Welcome, {user?.firstName || "User"}!</span>
-              <span className="text-purple-300 text-sm">Redirecting to dashboard...</span>
+              <span className="text-amber-300 text-sm">Redirecting to dashboard...</span>
             </>
           ) : (
             <>
               <button
                 onClick={handleSignUpClick}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-amber-500 to-yellow-600 text-black px-6 py-2 rounded-full hover:from-amber-400 hover:to-yellow-500 transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg"
               >
                 Sign up
               </button>
               <button
                 onClick={handleLoginClick}
-                className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300"
+                className="border border-amber-400 text-amber-400 px-6 py-2 rounded-full hover:bg-amber-400 hover:text-black transition-all duration-300"
               >
                 Log in
               </button>
@@ -728,53 +924,93 @@ const TradeWiseLanding = () => {
         </div>
       </header>
 
-      {/* Keep all your existing main content JSX */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20">
         <div className="text-center max-w-4xl">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">Welcome to TradeWise</h1>
-          <p className="text-xl md:text-2xl text-purple-200 mb-8 font-light">Your Gateway to Smart Trading</p>
-          <p className="text-lg text-purple-100 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <h1
+            className={`text-5xl md:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-2xl transform transition-all duration-1200 ${
+              isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+            }`}
+            style={{ transitionDelay: "300ms" }}
+          >
+            Welcome to TradeWise
+          </h1>
+
+          <p
+            className={`text-xl md:text-2xl text-amber-200 mb-8 font-light drop-shadow-lg transform transition-all duration-1200 ${
+              isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+            }`}
+            style={{ transitionDelay: "500ms" }}
+          >
+            Your Gateway to Smart Trading
+          </p>
+
+          <p
+            className={`text-lg text-amber-100 mb-12 max-w-3xl mx-auto leading-relaxed drop-shadow-md transform transition-all duration-1000 ${
+              isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+            }`}
+            style={{ transitionDelay: "700ms" }}
+          >
             Experience the future of trading with our cutting-edge platform. Get real-time market insights, advanced
             analytics, and powerful tools designed to help you make informed trading decisions.
           </p>
 
-          {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105">
-              <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="text-white w-8 h-8" />
+            <div
+              className={`bg-black bg-opacity-30 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-40 transition-all duration-300 transform hover:scale-105 border border-amber-500/20 shadow-xl ${
+                isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+              }`}
+              style={{ transitionDelay: "900ms", transition: "all 1000ms ease-out" }}
+            >
+              <div className="bg-gradient-to-r from-amber-500 to-yellow-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <TrendingUp className="text-black w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Real-Time Analytics</h3>
-              <p className="text-purple-200 text-sm">Advanced market analysis and live trading signals</p>
+              <p className="text-amber-200 text-sm">Advanced market analysis and live trading signals</p>
             </div>
-            <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105">
-              <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <PieChart className="text-white w-8 h-8" />
+
+            <div
+              className={`bg-black bg-opacity-30 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-40 transition-all duration-300 transform hover:scale-105 border border-amber-500/20 shadow-xl ${
+                isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+              }`}
+              style={{ transitionDelay: "1100ms", transition: "all 1000ms ease-out" }}
+            >
+              <div className="bg-gradient-to-r from-yellow-500 to-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <PieChart className="text-black w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Portfolio Management</h3>
-              <p className="text-purple-200 text-sm">Track and optimize your investments with ease</p>
+              <p className="text-amber-200 text-sm">Track and optimize your investments with ease</p>
             </div>
-            <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105">
-              <div className="bg-cyan-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="text-white w-8 h-8" />
+
+            <div
+              className={`bg-black bg-opacity-30 backdrop-blur-lg rounded-xl p-6 text-center hover:bg-opacity-40 transition-all duration-300 transform hover:scale-105 border border-amber-500/20 shadow-xl ${
+                isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+              }`}
+              style={{ transitionDelay: "1300ms", transition: "all 1000ms ease-out" }}
+            >
+              <div className="bg-gradient-to-r from-amber-400 to-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Users className="text-black w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Expert Insights</h3>
-              <p className="text-purple-200 text-sm">Learn from professional traders and market experts</p>
+              <p className="text-amber-200 text-sm">Learn from professional traders and market experts</p>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+          <div
+            className={`flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 transform transition-all duration-800 ${
+              isLoaded ? "scale-100 opacity-100" : "scale-75 opacity-0"
+            }`}
+            style={{ transitionDelay: "1500ms" }}
+          >
             <button
               onClick={handleStartTradingClick}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-amber-500 to-yellow-600 text-black px-8 py-4 rounded-full text-lg font-bold hover:from-amber-400 hover:to-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-2xl"
             >
               {isLoggedIn ? "Go to Dashboard" : "Start Trading Today"}
             </button>
             {!isLoggedIn && (
               <button
                 onClick={handleLoginClick}
-                className="bg-black bg-opacity-20 backdrop-blur-lg px-8 py-4 rounded-full text-lg font-semibold text-white hover:bg-opacity-30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="bg-black bg-opacity-40 backdrop-blur-lg px-8 py-4 rounded-full text-lg font-semibold text-amber-400 hover:bg-opacity-60 hover:text-amber-300 transition-all duration-300 transform hover:scale-105 shadow-xl border border-amber-500/30"
               >
                 Welcome Back
               </button>
@@ -783,19 +1019,23 @@ const TradeWiseLanding = () => {
         </div>
       </main>
 
-      {/* Trust Indicators */}
-      <div className="relative z-10 flex items-center justify-center space-x-8 pb-8">
+      <div
+        className={`relative z-10 flex items-center justify-center space-x-8 pb-8 transform transition-all duration-800 ${
+          isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+        }`}
+        style={{ transitionDelay: "1700ms" }}
+      >
         <div className="flex items-center space-x-2 text-emerald-400">
           <CheckCircle className="w-4 h-4" />
-          <span className="text-sm">Trusted by 100K+ traders</span>
+          <span className="text-sm drop-shadow-md">Trusted by 100K+ traders</span>
         </div>
-        <div className="flex items-center space-x-2 text-blue-400">
+        <div className="flex items-center space-x-2 text-amber-400">
           <Shield className="w-4 h-4" />
-          <span className="text-sm">Bank-grade security</span>
+          <span className="text-sm drop-shadow-md">Bank-grade security</span>
         </div>
-        <div className="flex items-center space-x-2 text-purple-400">
+        <div className="flex items-center space-x-2 text-yellow-400">
           <Clock className="w-4 h-4" />
-          <span className="text-sm">24/7 support</span>
+          <span className="text-sm drop-shadow-md">24/7 support</span>
         </div>
       </div>
 
