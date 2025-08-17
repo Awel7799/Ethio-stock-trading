@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../Controllers/authControler');
-const authMiddleware = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware'); // ✅ fixed path
 
 console.log('📁 Auth routes loaded');
 
