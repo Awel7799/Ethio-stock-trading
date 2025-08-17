@@ -119,6 +119,128 @@ const SuccessMessage = ({ message, onClose }) => (
   </div>
 )
 
+const ErrorMessage = ({ error, onRetry }) => {
+  const getErrorDetails = (errorMessage) => {
+    if (!errorMessage) return null
+
+    // Connection errors
+    if (
+      errorMessage.includes("ERR_CONNECTION_REFUSED") ||
+      errorMessage.includes("Cannot connect to server") ||
+      errorMessage.includes("Failed to fetch")
+    ) {
+      return {
+        title: "🔌 Connection Problem",
+        message: "We're having trouble connecting to our servers.",
+        suggestions: [
+          "Check your internet connection",
+          "The server might be temporarily down",
+          "Try again in a few moments",
+        ],
+        showRetry: true,
+      }
+    }
+
+    // Authentication errors
+    if (
+      errorMessage.includes("Invalid credentials") ||
+      errorMessage.includes("Unauthorized") ||
+      errorMessage.includes("401")
+    ) {
+      return {
+        title: "🔐 Login Failed",
+        message: "The email or password you entered is incorrect.",
+        suggestions: [
+          "Double-check your email address",
+          "Make sure your password is correct",
+          "Try using 'Forgot Password' if needed",
+        ],
+        showRetry: false,
+      }
+    }
+
+    // User already exists
+    if (errorMessage.includes("already exists") || errorMessage.includes("duplicate") || errorMessage.includes("409")) {
+      return {
+        title: "👤 Account Already Exists",
+        message: "An account with this email already exists.",
+        suggestions: [
+          "Try logging in instead of signing up",
+          "Use a different email address",
+          "Use 'Forgot Password' if you can't remember your password",
+        ],
+        showRetry: false,
+      }
+    }
+
+    // Server errors
+    if (errorMessage.includes("500") || errorMessage.includes("Internal Server Error")) {
+      return {
+        title: "⚠️ Server Issue",
+        message: "Our servers are experiencing some problems.",
+        suggestions: [
+          "This is temporary - please try again",
+          "Our team has been notified",
+          "Check our status page for updates",
+        ],
+        showRetry: true,
+      }
+    }
+
+    // Network timeout
+    if (errorMessage.includes("timeout") || errorMessage.includes("ETIMEDOUT")) {
+      return {
+        title: "⏱️ Request Timeout",
+        message: "The request took too long to complete.",
+        suggestions: [
+          "Check your internet connection",
+          "Try again with a stable connection",
+          "The server might be busy",
+        ],
+        showRetry: true,
+      }
+    }
+
+    // Default error
+    return {
+      title: "❌ Something Went Wrong",
+      message: errorMessage,
+      suggestions: ["Please try again", "If the problem persists, contact support", "Check your internet connection"],
+      showRetry: true,
+    }
+  }
+
+  const errorDetails = getErrorDetails(error)
+  if (!errorDetails) return null
+
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+      <div className="flex items-start">
+        <div className="flex-1">
+          <h4 className="text-red-800 font-semibold text-sm mb-2">{errorDetails.title}</h4>
+          <p className="text-red-700 text-sm mb-3">{errorDetails.message}</p>
+          <div className="space-y-1">
+            <p className="text-red-600 text-xs font-medium">What you can do:</p>
+            <ul className="text-red-600 text-xs space-y-1">
+              {errorDetails.suggestions.map((suggestion, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>{suggestion}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {errorDetails.showRetry && onRetry && (
+            <button onClick={onRetry} className="mt-3 text-red-700 hover:text-red-900 text-xs font-medium underline">
+              Try Again
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Sign Up Form Component - Use external AuthContext
 const SignUpForm = ({ onClose, onSwitchToLogin }) => {
   const { signUp } = useAuth() // Use external AuthContext
@@ -164,12 +286,19 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
     return Object.keys(newErrors).length === 0
   }
 
+  const handleRetry = () => {
+    setErrors({})
+    // Clear any connection-related errors and allow user to try again
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
     console.log("📧 LANDING: Starting signup process")
     setLoading(true)
+    setErrors({}) // Clear previous errors
+
     try {
       const result = await signUp(formData)
       console.log("📧 LANDING: Signup result:", result)
@@ -187,13 +316,19 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
       }
     } catch (error) {
       console.error("❌ LANDING: Sign up error:", error)
-      setErrors({ submit: "An error occurred during sign up. Please try again." })
+      let errorMessage = "An error occurred during sign up. Please try again."
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.name === "TypeError" && error.message.includes("fetch")) {
+        errorMessage = "ERR_CONNECTION_REFUSED - Cannot connect to server"
+      }
+      setErrors({ submit: errorMessage })
     } finally {
       setLoading(false)
     }
   }
 
-  // Keep your existing signup form JSX
+  // Keep your existing signup form JSX but replace the error display
   return (
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
@@ -300,9 +435,7 @@ const SignUpForm = ({ onClose, onSwitchToLogin }) => {
               </button>
               {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
-            {errors.submit && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{errors.submit}</div>
-            )}
+            {errors.submit && <ErrorMessage error={errors.submit} onRetry={handleRetry} />}
             <button
               type="submit"
               disabled={loading}
@@ -363,39 +496,52 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     return Object.keys(newErrors).length === 0
   }
 
+  const handleRetry = () => {
+    setErrors({})
+    // Clear any connection-related errors and allow user to try again
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
-    console.log("🔐 LANDING: Starting login process")
+    console.log("[v0] Starting login process")
     setLoading(true)
+    setErrors({}) // Clear previous errors
+
     try {
       const result = await login({
         email: formData.email,
         password: formData.password,
       })
-      console.log("🔐 LANDING: Login result:", result)
+      console.log("[v0] Login result:", result)
 
       if (result.success) {
-        console.log("✅ LANDING: Login successful - should redirect automatically")
+        console.log("[v0] Login successful - should redirect automatically")
         setSuccessMessage("Welcome back! Redirecting to dashboard...")
         setTimeout(() => {
           setSuccessMessage("")
           onClose()
         }, 1500)
       } else {
-        console.log("❌ LANDING: Login failed:", result.message)
+        console.log("[v0] Login failed:", result.message)
         setErrors({ submit: result.message || "Login failed. Please check your credentials." })
       }
     } catch (error) {
-      console.error("❌ LANDING: Login error:", error)
-      setErrors({ submit: "An error occurred during login. Please try again." })
+      console.error("[v0] Login error:", error)
+      let errorMessage = "An error occurred during login. Please try again."
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.name === "TypeError" && error.message.includes("fetch")) {
+        errorMessage = "ERR_CONNECTION_REFUSED - Cannot connect to server"
+      }
+      setErrors({ submit: errorMessage })
     } finally {
       setLoading(false)
     }
   }
 
-  // Keep your existing login form JSX
+  // Keep your existing login form JSX but replace the error display
   return (
     <>
       {successMessage && <SuccessMessage message={successMessage} onClose={() => setSuccessMessage("")} />}
@@ -470,9 +616,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
                 Forgot Password?
               </button>
             </div>
-            {errors.submit && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{errors.submit}</div>
-            )}
+            {errors.submit && <ErrorMessage error={errors.submit} onRetry={handleRetry} />}
             <button
               type="submit"
               disabled={loading}
