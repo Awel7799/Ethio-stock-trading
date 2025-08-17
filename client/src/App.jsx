@@ -1,6 +1,7 @@
 "use client"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "./context/AuthContext"
+import { WalletProvider } from "./context/WalletContext"
 
 // Import your existing components
 import StockDetailPage from "./components/comman/stockDetailPage/stockDetailPage"
@@ -198,13 +199,16 @@ const AppContent = () => {
   )
 }
 
-// Main App Component
+// Main App Component - FIXED: Proper context hierarchy
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      {/* FIXED: WalletProvider should wrap the entire app after AuthProvider */}
+      <WalletProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </WalletProvider>
     </AuthProvider>
   )
 }
