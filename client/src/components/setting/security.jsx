@@ -1,19 +1,37 @@
-import { useState } from "react";
+"use client"
+
+import { useState } from "react"
+import { useAuth } from "../../context/AuthContext"
 
 function Security() {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("")
+  const [confirm, setConfirm] = useState("")
+  const [error, setError] = useState("")
+
+  const { logout } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (password !== confirm) {
-      setError("Passwords do not match");
-      return;
+      setError("Passwords do not match")
+      return
     }
-    setError("");
-    alert("Security settings updated");
-  };
+    setError("")
+    alert("Security settings updated")
+  }
+
+  const handleLogout = async () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      setIsLoggingOut(true)
+      try {
+        await logout()
+      } catch (error) {
+        console.error("Logout failed:", error)
+        setIsLoggingOut(false)
+      }
+    }
+  }
 
   return (
     <div className="max-w-xl mx-auto bg-white p-6 shadow-md rounded">
@@ -52,11 +70,21 @@ function Security() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button type="submit" className="bg-black text-white px-4 py-2 rounded shadow">
           Save
-        </button> <br />
-        <button className="border">logout</button>
+        </button>{" "}
+        <br />
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white p-2 rounded-[5px]"
+        >
+          {isLoggingOut ? "Logging out..." : "Logout"}
+        </button>
       </form>
     </div>
-  );
+  )
 }
 
-export default Security;
+export default Security
+
+

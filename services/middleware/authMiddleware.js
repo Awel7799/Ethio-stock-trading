@@ -1,9 +1,9 @@
-// middleware/auth.js
+// middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Authenticate access token
-const authenticate = async (req, res, next) => {
+// Main authentication middleware (default export for wallet routes)
+const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     
@@ -133,7 +133,7 @@ const authenticateRefreshToken = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  authenticate,
-  authenticateRefreshToken
-};
+// Export the main middleware as default, and named exports for others
+module.exports = authMiddleware;
+module.exports.authenticate = authMiddleware; // Alias for compatibility
+module.exports.authenticateRefreshToken = authenticateRefreshToken;

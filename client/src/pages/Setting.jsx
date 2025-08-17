@@ -2,7 +2,7 @@ import Button from "../components/comman/Button";
 import Sidebar from "../components/setting/Sidebar";
 import PersonalInfo from "../components/setting/PersonalInfo";
 import Profile from "../components/setting/Profile";
-import Security from "../components/setting/Security";
+import Security from "../components/setting/security";
 import VerifyKYC from "../components/setting/VerifyKYC";
 import { useState } from "react";
 
