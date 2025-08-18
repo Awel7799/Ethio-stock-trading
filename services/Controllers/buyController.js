@@ -1,15 +1,11 @@
-// buyController.js
-const mongoose = require('mongoose');
-const { Double, ObjectId } = require('mongodb'); // import ObjectId from mongodb driver
-const Holding = require('../models/Holding');
-const StockTransaction = require('../models/StockTransaction'); // You need this model for transactions
-
-const BASE_WALLET_BALANCE = 10000; // Simulated wallet balance fallback
-
-const FALLBACK_USER_ID = new ObjectId(); // fallback user id if invalid
+const mongoose = require("mongoose");
+const { Double, ObjectId } = require("mongodb");
+const Holding = require("../models/Holding");
+const StockTransaction = require("../models/StockTransaction");
+const Wallet = require("../models/Wallet"); // Import your wallet model
 
 function toNumber(value) {
-  if (value && typeof value.toNumber === 'function') {
+  if (value && typeof value.toNumber === "function") {
     return value.toNumber();
   }
   return Number(value);
@@ -17,62 +13,51 @@ function toNumber(value) {
 
 function toObjectId(id) {
   try {
-    if (id) return new ObjectId(id); // use `new` here!
-  } catch (e) {
-    // fallback silently
-  }
-  return FALLBACK_USER_ID;
-}
-
-async function getBalance(userId) {
-  const holdings = await Holding.find({ userId });
-  const invested = holdings.reduce((sum, h) => {
-    const price = toNumber(h.purchasePrice);
-    return sum + price * h.quantity;
-  }, 0);
-  return BASE_WALLET_BALANCE - invested;
+    if (id) return new ObjectId(id);
+  } catch (e) {}
+  return new ObjectId(); // fallback
 }
 
 exports.buyStock = async (req, res) => {
   try {
     // 1. Extract inputs
     const userId = toObjectId(req.body.userId);
-    const rawSymbol = req.body.stockSymbol || '';
-    const stockSymbol = rawSymbol.trim().toUpperCase();
-
-    const rawQuantity = req.body.quantity;
-    const quantity = Number(rawQuantity);
-
-    const rawPrice = req.body.purchasePrice;
-    const purchasePriceNum = Number(rawPrice);
-
-    const purchaseDate = req.body.purchaseDate ? new Date(req.body.purchaseDate) : new Date();
+    const stockSymbol = (req.body.stockSymbol || "").trim().toUpperCase();
+    const quantity = Number(req.body.quantity);
+    const purchasePriceNum = Number(req.body.purchasePrice);
+    const purchaseDate = req.body.purchaseDate
+      ? new Date(req.body.purchaseDate)
+      : new Date();
 
     // 2. Validate inputs
     if (!stockSymbol) {
-      return res.status(400).json({ error: 'stockSymbol is required' });
+      return res.status(400).json({ error: "stockSymbol is required" });
     }
     if (!Number.isFinite(quantity) || quantity < 1) {
-      return res.status(400).json({ error: 'quantity must be a number >= 1' });
+      return res.status(400).json({ error: "quantity must be >= 1" });
     }
     if (!Number.isFinite(purchasePriceNum) || purchasePriceNum <= 0) {
-      return res.status(400).json({ error: 'purchasePrice must be a positive number' });
+      return res
+        .status(400)
+        .json({ error: "purchasePrice must be a positive number" });
     }
 
     const purchasePriceDouble = new Double(purchasePriceNum);
     const totalCost = toNumber(purchasePriceDouble) * quantity;
 
-    // 3. Check balance
-    const availableBalance = await getBalance(userId);
-    if (totalCost > availableBalance) {
-      return res.status(400).json({
-        error: 'Insufficient balance to execute buy',
-        required: totalCost,
-        availableBalance,
-      });
+    // 3. Find wallet & withdraw
+    const wallet = await Wallet.findByUserId(userId);
+    if (!wallet) {
+      return res.status(400).json({ error: "Wallet not found for user" });
     }
 
-    // 4. Upsert holding (merge if exists)
+    try {
+      await wallet.withdraw(totalCost); // ✅ use built-in method
+    } catch (withdrawErr) {
+      return res.status(400).json({ error: withdrawErr.message });
+    }
+
+    // 4. Upsert holding
     let holding = await Holding.findOne({ userId, stockSymbol });
 
     if (holding) {
@@ -86,7 +71,7 @@ exports.buyStock = async (req, res) => {
 
       holding.purchasePrice = new Double(newAvgPrice);
       holding.quantity = newQuantity;
-      holding.purchaseDate = purchaseDate; // update purchase date
+      holding.purchaseDate = purchaseDate;
 
       await holding.save();
     } else {
@@ -104,7 +89,7 @@ exports.buyStock = async (req, res) => {
     const transaction = new StockTransaction({
       userId,
       stockSymbol,
-      type: 'buy',
+      type: "buy",
       quantity,
       price: purchasePriceDouble,
       transactionDate: purchaseDate,
@@ -113,29 +98,30 @@ exports.buyStock = async (req, res) => {
 
     // 6. Return response
     return res.json({
-      message: 'Buy executed successfully',
+      message: "Buy executed successfully",
       holding,
-      availableBalance: availableBalance - totalCost,
+      availableBalance: wallet.balance, // already updated in withdraw()
       transaction,
+      walletSummary: wallet.getWalletSummary(),
     });
   } catch (err) {
-    console.error('buyStock error:', err);
+    console.error("buyStock error:", err);
 
     if (err.errorResponse && err.errorResponse.code === 121) {
       const details = err.errInfo?.details;
       return res.status(400).json({
-        error: 'Document failed validation',
+        error: "Document failed validation",
         validation: details,
       });
     }
 
-    if (err.name === 'ValidationError') {
+    if (err.name === "ValidationError") {
       return res.status(400).json({
-        error: 'Mongoose validation error',
+        error: "Mongoose validation error",
         validation: err.errors,
       });
     }
 
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

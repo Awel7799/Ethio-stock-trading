@@ -1,6 +1,7 @@
 // Controllers/portfolioController.js
 const Holding = require('../models/Holding');
 const StockTransaction = require('../models/StockTransaction');
+const User = require('../models/User'); // import User model
 const { ObjectId } = require('mongodb');
 
 function toNumber(value) {
@@ -17,8 +18,16 @@ exports.getPortfolio = async (req, res) => {
       return res.status(400).json({ error: 'Invalid userId' });
     }
 
+    // fetch holdings and transactions
     const holdings = await Holding.find({ userId: new ObjectId(userId) });
     const transactions = await StockTransaction.find({ userId: new ObjectId(userId) }).sort({ transactionDate: -1 });
+
+    // fetch wallet balance from real User DB
+    const user = await User.findById(userId).select('walletBalance');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const walletBalance = toNumber(user.walletBalance);
 
     let totalInvested = 0;
     let currentPortfolioValue = 0;
@@ -47,11 +56,8 @@ exports.getPortfolio = async (req, res) => {
 
     const profitLoss = currentPortfolioValue - totalInvested;
 
-    // Simulate wallet balance for example
-    const walletBalance = 10000; // You can fetch real wallet balance from user account if available
-
     res.json({
-      walletBalance,
+      walletBalance, // now real balance from DB
       totalInvested,
       currentPortfolioValue,
       profitLoss,
