@@ -94,6 +94,30 @@ const AnimatedBackground = () => {
       setParticles(newParticles)
     }
     generateParticles()
+
+    // Add CSS animations to document head
+    const styleElement = document.createElement('style')
+    styleElement.textContent = `
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-20px) rotate(90deg); }
+        50% { transform: translateY(-10px) rotate(180deg); }
+        75% { transform: translateY(-30px) rotate(270deg); }
+      }
+      
+      @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 60px rgba(251, 191, 36, 0.3); }
+      }
+    `
+    document.head.appendChild(styleElement)
+
+    // Cleanup function
+    return () => {
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement)
+      }
+    }
   }, [])
 
   return (
@@ -129,21 +153,6 @@ const AnimatedBackground = () => {
           }}
         />
       ))}
-
-      {/* CSS animations for floating and glowing effects */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          25% { transform: translateY(-20px) rotate(90deg); }
-          50% { transform: translateY(-10px) rotate(180deg); }
-          75% { transform: translateY(-30px) rotate(270deg); }
-        }
-        
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 60px rgba(251, 191, 36, 0.3); }
-        }
-      `}</style>
     </div>
   )
 }
