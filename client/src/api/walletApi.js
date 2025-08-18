@@ -1,6 +1,7 @@
 // frontend/src/api/walletApi.js
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
+// Use environment variable or fallback to localhost
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 
 // Helper function for making API requests
 const apiRequest = async (endpoint, options = {}) => {
@@ -24,7 +25,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
 // Get wallet balance
 export const getBalance = async (token) => {
-  return await apiRequest("/api/wallet/balance", {
+  return await apiRequest("/wallet/balance", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -34,7 +35,7 @@ export const getBalance = async (token) => {
 
 // Get transaction history
 export const getTransactions = async (token, page = 1, limit = 50) => {
-  return await apiRequest(`/api/wallet/transactions?page=${page}&limit=${limit}`, {
+  return await apiRequest(`/wallet/transactions?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -44,11 +45,11 @@ export const getTransactions = async (token, page = 1, limit = 50) => {
 
 // Initiate deposit
 export const initiateDeposit = async (token, depositData) => {
-  return await apiRequest("/api/wallet/deposit", {
+  return await apiRequest("/wallet/deposit", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json", // <-- FIXED: Explicitly setting Content-Type here
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(depositData),
   })
@@ -56,11 +57,11 @@ export const initiateDeposit = async (token, depositData) => {
 
 // Initiate withdrawal
 export const initiateWithdraw = async (token, withdrawData) => {
-  return await apiRequest("/api/wallet/withdraw", {
+  return await apiRequest("/wallet/withdraw", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json", // <-- FIXED: Explicitly setting Content-Type here
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(withdrawData),
   })
@@ -68,7 +69,7 @@ export const initiateWithdraw = async (token, withdrawData) => {
 
 // Get transaction status (for polling)
 export const getTransactionStatus = async (token, transactionId) => {
-  return await apiRequest(`/api/wallet/transaction/${transactionId}/status`, {
+  return await apiRequest(`/wallet/transaction/${transactionId}/status`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -76,9 +77,9 @@ export const getTransactionStatus = async (token, transactionId) => {
   })
 }
 
-// Get supported banks (if needed from backend)
+// Get supported banks
 export const getSupportedBanks = async (token) => {
-  return await apiRequest("/api/wallet/banks", {
+  return await apiRequest("/wallet/banks", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
