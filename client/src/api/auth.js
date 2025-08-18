@@ -1,3 +1,4 @@
+//api/auth.js
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api"
 
 // Token keys
@@ -270,3 +271,10 @@ export const isAuthenticated = () => {
     return false
   }
 }
+
+// Legacy compatibility functions
+export const getUserData = getUser
+export const setUserData = (userData) => setTokens(getAccessToken(), getRefreshToken(), userData)
+export const removeUserData = clearTokens
+export const setAccessToken = (token) => setTokens(token, getRefreshToken(), getUser())
+export const removeAccessToken = clearTokens
