@@ -1,6 +1,6 @@
 // controllers/walletController.js - Wallet Business Logic (FIXED)
 // Handles all wallet operations including deposits, withdrawals, and transaction management
-
+//note here this is anothere controllers fiel
 const Wallet = require("../models/Wallet")
 const WalletTransaction = require("../models/WalletTransaction")
 const User = require("../models/User")
@@ -31,22 +31,31 @@ const {
 // Get wallet balance
 const getWalletBalance = async (req, res) => {
   try {
-    const userId = req.user.id
+    console.log("🔍 WALLET BALANCE: Request received")
+    console.log("🔍 WALLET BALANCE: req.user:", req.user)
+    
+    // FIXED: Use req.user.userId (from auth middleware) instead of req.user.id
+    const userId = req.user.userId
+    console.log("✅ WALLET BALANCE: User ID:", userId)
 
     let wallet = await Wallet.findOne({ userId: userId })
+    console.log("📊 WALLET BALANCE: Wallet found:", wallet ? `Balance: ${wallet.balance}` : 'Not found')
 
     if (!wallet) {
+      console.log("🆕 WALLET BALANCE: Creating new wallet for user:", userId)
       // Create wallet if it doesn't exist
       wallet = new Wallet({
         userId: userId,
         balance: 0,
       })
       await wallet.save()
+      console.log("✅ WALLET BALANCE: New wallet created")
     }
 
+    console.log("✅ WALLET BALANCE: Returning balance:", wallet.balance)
     return successResponse(res, walletBalanceResponse(wallet), "Wallet balance retrieved successfully")
   } catch (error) {
-    console.error("Get wallet balance error:", error)
+    console.error("❌ WALLET BALANCE: Error:", error)
     return serverErrorResponse(res, "Failed to retrieve wallet balance")
   }
 }
@@ -54,7 +63,8 @@ const getWalletBalance = async (req, res) => {
 // Initiate deposit (FIXED)
 const initiateDeposit = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
 
     // Log request for debugging - THIS IS THE NEW LINE
     console.log("DEBUG: req.body at start of initiateDeposit:", req.body)
@@ -162,7 +172,8 @@ const initiateDeposit = async (req, res) => {
 // Initiate withdrawal (FIXED)
 const initiateWithdraw = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
     console.log("Withdrawal request received:", req.body)
 
     // Get current wallet balance
@@ -254,7 +265,8 @@ const initiateWithdraw = async (req, res) => {
 // Get transaction history
 const getTransactionHistory = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
     const { page: reqPage, limit: reqLimit, status } = req.query
 
     // Validate pagination parameters
@@ -282,7 +294,8 @@ const getTransactionHistory = async (req, res) => {
 // Get transaction details
 const getTransactionDetails = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
     const { transactionId } = req.params
 
     // Validate transaction ID
@@ -309,7 +322,8 @@ const getTransactionDetails = async (req, res) => {
 // Get pending transactions (for real-time polling)
 const getPendingTransactions = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
 
     const pendingTransactions = await WalletTransaction.findPendingTransactions(userId)
 
@@ -399,7 +413,8 @@ const handleEthSwitchCallback = async (req, res) => {
 // Query transaction status from EthSwitch (manual check)
 const queryTransactionStatus = async (req, res) => {
   try {
-    const userId = req.user.id
+    // FIXED: Use req.user.userId instead of req.user.id
+    const userId = req.user.userId
     const { transactionId } = req.params
 
     // Validate transaction ID
