@@ -1,8 +1,17 @@
 // Controllers/portfolioController.js
 const Holding = require('../models/Holding');
 const StockTransaction = require('../models/StockTransaction');
-const User = require('../models/User'); // import User model
+const Wallet = require('../models/Wallet');
 const { ObjectId } = require('mongodb');
+
+// Helper: compute gain/loss
+function computeGainLoss(purchasePrice, currentPrice, quantity) {
+  const invested = purchasePrice * quantity;
+  const currentValue = currentPrice * quantity;
+  const profitLoss = currentValue - invested;
+  const percent = invested === 0 ? 0 : (profitLoss / invested) * 100;
+  return { invested, currentValue, profitLoss, percent };
+}
 
 function toNumber(value) {
   if (value && typeof value.toNumber === 'function') return value.toNumber();
@@ -12,7 +21,9 @@ function toNumber(value) {
 exports.getPortfolio = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const currentPrices = req.query.currentPrices ? JSON.parse(req.query.currentPrices) : {};
+    const currentPrices = req.query.currentPrices
+      ? JSON.parse(req.query.currentPrices)
+      : {};
 
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ error: 'Invalid userId' });
@@ -20,52 +31,61 @@ exports.getPortfolio = async (req, res) => {
 
     // fetch holdings and transactions
     const holdings = await Holding.find({ userId: new ObjectId(userId) });
-    const transactions = await StockTransaction.find({ userId: new ObjectId(userId) }).sort({ transactionDate: -1 });
+    const transactions = await StockTransaction.find({
+      userId: new ObjectId(userId),
+    }).sort({ transactionDate: -1 });
 
-    // fetch wallet balance from real User DB
-    const user = await User.findById(userId).select('walletBalance');
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    // fetch wallet balance
+    let wallet = await Wallet.findByUserId(userId);
+    if (!wallet) {
+      wallet = await Wallet.createWallet(userId, 10000);
     }
-    const walletBalance = toNumber(user.walletBalance);
+    const walletBalance = toNumber(wallet.balance);
 
     let totalInvested = 0;
-    let currentPortfolioValue = 0;
+    let totalCurrentValue = 0;
 
-    const holdingsWithCalc = holdings.map(h => {
+    const holdingsWithCalc = holdings.map((h) => {
       const avgCost = toNumber(h.purchasePrice);
       const quantity = h.quantity;
-      const invested = avgCost * quantity;
-      totalInvested += invested;
-
-      // Get current price from query param, fallback to avg cost
       const currentPrice = currentPrices[h.stockSymbol] || avgCost;
-      const currentValue = currentPrice * quantity;
-      currentPortfolioValue += currentValue;
+
+      const { invested, currentValue, profitLoss, percent } =
+        computeGainLoss(avgCost, currentPrice, quantity);
+
+      totalInvested += invested;
+      totalCurrentValue += currentValue;
 
       return {
         stockSymbol: h.stockSymbol,
         quantity,
-        avgCost,
-        invested,
+        purchasePrice: avgCost,
         currentPrice,
+        invested,
         currentValue,
-        profitLoss: currentValue - invested,
+        gainLoss: {
+          dollar: profitLoss,
+          percent,
+        },
       };
     });
 
-    const profitLoss = currentPortfolioValue - totalInvested;
+    const totalProfitLoss = totalCurrentValue - totalInvested;
+    const totalPercent =
+      totalInvested === 0 ? 0 : (totalProfitLoss / totalInvested) * 100;
 
     res.json({
-      walletBalance, // now real balance from DB
+      walletBalance,
+      currency: wallet.currency,
       totalInvested,
-      currentPortfolioValue,
-      profitLoss,
+      currentPortfolioValue: totalCurrentValue, // ✅ match frontend
+      profitLoss: totalProfitLoss, // ✅ match frontend
+      profitLossPercent: totalPercent,
       holdings: holdingsWithCalc,
       transactions,
     });
   } catch (error) {
-    console.error('Error fetching portfolio:', error);
+    console.error('❌ Error fetching portfolio:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

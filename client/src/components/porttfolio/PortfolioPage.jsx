@@ -24,25 +24,33 @@ const Portfolio = ({ currentPrices }) => {
       .catch((err) => setError(err.message));
   }, [user, authLoading, currentPrices]);
 
-  if (authLoading) return <div className="text-center py-20 text-gray-500">Checking authentication...</div>;
-  if (error) return <div className="text-red-600 text-center py-20 font-semibold">{error}</div>;
-  if (!portfolio) return <div className="text-center py-20 text-gray-500">Loading portfolio...</div>;
+  if (authLoading) {
+    return <div className="text-center py-20 text-gray-500">Checking authentication...</div>;
+  }
+  if (error) {
+    return <div className="text-red-600 text-center py-20 font-semibold">{error}</div>;
+  }
+  if (!portfolio) {
+    return <div className="text-center py-20 text-gray-500">Loading portfolio...</div>;
+  }
 
   const {
     walletBalance,
     totalInvested,
     currentPortfolioValue,
     profitLoss,
-    holdings,
-    transactions,
+    holdings = [],
+    transactions = [],
   } = portfolio;
 
   const formattedCurrency = (val) =>
-    val.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    typeof val === 'number'
+      ? val.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      : '$0.00';
 
   function toNumber(value) {
     if (value && typeof value.toNumber === 'function') return value.toNumber();
-    return Number(value);
+    return Number(value) || 0;
   }
 
   return (
@@ -54,11 +62,11 @@ const Portfolio = ({ currentPrices }) => {
           <BalanceCard title="Wallet Balance" amount={walletBalance} icon="💰" />
           <BalanceCard title="Total Invested" amount={totalInvested} icon="📈" />
           <BalanceCard title="Current Portfolio Value" amount={currentPortfolioValue} icon="📊" />
-          <BalanceCard 
-            title="Profit / Loss" 
-            amount={profitLoss} 
-            icon={profitLoss >= 0 ? "📈" : "📉"} 
-            isProfit={profitLoss >= 0} 
+          <BalanceCard
+            title="Profit / Loss"
+            amount={profitLoss}
+            icon={profitLoss >= 0 ? "📈" : "📉"}
+            isProfit={profitLoss >= 0}
           />
         </div>
 
@@ -109,14 +117,19 @@ const Portfolio = ({ currentPrices }) => {
   );
 };
 
-// Small reusable card component for balances
+// Safe BalanceCard component
 function BalanceCard({ title, amount, icon, isProfit }) {
+  const displayAmount =
+    typeof amount === 'number'
+      ? amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      : '$0.00';
+
   return (
-    <div className={`bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-105`}>
+    <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
       <div className="text-4xl mb-3">{icon}</div>
       <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
       <p className={`text-3xl font-bold ${isProfit === undefined ? 'text-gray-900' : isProfit ? 'text-green-600' : 'text-red-600'}`}>
-        {amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+        {displayAmount}
       </p>
     </div>
   );

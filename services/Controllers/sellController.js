@@ -1,10 +1,9 @@
 // controllers/sellController.js
-const mongoose = require('mongoose');
 const { Double, ObjectId } = require('mongodb');
 const Holding = require('../models/Holding');
 const StockTransaction = require('../models/StockTransaction');
+const Wallet = require('../models/Wallet'); // ✅ use wallet model
 
-const BASE_WALLET_BALANCE = 10000; // simulated wallet
 const FALLBACK_USER_ID = new ObjectId();
 
 function toNumber(value) {
@@ -21,50 +20,31 @@ function toObjectId(id) {
   return FALLBACK_USER_ID;
 }
 
-async function getBalance(userId) {
-  const holdings = await Holding.find({ userId });
-  const invested = holdings.reduce((sum, h) => {
-    const price = toNumber(h.purchasePrice);
-    return sum + price * h.quantity;
-  }, 0);
-  return BASE_WALLET_BALANCE - invested;
-}
-
 exports.sellStock = async (req, res) => {
   try {
-    // 1. Extract inputs
     const userId = toObjectId(req.body.userId);
-    const rawSymbol = req.body.stockSymbol || '';
-    const stockSymbol = rawSymbol.trim().toUpperCase();
+    const stockSymbol = (req.body.stockSymbol || '').trim().toUpperCase();
+    const quantity = Number(req.body.quantity);
+    const sellPriceNum = Number(req.body.sellPrice);
+    const sellDate = req.body.sellDate ? new Date(req.body.sellDate) : new Date();
 
-    const rawQuantity = req.body.quantity;
-    const quantity = Number(rawQuantity);
-
-    const rawPrice = req.body.sellPrice;
-    const sellPriceNum = Number(rawPrice);
-
-    const sellDate = req.body.purchaseDate ? new Date(req.body.purchaseDate) : new Date();
-
-    // 2. Validate inputs
-    if (!stockSymbol) {
-      return res.status(400).json({ error: 'stockSymbol is required' });
-    }
+    // 🔹 Validate
+    if (!stockSymbol) return res.status(400).json({ error: 'stockSymbol is required' });
     if (!Number.isFinite(quantity) || quantity < 1) {
-      return res.status(400).json({ error: 'quantity must be a number >= 1' });
+      return res.status(400).json({ error: 'quantity must be >= 1' });
     }
     if (!Number.isFinite(sellPriceNum) || sellPriceNum <= 0) {
-      return res.status(400).json({ error: 'sellPrice must be a positive number' });
+      return res.status(400).json({ error: 'sellPrice must be positive' });
     }
 
     const sellPriceDouble = new Double(sellPriceNum);
-    const totalValue = toNumber(sellPriceDouble) * quantity;
+    const totalValue = sellPriceNum * quantity;
 
-    // 3. Find holding
+    // 🔹 Find holding
     let holding = await Holding.findOne({ userId, stockSymbol });
     if (!holding) {
       return res.status(400).json({ error: 'You do not own this stock' });
     }
-
     if (holding.quantity < quantity) {
       return res.status(400).json({
         error: 'Not enough quantity to sell',
@@ -72,13 +52,12 @@ exports.sellStock = async (req, res) => {
       });
     }
 
-    // 4. Calculate profit/loss (optional)
+    // 🔹 Profit/loss calculation
     const profitLoss =
-      (toNumber(sellPriceDouble) - toNumber(holding.purchasePrice)) * quantity;
+      (sellPriceNum - toNumber(holding.purchasePrice)) * quantity;
 
-    // 5. Update or remove holding
+    // 🔹 Update/remove holding
     if (holding.quantity === quantity) {
-      // Selling all shares
       await Holding.deleteOne({ _id: holding._id });
       holding = null;
     } else {
@@ -86,7 +65,15 @@ exports.sellStock = async (req, res) => {
       await holding.save();
     }
 
-    // 6. Save transaction
+    // 🔹 Update wallet (deposit sale proceeds)
+    let wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      // if user has no wallet, create one
+      wallet = await Wallet.createWallet(userId, 0);
+    }
+    await wallet.deposit(totalValue);
+
+    // 🔹 Save transaction
     const transaction = new StockTransaction({
       userId,
       stockSymbol,
@@ -98,33 +85,18 @@ exports.sellStock = async (req, res) => {
     });
     await transaction.save();
 
-    // 7. Get updated balance
-    const availableBalance = await getBalance(userId);
-
-    // 8. Response
-    return res.json({
+    res.json({
       message: 'Sell executed successfully',
       holding,
-      availableBalance,
+      walletBalance: wallet.balance,
       transaction,
       profitLoss,
     });
   } catch (err) {
     console.error('sellStock error:', err);
 
-    if (err.errorResponse && err.errorResponse.code === 121) {
-      const details = err.errInfo?.details;
-      return res.status(400).json({
-        error: 'Document failed validation',
-        validation: details,
-      });
-    }
-
-    if (err.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Mongoose validation error',
-        validation: err.errors,
-      });
+    if (err.message?.includes('Wallet')) {
+      return res.status(400).json({ error: err.message });
     }
 
     return res.status(500).json({ error: 'Internal server error' });
