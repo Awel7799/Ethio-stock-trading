@@ -1,47 +1,83 @@
 // server.js - VALIDATION VERSION
 
+// server.js - Re-integrated Auth Routes for Login
 const express = require("express")
 const cors = require("cors")
-const helmet = require("helmet")
-const rateLimit = require("express-rate-limit")
+const helmet = require("helmet") // Re-added helmet for security
+const rateLimit = require("express-rate-limit") // Re-added rateLimit
 require("dotenv").config()
 
-console.log("🔧 Initializing server...")
+console.log("🔧 Initializing server with auth routes...")
 
 // Initialize Express app
 const app = express()
 
-// Connect to database with error handling
+// ============================================
+// CRITICAL FIX: Body parsing middleware at the very top
+// ============================================
+app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true, limit: "10mb" }))
+
+// CORS middleware
+app.use(
+  cors({
+    origin: true, // Allow all origins for now, or specify your frontend URL
+    credentials: true,
+  }),
+)
+
+// ============================================
+// Database Connection
+// ============================================
 try {
   const connectDB = require("./config/db")
   connectDB()
   console.log("✅ Database connection initiated")
+
+  // Create wallet transaction indexes after database connection
+  setTimeout(async () => {
+    try {
+      const WalletTransaction = require("./models/WalletTransaction")
+      await WalletTransaction.createIndexes()
+      console.log("✅ Wallet transaction indexes created successfully")
+    } catch (error) {
+      console.warn("⚠️ Could not create wallet indexes (database may not be ready):", error.message)
+    }
+  }, 2000)
 } catch (error) {
   console.error("❌ Database connection error:", error.message)
 }
 
-// Load dependencies
+// ============================================
+// Load Dependencies (Auth Service, User Model, Auth Middleware)
+// ============================================
 console.log("🔧 Loading dependencies...")
 let authService, authenticate, authenticateRefreshToken, User
 try {
   authService = require("./services/authService")
-  const authMiddleware = require("./middleware/auth")
-  authenticate = authMiddleware.authenticate
-  authenticateRefreshToken = authMiddleware.authenticateRefreshToken
+  const authMiddleware = require("./middleware/authMiddleware")
+  authenticate = authMiddleware // Fixed: use the main function
+  authenticateRefreshToken = authMiddleware.authenticateRefreshToken // Correctly assign the refresh token middleware
   User = require("./models/User")
   console.log("✅ All dependencies loaded successfully")
 } catch (error) {
   console.error("❌ Error loading dependencies:", error.message)
+  // Exit if critical dependencies fail to load in production
+  if (process.env.NODE_ENV === "production") {
+    process.exit(1)
+  }
 }
 
-// Security middleware
+// ============================================
+// Security Middleware (Re-added)
+// ============================================
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
   }),
 )
 
-// Rate limiting
+// Rate limiting (Re-added)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -54,7 +90,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
 })
 
-// Stricter rate limiting for auth routes
+// Stricter rate limiting for auth routes (Re-added)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // Limit each IP to 10 auth requests per windowMs
@@ -65,106 +101,62 @@ const authLimiter = rateLimit({
   },
 })
 
-// Apply rate limiting to all routes
+// Apply general rate limiting to all routes
 app.use(limiter)
 
-// CORS configuration
-const corsOptions = {
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      process.env.CLIENT_URL,
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:5173", // Vite default port
-      "http://127.0.0.1:5173", // Alternative localhost
-    ]
+// Trust proxy for rate limiting and IP detection
+app.set("trust proxy", 1)
 
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
-    } else {
-      console.log("CORS blocked origin:", origin)
-      callback(new Error("Not allowed by CORS"))
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-}
+// ============================================
+// Wallet Routes (Registered early)
+// ============================================
+const walletRoutes = require("./routes/wallet")
+console.log("🔧 Registering wallet routes...")
+app.use("/api/wallet", walletRoutes)
+console.log("✅ Wallet routes registered successfully")
+// === Routes ===
+const stockRoutes = require("./routes/stockRoutes");
+const stockDetailRoutes = require("./routes/detailStockDetailRouter");
+const holdingRoutes = require("./routes/holdingRoutes");
+const buyRouter = require("./routes/buyRouter");
+const sellRouter = require('./routes/sellRouter');
+const searchRouter = require("./routes/searchRouter");
+const investmentRoutes = require("./routes/investmentRoutes");
+const authRoutes = require('./routes/auth');
+const chatRouter = require('./routes/chatRoutes'); 
+const stockPortfolioRouter = require('./routes/stockPortfolioRouter');
+const portfolioRouter = require('./routes/portfolioRouter');
+const newsRoutes = require('./routes/newsRoutes.Js');
 
-app.use(cors(corsOptions))
+//const performanceRoutes = require('./routes/performanceRoutes');
 
-// Handle preflight requests
-app.options("*", cors(corsOptions))
+//const { runDailySnapshotJob } = require('./jobs/savePerformanceSnapshots');
+//runDailySnapshotJob();
 
-// Additional CORS headers middleware
-app.use((req, res, next) => {
-  console.log(`📍 ${req.method} ${req.url}`)
+app.use('/api/auth', authRoutes);
+app.use("/api/stocks", stockRoutes);
+app.use("/api/stocks", stockDetailRoutes);
+app.use("/api/holdings", holdingRoutes);
+app.use("/api", buyRouter);
+app.use('/api', sellRouter); // handles /api/sell
+app.use("/api/search", searchRouter);
+app.use("/api/investments", investmentRoutes);
+app.use("/api/chat", chatRouter);
+app.use('/api', stockPortfolioRouter);
+app.use('/api', portfolioRouter);
+app.use('/api/news', newsRoutes);
 
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173")
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-  res.header("Access-Control-Allow-Credentials", "true")
-
-  if (req.method === "OPTIONS") {
-    console.log("✅ Handling OPTIONS preflight request")
-    return res.sendStatus(200)
-  }
-
-  next()
-})
-
-// Body parsing middleware
-app.use(express.json({ limit: "10mb" }))
-app.use(express.urlencoded({ extended: true, limit: "10mb" }))
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is running successfully",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
-  })
-})
-
-// Test route
-app.get("/test", (req, res) => {
-  res.json({ message: "Basic routing works!" })
-})
-
-app.get("/api/test", (req, res) => {
-  console.log("🧪 Test route hit!")
-  res.json({
-    success: true,
-    message: "Server is working!",
-    timestamp: new Date().toISOString(),
-  })
-})
-
-// Test signup route
-app.post("/api/test-signup", (req, res) => {
-  console.log("🧪 TEST SIGNUP ROUTE HIT!")
-  console.log("Request body:", req.body)
-
-  res.json({
-    success: true,
-    message: "Test route working!",
-    receivedData: req.body,
-  })
-})
-
-// Auth Routes - VALIDATION
+//app.use('/api/performance', performanceRoutes);
+// ============================================
+// Auth Routes (Re-added)
+// ============================================
 console.log("🔧 Registering auth routes...")
-
-// Signup route - VALIDATION
+// Signup route
 app.post("/api/auth/signup", authLimiter, async (req, res) => {
   console.log("🚀 SIGNUP ROUTE HIT IN SERVER.JS!")
   console.log("📧 Request body:", JSON.stringify(req.body, null, 2))
-
   try {
     const { firstName, lastName, email, password } = req.body
-
     if (!firstName || !lastName || !email || !password) {
       console.log("❌ Missing fields in server.js")
       return res.status(400).json({
@@ -173,13 +165,27 @@ app.post("/api/auth/signup", authLimiter, async (req, res) => {
         source: "server.js validation",
       })
     }
-
     console.log("✅ All fields present, calling authService.registerUser...")
-
     if (authService) {
       console.log("📧 Calling authService.registerUser with:", { firstName, lastName, email })
       const result = await authService.registerUser(req.body)
       console.log("📧 AuthService result:", result)
+
+      // Create wallet for new user
+      if (result.success && result.data?.user?.id) {
+        try {
+          const Wallet = require("./models/Wallet")
+          const wallet = new Wallet({
+            userId: result.data.user.id, // Use userId as per your Wallet model
+            balance: 0,
+          })
+          await wallet.save()
+          console.log("✅ Wallet created for new user:", result.data.user.id)
+        } catch (walletError) {
+          console.warn("⚠️ Could not create wallet for new user:", walletError.message)
+        }
+      }
+
       const statusCode = result.success ? 201 : 400
       res.status(statusCode).json(result)
     } else {
@@ -208,21 +214,17 @@ app.post("/api/auth/signup", authLimiter, async (req, res) => {
   }
 })
 
-// Login route - VALIDATION
+// Login route
 app.post("/api/auth/login", authLimiter, async (req, res) => {
   try {
     console.log("🔐 Login request received:", req.body.email)
-
     const { email, password } = req.body
-
-    // Simple check for required fields (no validation)
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
       })
     }
-
     const result = await authService.loginUser(req.body)
     const statusCode = result.success ? 200 : 401
     res.status(statusCode).json(result)
@@ -239,7 +241,8 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
 // Refresh token route
 app.post("/api/auth/refresh-token", authLimiter, authenticateRefreshToken, async (req, res) => {
   try {
-    const result = await authService.refreshAccessToken(req.user, req.refreshToken)
+    const refreshToken = req.body.refreshToken
+    const result = await authService.refreshAccessToken(req.user, refreshToken)
     const statusCode = result.success ? 200 : 401
     res.status(statusCode).json(result)
   } catch (error) {
@@ -321,19 +324,70 @@ app.get("/api/auth/verify-token", authLimiter, authenticate, (req, res) => {
     },
   })
 })
-
 console.log("✅ All auth routes registered successfully")
 
-// TEMPORARY: Debug endpoints
+// ============================================
+// Health Check & Test Endpoints
+// ============================================
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is running successfully",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development",
+    wallet_system: "enabled",
+    ethswitch_mode: process.env.ETHSWITCH_MODE || "test",
+  })
+})
+
+// Test route
+app.get("/test", (req, res) => {
+  res.json({ message: "Basic routing works!" })
+})
+
+app.get("/api/test", (req, res) => {
+  console.log("🧪 Test route hit!")
+  res.json({
+    success: true,
+    message: "Server is working!",
+    timestamp: new Date().toISOString(),
+  })
+})
+
+// Test signup route
+app.post("/api/test-signup", (req, res) => {
+  console.log("🧪 TEST SIGNUP ROUTE HIT!")
+  console.log("Request body:", req.body)
+  res.json({
+    success: true,
+    message: "Test route working!",
+    receivedData: req.body,
+  })
+})
+
+// TEMPORARY: Raw Body Test Route (Confirmed Working)
+app.post("/api/debug/raw-body-test", (req, res) => {
+  console.log("--- RAW BODY TEST ROUTE HIT ---")
+  console.log("Request Headers:", req.headers)
+  console.log("Request Body:", req.body)
+  res.json({
+    success: true,
+    message: "Raw body test received!",
+    receivedBody: req.body,
+    receivedHeaders: req.headers,
+  })
+})
+
+// ============================================
+// Debug Endpoints (Existing)
+// ============================================
 // TEMPORARY: Delete user by email endpoint
 app.delete("/api/debug/delete-user/:email", async (req, res) => {
   try {
     const email = req.params.email.toLowerCase().trim()
     console.log("🗑️ DEBUG: Attempting to delete user with email:", email)
-
     const User = require("./models/User")
-
-    // Find the user first
     const user = await User.findOne({ email })
     if (!user) {
       console.log("❌ DEBUG: No user found with email:", email)
@@ -343,19 +397,25 @@ app.delete("/api/debug/delete-user/:email", async (req, res) => {
         email: email,
       })
     }
-
     console.log("🔍 DEBUG: Found user to delete:")
     console.log("  - ID:", user._id)
     console.log("  - Email:", user.email)
     console.log("  - Name:", user.name)
+    try {
+      const Wallet = require("./models/Wallet")
+      const WalletTransaction = require("./models/WalletTransaction")
 
-    // Delete the user
+      await Wallet.deleteMany({ userId: user._id }) // Use userId as per your Wallet model
+      await WalletTransaction.deleteMany({ userId: user._id }) // Use userId as per your WalletTransaction model
+      console.log("🗑️ DEBUG: Deleted user's wallet and transactions")
+    } catch (walletError) {
+      console.warn("⚠️ Could not delete wallet data:", walletError.message)
+    }
     const deleteResult = await User.deleteOne({ email })
     console.log("🗑️ DEBUG: Delete result:", deleteResult)
-
     res.json({
       success: true,
-      message: "User deleted successfully",
+      message: "User and associated wallet data deleted successfully",
       deletedUser: {
         id: user._id,
         email: user.email,
@@ -377,14 +437,11 @@ app.delete("/api/debug/delete-user/:email", async (req, res) => {
 app.get("/api/debug/list-users", async (req, res) => {
   try {
     const User = require("./models/User")
-
     const users = await User.find({}).select("email name firstName lastName createdAt")
     console.log("📋 DEBUG: Found", users.length, "users in database")
-
     users.forEach((user, index) => {
       console.log(`  ${index + 1}. ID: ${user._id}, Email: "${user.email}", Name: "${user.name}"`)
     })
-
     res.json({
       success: true,
       message: `Found ${users.length} users`,
@@ -407,29 +464,17 @@ app.get("/api/debug/list-users", async (req, res) => {
   }
 })
 
-// Global error handler
+// ============================================
+// Global Error Handling
+// ============================================
 app.use((error, req, res, next) => {
   console.error("Global error handler:", error)
-
-  // Handle CORS errors
   if (error.message === "Not allowed by CORS") {
-    return res.status(403).json({
-      success: false,
-      message: "CORS policy violation",
-      code: "CORS_ERROR",
-    })
+    return res.status(403).json({ success: false, message: "CORS policy violation", code: "CORS_ERROR" });
   }
-
-  // Handle JSON parsing errors
   if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid JSON format",
-      code: "INVALID_JSON",
-    })
+    return res.status(400).json({ success: false, message: "Invalid JSON", code: "INVALID_JSON" });
   }
-
-  // Default error response
   res.status(500).json({
     success: false,
     message: "Internal server error",
@@ -443,21 +488,37 @@ app.use((error, req, res, next) => {
 
 // Catch undefined routes
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found`,
-    code: "ROUTE_NOT_FOUND",
-  })
-})
+  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found`, code: "ROUTE_NOT_FOUND" });
+});
 
-// Start server
-const PORT = process.env.PORT || 5000
+// ============================================
+// Server Startup
+// ============================================
+const PORT = process.env.PORT || 3000
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`)
   console.log(`📱 Environment: ${process.env.NODE_ENV || "development"}`)
+  console.log(`💳 Wallet Mode: ${process.env.ETHSWITCH_MODE || "test"}`)
   console.log(`🌐 Health check: http://localhost:${PORT}/health`)
   console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`)
   console.log(`🔗 Allowed origins: http://localhost:5173, http://localhost:3000`)
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`💰 Wallet API docs: http://localhost:${PORT}/api/wallet/docs`)
+    console.log(`🏦 Supported banks: http://localhost:${PORT}/api/wallet/banks`)
+  }
+
+  console.log("=".repeat(50))
+})
+
+// Handle server errors
+server.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`❌ Port ${PORT} is already in use`)
+  } else {
+    console.error("❌ Server error:", error)
+  }
+  process.exit(1)
 })
 
 // Graceful shutdown
@@ -465,7 +526,16 @@ process.on("SIGTERM", () => {
   console.log("👋 SIGTERM received. Shutting down gracefully...")
   server.close(() => {
     console.log("✅ Process terminated")
+    process.exit(0)
   })
 })
 
-module.exports = app
+process.on("SIGINT", () => {
+  console.log("\n👋 SIGINT received. Shutting down gracefully...")
+  server.close(() => {
+    console.log("✅ Process terminated")
+    process.exit(0)
+  })
+})
+
+module.exports = app;

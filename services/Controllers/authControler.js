@@ -1,4 +1,4 @@
-//controler/authControler.js
+// Controllers/authControler.js (matching your original filename)
 const User = require("../models/User")
 const authService = require("../services/authService")
 
@@ -163,7 +163,8 @@ const logout = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const { userId } = req.user
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).select('-password -refreshTokens')
+    
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -196,11 +197,15 @@ const getProfile = async (req, res) => {
 // Verify Token Controller (for frontend token validation)
 const verifyToken = async (req, res) => {
   try {
+    console.log("🔍 VERIFY TOKEN: Request received")
+    
     // If middleware passes, token is valid
     const { userId } = req.user
+    console.log("✅ VERIFY TOKEN: User ID from token:", userId)
 
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).select('-password -refreshTokens')
     if (!user) {
+      console.log("❌ VERIFY TOKEN: User not found")
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -213,6 +218,7 @@ const verifyToken = async (req, res) => {
     userResponse.firstName = nameParts[0] || ""
     userResponse.lastName = nameParts.slice(1).join(" ") || ""
 
+    console.log("✅ VERIFY TOKEN: Token verified successfully")
     res.status(200).json({
       success: true,
       message: "Token is valid",
@@ -221,7 +227,7 @@ const verifyToken = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error("Verify token error:", error)
+    console.error("❌ VERIFY TOKEN: Error:", error)
     res.status(500).json({
       success: false,
       message: "Internal server error during token verification",

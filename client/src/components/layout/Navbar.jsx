@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
+import AIchat from "../AIChatBox/AIchat";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAIOpen, setIsAIOpen] = useState(false);
   const location = useLocation()
 
   const navigationItems = [
@@ -47,6 +49,13 @@ export default function Navigation() {
               </Link>
             ))}
           </div>
+          <button
+            onClick={() => setIsAIOpen(true)}
+            className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+           >
+          AI
+            </button>
+
 
           {/* Right side items */}
           <div className="flex items-center space-x-4 flex-shrink-0">
@@ -112,6 +121,16 @@ export default function Navigation() {
                   {item.name}
                 </Link>
               ))}
+              <button
+                 onClick={() => {
+                 setIsAIOpen(true);
+                  setIsOpen(false);
+                 }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900"
+                >
+                AI
+                    </button>
+
 
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex items-center px-3 py-2">
@@ -130,6 +149,7 @@ export default function Navigation() {
           </div>
         )}
       </div>
+      <AIchat isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
     </nav>
   )
 }
