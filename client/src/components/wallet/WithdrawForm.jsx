@@ -1,17 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { useWallet } from "../../context/WalletContext" // Assuming useWallet provides user info
+import { useWallet } from "../../context/WalletContext"
 import BankSelector from "./BankSelector"
 
 const WithdrawForm = () => {
-  // Destructure 'user' from useWallet context
   const { balance, initiateWithdraw, withdrawLoading, supportedBanks, technicalErrors, user } = useWallet()
 
   const [formData, setFormData] = useState({
     amount: "",
     bankCode: "",
     bankAccount: "",
+    customerPhone: user?.phone || "",
+    customerEmail: user?.email || "",
   })
   const [errors, setErrors] = useState({})
   const [success, setSuccess] = useState("")
@@ -54,9 +55,23 @@ const WithdrawForm = () => {
       isValid = false
     }
 
-    // REMOVED: Client-side validation for customerName and customerPhone
-    // These fields are now optional and will be sent as empty strings if not available from user object.
-    // The backend will handle their optionality.
+    // Phone validation for production mode
+    if (!formData.customerPhone) {
+      newErrors.customerPhone = "Phone number is required"
+      isValid = false
+    } else if (!/^(\+251|0)[0-9]{9}$/.test(formData.customerPhone.replace(/\s/g, ""))) {
+      newErrors.customerPhone = "Invalid Ethiopian phone number format"
+      isValid = false
+    }
+
+    // Email validation for production mode
+    if (!formData.customerEmail) {
+      newErrors.customerEmail = "Email address is required"
+      isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
+      newErrors.customerEmail = "Invalid email format"
+      isValid = false
+    }
 
     setErrors(newErrors)
     return isValid
@@ -99,12 +114,8 @@ const WithdrawForm = () => {
       return
     }
 
-    // Construct customerName and customerPhone from the 'user' object
-    // These will now be empty strings if user.firstName, user.lastName, or user.phone are not available,
-    // and the backend will accept them as optional.
+    // Construct customerName from the 'user' object
     const customerName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : ""
-    const customerPhone = user ? user.phone || "" : ""
-    const customerEmail = user ? user.email || "" : "" // Also include email for consistency
 
     const result = await initiateWithdraw({
       amount: Number.parseFloat(formData.amount),
@@ -112,13 +123,19 @@ const WithdrawForm = () => {
       bankAccount: formData.bankAccount,
       description: "Stock trading wallet withdrawal",
       customerName: customerName,
-      customerPhone: customerPhone,
-      customerEmail: customerEmail,
+      customerPhone: formData.customerPhone,
+      customerEmail: formData.customerEmail,
     })
 
     if (result.success) {
       setSuccess("Withdrawal initiated successfully! Funds will be transferred to your bank account.")
-      setFormData({ amount: "", bankCode: "", bankAccount: "" })
+      setFormData({ 
+        amount: "", 
+        bankCode: "", 
+        bankAccount: "", 
+        customerPhone: user?.phone || "", 
+        customerEmail: user?.email || "" 
+      })
       setErrors({})
     } else {
       setErrors({ submit: result.error || "Failed to initiate withdrawal" })
@@ -182,6 +199,8 @@ const WithdrawForm = () => {
           </div>
         </div>
       )}
+
+      {/*form to be submitted*/}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Amount Field */}
         <div>
@@ -228,6 +247,7 @@ const WithdrawForm = () => {
             </div>
           )}
         </div>
+        
         {/* Bank Selector */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Select Destination Bank</label>
@@ -240,6 +260,7 @@ const WithdrawForm = () => {
           />
           {errors.bankCode && <p className="mt-1 text-sm text-red-600">{errors.bankCode}</p>}
         </div>
+        
         {/* Bank Account Field */}
         <div>
           <label htmlFor="bankAccount" className="block text-sm font-medium text-gray-700 mb-2">
@@ -260,6 +281,49 @@ const WithdrawForm = () => {
           {errors.bankAccount && <p className="mt-1 text-sm text-red-600">{errors.bankAccount}</p>}
           <p className="mt-1 text-xs text-gray-500">Enter the account number where you want to receive the money</p>
         </div>
+        
+        {/* Phone Number Field */}
+        <div>
+          <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number (Required)
+          </label>
+          <input
+            type="tel"
+            id="customerPhone"
+            name="customerPhone"
+            value={formData.customerPhone}
+            onChange={handleInputChange}
+            placeholder="+251 912 345678"
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+              errors.customerPhone ? "border-red-300" : "border-gray-300"
+            }`}
+            disabled={withdrawLoading}
+          />
+          {errors.customerPhone && <p className="mt-1 text-sm text-red-600">{errors.customerPhone}</p>}
+          <p className="mt-1 text-xs text-gray-500">Used for transaction notifications and verification</p>
+        </div>
+        
+        {/* Email Address Field */}
+        <div>
+          <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address (Required)
+          </label>
+          <input
+            type="email"
+            id="customerEmail"
+            name="customerEmail"
+            value={formData.customerEmail}
+            onChange={handleInputChange}
+            placeholder="your@email.com"
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+              errors.customerEmail ? "border-red-300" : "border-gray-300"
+            }`}
+            disabled={withdrawLoading}
+          />
+          {errors.customerEmail && <p className="mt-1 text-sm text-red-600">{errors.customerEmail}</p>}
+          <p className="mt-1 text-xs text-gray-500">Used for transaction receipts and notifications</p>
+        </div>
+        
         {/* Submit Error */}
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -279,6 +343,7 @@ const WithdrawForm = () => {
             </div>
           </div>
         )}
+        
         {/* Technical Errors */}
         {technicalErrors.length > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
@@ -299,6 +364,7 @@ const WithdrawForm = () => {
             </div>
           </div>
         )}
+        
         {/* Submit Button */}
         <button
           type="submit"
@@ -324,6 +390,7 @@ const WithdrawForm = () => {
           )}
         </button>
       </form>
+      
       {/* Information Box */}
       <div className="mt-8 bg-orange-50 border border-orange-200 rounded-md p-4">
         <div className="flex">
@@ -345,6 +412,7 @@ const WithdrawForm = () => {
                 <li>Funds will be transferred to your bank account</li>
                 <li>Processing time: Usually 1-3 business hours</li>
                 <li>Make sure the account number is correct</li>
+                <li>Phone and email are required for transaction notifications</li>
               </ul>
             </div>
           </div>
