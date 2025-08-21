@@ -6,6 +6,62 @@ const TOKEN_KEY = "tradewise_access_token"
 const REFRESH_TOKEN_KEY = "tradewise_refresh_token"
 const USER_KEY = "tradewise_user"
 
+// Rate limiting storage
+const RATE_LIMIT_KEY = "tradewise_rate_limit"
+
+// Rate limiting helper functions
+const getRateLimitData = () => {
+  try {
+    const data = localStorage.getItem(RATE_LIMIT_KEY)
+    return data ? JSON.parse(data) : { attempts: [], lastAttempt: null }
+  } catch (error) {
+    return { attempts: [], lastAttempt: null }
+  }
+}
+
+const setRateLimitData = (data) => {
+  try {
+    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data))
+  } catch (error) {
+    console.error("Error storing rate limit data:", error)
+  }
+}
+
+const isRateLimited = () => {
+  const rateLimitData = getRateLimitData()
+  const now = Date.now()
+  const fiveMinutesAgo = now - (5 * 60 * 1000) // 5 minutes window
+  
+  // Filter recent attempts within the last 5 minutes
+  const recentAttempts = rateLimitData.attempts.filter(attempt => attempt > fiveMinutesAgo)
+  
+  // Update the attempts array
+  rateLimitData.attempts = recentAttempts
+  setRateLimitData(rateLimitData)
+  
+  // Check if user has made too many attempts (3 or more in 5 minutes)
+  return recentAttempts.length >= 3
+}
+
+const recordLoginAttempt = () => {
+  const rateLimitData = getRateLimitData()
+  const now = Date.now()
+  rateLimitData.attempts.push(now)
+  rateLimitData.lastAttempt = now
+  setRateLimitData(rateLimitData)
+}
+
+const getRemainingCooldown = () => {
+  const rateLimitData = getRateLimitData()
+  if (!rateLimitData.lastAttempt) return 0
+  
+  const now = Date.now()
+  const cooldownPeriod = 5 * 60 * 1000 // 5 minutes
+  const timeSinceLastAttempt = now - rateLimitData.lastAttempt
+  
+  return Math.max(0, cooldownPeriod - timeSinceLastAttempt)
+}
+
 // Token Getters
 export const getAccessToken = () => {
   try {
@@ -80,6 +136,17 @@ const apiRequest = async (url, options = {}) => {
     if (!response.ok) {
       const data = await response.json().catch(() => ({}))
       console.log('❌ Response data:', data)
+
+      // Handle rate limiting (429 status)
+      if (response.status === 429) {
+        console.log('⏳ Rate limit exceeded, handling gracefully...')
+        return { 
+          success: false, 
+          message: data.message || 'Too many requests. Please wait before trying again.',
+          code: 'RATE_LIMIT_EXCEEDED',
+          rateLimited: true
+        }
+      }
 
       // Handle token expiration
       if (response.status === 401) {
@@ -174,6 +241,23 @@ export const authAPI = {
   login: async (credentials) => {
     try {
       console.log('🔐 Attempting login...')
+      
+      // Check client-side rate limiting before making request
+      if (isRateLimited()) {
+        const remainingTime = getRemainingCooldown()
+        const minutes = Math.ceil(remainingTime / (60 * 1000))
+        console.log('⏳ Client-side rate limit active, blocking request')
+        return { 
+          success: false, 
+          message: `Too many login attempts. Please wait ${minutes} minute(s) before trying again.`,
+          code: 'CLIENT_RATE_LIMIT',
+          rateLimited: true
+        }
+      }
+
+      // Record this login attempt
+      recordLoginAttempt()
+
       const response = await apiRequest("/auth/login", {
         method: "POST",
         body: JSON.stringify(credentials),
@@ -181,6 +265,9 @@ export const authAPI = {
 
       if (response.success) {
         console.log('✅ Login successful')
+        // Clear rate limit data on successful login
+        localStorage.removeItem(RATE_LIMIT_KEY)
+        
         const accessToken = response.token || response.data?.accessToken
         const refreshToken = response.data?.refreshToken
         const user = response.user || response.data?.user
