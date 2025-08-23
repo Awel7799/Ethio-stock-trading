@@ -221,7 +221,7 @@ export default function AIchat({ isOpen, onClose }) {
         </div>
 
         {/* Input Area */}
-        <div className="p-6 border-t-4 border-amber-200 bg-gradient-to-r from-amber-100 to-yellow-100 rounded-b-xl">
+        <div className="p-6 border-t-4 w-full rounded-4xl border-amber-200 bg-gradient-to-r from-amber-100 to-yellow-100 rounded-b-xl">
           <div className="flex items-end space-x-4">
             <div className="flex-1">
               <div className="relative">
