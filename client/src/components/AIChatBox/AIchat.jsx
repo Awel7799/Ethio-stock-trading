@@ -83,10 +83,10 @@ export default function AIchat({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Backdrop for mobile/small screens */}
+      {/* Invisible backdrop for click outside to close */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 z-40 lg:hidden"
+          className="fixed inset-0 transition-opacity duration-300 z-40"
           onClick={onClose}
         />
       )}
@@ -101,6 +101,7 @@ export default function AIchat({ isOpen, onClose }) {
             : "w-full sm:w-96 lg:w-80 xl:w-96"
         }`}
         style={{ fontFamily: "Segoe UI, sans-serif" }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-4 border-b-4 border-amber-200 flex justify-between items-center bg-gradient-to-r from-amber-100 to-yellow-100 shadow-lg">
@@ -141,10 +142,10 @@ export default function AIchat({ isOpen, onClose }) {
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-red-100 hover:text-red-600 transition-all duration-200 text-amber-800 transform hover:scale-110"
-              title="Close"
+              className="p-2 rounded-lg hover:bg-red-100 hover:text-red-600 transition-all duration-200 text-amber-800 transform hover:scale-110 border-2 border-transparent hover:border-red-300 bg-white shadow-md"
+              title="Close Chat"
             >
-              <FiX size={18} />
+              <FiX size={18} className="font-bold" />
             </button>
           </div>
         </div>
