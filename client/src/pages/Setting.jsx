@@ -6,6 +6,45 @@ import Profile from "../components/setting/Profile";
 import Security from "../components/setting/security";
 import VerifyKYC from "../components/setting/VerifyKYC";
 import { useState, useEffect } from "react";
+
+// Animated Background Component (matching landing page)
+const AnimatedBackground = () => {
+  const [particles, setParticles] = useState([])
+
+  useEffect(() => {
+    const generateParticles = () => {
+      const newParticles = []
+      // Golden floating particles
+      for (let i = 0; i < 15; i++) {
+        newParticles.push({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 6 + 2,
+          color: ["bg-yellow-400", "bg-amber-400", "bg-orange-400", "bg-yellow-300"][Math.floor(Math.random() * 4)],
+          opacity: Math.random() * 0.3 + 0.05,
+          duration: Math.random() * 25 + 15,
+          delay: Math.random() * 8,
+        })
+      }
+      // Larger glowing orbs
+      for (let i = 15; i < 22; i++) {
+        newParticles.push({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 15 + 10,
+          color: "bg-gradient-to-r from-yellow-400 to-amber-500",
+          opacity: Math.random() * 0.15 + 0.03,
+          duration: Math.random() * 30 + 20,
+          delay: Math.random() * 10,
+        })
+      }
+      setParticles(newParticles)
+    }
+    generateParticles()
+
+
 export default function Setting() {
   const [activeSection, setActiveSection] = useState("Profile");
   const [isLoaded, setIsLoaded] = useState(false);
