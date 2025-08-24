@@ -1,3 +1,11 @@
+
+import Button from "../components/comman/Button";
+import Sidebar from "../components/setting/Sidebar";
+import PersonalInfo from "../components/setting/PersonalInfo";
+import Profile from "../components/setting/Profile";
+import Security from "../components/setting/security";
+import VerifyKYC from "../components/setting/VerifyKYC";
+import { useState, useEffect } from "react";
 export default function Setting() {
   const [activeSection, setActiveSection] = useState("Profile");
   const [isLoaded, setIsLoaded] = useState(false);
