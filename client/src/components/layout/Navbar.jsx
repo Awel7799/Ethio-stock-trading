@@ -12,7 +12,6 @@ export default function Navigation() {
     { name: "Markets", href: "/markets" },
     { name: "Portfolio", href: "/portfolio" },
     { name: "Wallet", href: "/wallet" }, 
-    { name: "Setting", href: "/setting" },
   ]
 
   const isActive = (href) => {
@@ -63,15 +62,18 @@ export default function Navigation() {
                 <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500 shadow-lg"></span>
               </button>
 
-              {/* User Avatar */}
+              {/* User Avatar - Now clickable to navigate to settings */}
               <div className="relative">
-                <button className="p-1 rounded-full hover:bg-amber-100 transition-all duration-200 shadow-md">
+                <Link 
+                  to="/setting" 
+                  className="p-1 rounded-full hover:bg-amber-100 transition-all duration-200 shadow-md block"
+                >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg">
                     <svg className="h-5 w-5 text-amber-900" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                   </div>
-                </button>
+                </Link>
               </div>
 
               {/* Mobile menu button */}
@@ -113,7 +115,11 @@ export default function Navigation() {
               ))}
 
               <div className="pt-4 border-t border-amber-200 mt-4">
-                <div className="flex items-center px-3 py-2">
+                <Link 
+                  to="/setting"
+                  className="flex items-center px-3 py-2 hover:bg-amber-100 rounded-lg transition-all duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
                   <div className="h-10 w-10 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 flex items-center justify-center shadow-lg">
                     <svg className="h-6 w-6 text-amber-900" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -123,7 +129,7 @@ export default function Navigation() {
                     <p className="text-sm font-semibold text-amber-900">John Doe</p>
                     <p className="text-sm text-amber-700">john@example.com</p>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -132,4 +138,3 @@ export default function Navigation() {
     </nav>
   )
 }
-
