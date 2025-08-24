@@ -1,4 +1,3 @@
-
 import Button from "../components/comman/Button";
 import Sidebar from "../components/setting/Sidebar";
 import PersonalInfo from "../components/setting/PersonalInfo";
@@ -44,6 +43,61 @@ const AnimatedBackground = () => {
     }
     generateParticles()
 
+    // Add CSS animations to document head
+    const styleElement = document.createElement('style')
+    styleElement.textContent = `
+      @keyframes settingsFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-15px) rotate(45deg); }
+        50% { transform: translateY(-8px) rotate(90deg); }
+        75% { transform: translateY(-20px) rotate(135deg); }
+      }
+      
+      @keyframes settingsGlow {
+        0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4), 0 0 45px rgba(251, 191, 36, 0.2); }
+      }
+    `
+    document.head.appendChild(styleElement)
+
+    // Cleanup function
+    return () => {
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement)
+      }
+    }
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Base gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100" />
+      
+      {/* Subtle overlay pattern */}
+      <div className="absolute inset-0 bg-gradient-to-r from-amber-900/5 via-transparent to-yellow-900/5" />
+
+      {/* Animated golden particles */}
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className={`absolute rounded-full ${particle.color} animate-pulse shadow-sm`}
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            opacity: particle.opacity,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`,
+            boxShadow: "0 0 15px rgba(251, 191, 36, 0.2)",
+            transform: "translateY(0px)",
+            animation: `settingsFloat ${particle.duration}s ease-in-out infinite ${particle.delay}s, settingsGlow ${particle.duration * 0.8}s ease-in-out infinite ${particle.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function Setting() {
   const [activeSection, setActiveSection] = useState("Profile");
