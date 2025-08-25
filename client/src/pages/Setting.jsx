@@ -1,3 +1,4 @@
+//setting
 import Button from "../components/comman/Button";
 import Sidebar from "../components/setting/Sidebar";
 import PersonalInfo from "../components/setting/PersonalInfo";
