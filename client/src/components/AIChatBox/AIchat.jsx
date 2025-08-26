@@ -81,12 +81,18 @@ export default function AIchat({ isOpen, onClose }) {
     setIsMaximized(!isMaximized);
   };
 
+  // Handle close with better event handling
+  const handleClose = (e) => {
+    e.stopPropagation();
+    onClose();
+  };
+
   return (
     <>
-      {/* Invisible backdrop for click outside to close */}
+      {/* Invisible backdrop for click outside to close - Only for desktop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 transition-opacity duration-300 z-40"
+          className="fixed inset-0 transition-opacity duration-300 z-40 hidden md:block"
           onClick={onClose}
         />
       )}
@@ -126,6 +132,7 @@ export default function AIchat({ isOpen, onClose }) {
           </div>
           
           <div className="flex items-center space-x-1">
+            {/* Clear Chat Button */}
             <button
               onClick={clearChat}
               className="p-2 rounded-lg hover:bg-amber-200 transition-all duration-200 text-amber-800 hover:text-amber-900 transform hover:scale-110"
@@ -133,21 +140,36 @@ export default function AIchat({ isOpen, onClose }) {
             >
               <FiRotateCcw size={16} />
             </button>
+            
+            {/* Maximize/Minimize Button - Hidden on mobile */}
             <button
               onClick={toggleMaximize}
-              className="p-2 rounded-lg hover:bg-amber-200 transition-all duration-200 text-amber-800 hover:text-amber-900 transform hover:scale-110"
+              className="p-2 rounded-lg hover:bg-amber-200 transition-all duration-200 text-amber-800 hover:text-amber-900 transform hover:scale-110 hidden sm:block"
               title={isMaximized ? "Restore" : "Maximize"}
             >
               {isMaximized ? <FiMinimize2 size={16} /> : <FiMaximize2 size={16} />}
             </button>
+            
+            {/* Enhanced Close Button - More prominent */}
             <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-red-100 hover:text-red-600 transition-all duration-200 text-amber-800 transform hover:scale-110 border-2 border-transparent hover:border-red-300 bg-white shadow-md"
+              onClick={handleClose}
+              className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 transition-all duration-200 transform hover:scale-110 border-2 border-red-300 hover:border-red-400 shadow-md"
               title="Close Chat"
             >
-              <FiX size={18} className="font-bold" />
+              <FiX size={20} className="font-bold" />
             </button>
           </div>
+        </div>
+
+        {/* Additional Close Button for Mobile - Floating */}
+        <div className="md:hidden">
+          <button
+            onClick={handleClose}
+            className="absolute top-2 right-2 z-10 p-2 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg transform hover:scale-110 transition-all duration-200"
+            title="Close Chat"
+          >
+            <FiX size={18} className="font-bold" />
+          </button>
         </div>
 
         {/* Messages Container */}
