@@ -114,7 +114,7 @@ export default function AIchat({ isOpen, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b-4 border-amber-200 flex justify-between items-center bg-gradient-to-r from-amber-100 to-yellow-100 shadow-lg">
+        <div className="p-2 border-b-4 border-amber-200 h-fit flex justify-between items-center bg-gradient-to-r from-amber-100 to-yellow-100 shadow-lg">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -177,7 +177,7 @@ export default function AIchat({ isOpen, onClose }) {
         </div>
 
         {/* Messages Container */}
-        <div className="mb-5 flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-amber-50 to-yellow-50" style={{ height: 'calc(100vh - 204px)' }}>
+        <div className="mb-[-20px] flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-amber-50 to-yellow-50" style={{ height: 'calc(100vh - 204px)' }}>
           {messages.map((msg, index) => (
             <div
               key={index}
