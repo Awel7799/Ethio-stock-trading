@@ -99,14 +99,18 @@ export default function AIchat({ isOpen, onClose }) {
       
       {/* Side Panel Chat Interface */}
       <div
-        className={`fixed right-0 top-0 h-full bg-gradient-to-b from-amber-50 to-yellow-50 shadow-2xl border-l-4 border-amber-300 transition-all duration-300 z-50 ${
+        className={`fixed right-0 bg-gradient-to-b from-amber-50 to-yellow-50 shadow-2xl border-l-4 border-amber-300 transition-all duration-300 z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } ${
           isMaximized 
             ? "w-full lg:w-3/4 xl:w-2/3" 
             : "w-full sm:w-96 lg:w-80 xl:w-96"
         }`}
-        style={{ fontFamily: "Segoe UI, sans-serif" }}
+        style={{ 
+          fontFamily: "Segoe UI, sans-serif",
+          top: "4rem", // Account for navbar height (approximately 64px)
+          height: "calc(100vh - 4rem)" // Full height minus navbar
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -173,7 +177,7 @@ export default function AIchat({ isOpen, onClose }) {
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-amber-50 to-yellow-50" style={{ height: 'calc(100vh - 140px)' }}>
+        <div className="mb-5 flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-amber-50 to-yellow-50" style={{ height: 'calc(100vh - 204px)' }}>
           {messages.map((msg, index) => (
             <div
               key={index}
