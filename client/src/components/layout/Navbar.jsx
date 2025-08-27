@@ -25,10 +25,10 @@ export default function Navigation() {
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
-              <svg className="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6 text-amber-500 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              <span className="text-xl font-bold text-amber-900">TradeWise</span>
+              <span className="text-xl font-bold text-amber-700 italic">TradeWise</span>
             </Link>
           </div>
 
