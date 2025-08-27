@@ -16,3 +16,27 @@
             </h1>
             <p className="text-gray-600 font-medium text-sm">Manage your finances with elegance and control</p>
           </div>
+          {/* Technical Errors - Compact */}
+          {technicalErrors.length > 0 && (
+            <div className="bg-white/90 backdrop-blur-sm border-l-4 border-red-500 rounded-xl shadow-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                    <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-red-900 text-sm">Technical Issues ({technicalErrors.length})</h3>
+                    <p className="text-red-700 text-xs">{technicalErrors[0]?.message}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={clearErrors}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
