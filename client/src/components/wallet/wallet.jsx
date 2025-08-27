@@ -1,4 +1,35 @@
- return (
+import React, { useState } from 'react';
+import { useWallet } from '../../context/WalletContext';
+import DepositForm from './DepositForm';
+import WithdrawForm from './WithdrawForm';
+import TransactionHistory from './TransactionHistory';
+import TransactionStatus from './TransactionStatus';
+
+const Wallett = () => {
+  const {
+    balance,
+    balanceLoading,
+    pendingTransactions,
+    refreshBalance,
+    technicalErrors,
+    clearErrors
+  } = useWallet();
+
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'ETB',
+      minimumFractionDigits: 2
+    }).format(amount).replace('ETB', 'ETB');
+  };
+
+  const handleRefresh = () => {
+    refreshBalance();
+  };
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-25 to-orange-50 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -9,13 +40,7 @@
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
         <div className="space-y-6">
           
-          {/* Compact Header */}
-          <div className="text-center space-y-2 mb-8">
-            <h1 className="text-3xl font-black bg-gradient-to-r from-amber-800 via-yellow-700 to-orange-800 bg-clip-text text-transparent tracking-tight">
-              Wallet Dashboard
-            </h1>
-            <p className="text-gray-600 font-medium text-sm">Manage your finances with elegance and control</p>
-          </div>
+
           {/* Technical Errors - Compact */}
           {technicalErrors.length > 0 && (
             <div className="bg-white/90 backdrop-blur-sm border-l-4 border-red-500 rounded-xl shadow-lg p-4">
@@ -40,7 +65,8 @@
               </div>
             </div>
           )}
-{/* Main Layout */}
+
+          {/* Main Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             
             {/* Balance Card */}
@@ -108,11 +134,12 @@
                 )}
               </div>
             </div>
+
             {/* Quick Stats Sidebar */}
             <div className="space-y-4">
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                <div className="flex items-center space-x-3 p-0">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
                     <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                     </svg>
@@ -124,9 +151,9 @@
                 </div>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                     <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -138,9 +165,9 @@
                 </div>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                     <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
@@ -153,6 +180,7 @@
               </div>
             </div>
           </div>
+
           {/* Enhanced Tab System */}
           <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-amber-200/50 overflow-hidden">
             
@@ -278,4 +306,4 @@
   );
 };
 
-export default Wallett
+export default Wallett;
