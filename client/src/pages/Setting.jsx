@@ -138,25 +138,24 @@ export default function Setting() {
             isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
           }`}
         >
-          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl">
+          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl mt-3.5">
             <Sidebar setActiveSection={setActiveSection} activeSection={activeSection} />
           </div>
         </div>
 
         {/* Main Content Area */}
         <div 
-          className={`flex-1 transform transition-all duration-1200 ${
+          className={` flex-1 transform transition-all duration-1200 ${
             isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
           }`}
           style={{ transitionDelay: "300ms" }}
         >
           {/* Content Background */}
-          <div className="min-h-screen bg-white/40 backdrop-blur-sm border border-amber-200/30 shadow-2xl m-4 rounded-2xl overflow-hidden">
 
 
             {/* Content Area */}
-            <div className="p-8">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-6 min-h-[600px]">
+            <div className="p-3 ">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-6 min-h-[600px] ">
                 {renderSection()}
               </div>
             </div>
@@ -176,7 +175,6 @@ export default function Setting() {
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
