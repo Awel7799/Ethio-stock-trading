@@ -153,3 +153,129 @@
               </div>
             </div>
           </div>
+          {/* Enhanced Tab System */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-amber-200/50 overflow-hidden">
+            
+            {/* Tab Navigation */}
+            <div className="bg-gradient-to-r from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-sm border-b border-amber-200/50 p-4">
+              <nav className="flex justify-center space-x-3" aria-label="Tabs">
+                {[
+                  { id: 'overview', name: 'Overview', icon: 'chart' },
+                  { id: 'deposit', name: 'Deposit', icon: 'plus' },
+                  { id: 'withdraw', name: 'Withdraw', icon: 'minus' },
+                  { id: 'history', name: 'History', icon: 'history' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`${
+                      activeTab === tab.id
+                        ? 'bg-gradient-to-r from-gray-900 to-black text-white shadow-xl'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/60 hover:shadow-md'
+                    } px-6 py-3 rounded-xl font-bold text-sm flex items-center space-x-2 transition-all duration-200 transform hover:scale-105`}
+                  >
+                    {tab.icon === 'chart' && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    )}
+                    {tab.icon === 'plus' && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    )}
+                    {tab.icon === 'minus' && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    )}
+                    {tab.icon === 'history' && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                    <span>{tab.name}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-8 min-h-[600px]">
+              {activeTab === 'overview' && (
+                <div className="space-y-8">
+                  
+                  {/* Transaction Status */}
+                  <div className="bg-gradient-to-br from-amber-50/50 to-yellow-50/30 backdrop-blur-sm rounded-2xl p-6 border border-amber-200/30">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-yellow-700 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">Transaction Status</h3>
+                    </div>
+                    <TransactionStatus />
+                  </div>
+                  
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <button
+                      onClick={() => setActiveTab('deposit')}
+                      className="group bg-gradient-to-br from-white/80 to-green-50/50 backdrop-blur-sm border-2 border-dashed border-green-300 hover:border-green-400 hover:from-green-50/60 hover:to-green-100/40 rounded-2xl p-8 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <div className="text-center">
+                        <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Make Deposit</h3>
+                        <p className="text-gray-600 text-sm">Add funds securely</p>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => setActiveTab('withdraw')}
+                      className="group bg-gradient-to-br from-white/80 to-orange-50/50 backdrop-blur-sm border-2 border-dashed border-orange-300 hover:border-orange-400 hover:from-orange-50/60 hover:to-orange-100/40 rounded-2xl p-8 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <div className="text-center">
+                        <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Withdraw Funds</h3>
+                        <p className="text-gray-600 text-sm">Transfer to bank</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'deposit' && (
+                <div className="bg-gradient-to-br from-amber-50/40 to-yellow-50/30 backdrop-blur-sm rounded-2xl p-8 border border-amber-200/30">
+                  <DepositForm />
+                </div>
+              )}
+              
+              {activeTab === 'withdraw' && (
+                <div className="bg-gradient-to-br from-amber-50/40 to-yellow-50/30 backdrop-blur-sm rounded-2xl p-8 border border-amber-200/30">
+                  <WithdrawForm />
+                </div>
+              )}
+              
+              {activeTab === 'history' && (
+                <div className="bg-gradient-to-br from-amber-50/40 to-yellow-50/30 backdrop-blur-sm rounded-2xl p-8 border border-amber-200/30">
+                  <TransactionHistory />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Wallett
