@@ -229,7 +229,7 @@ const Wallett = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="p-8 min-h-[600px]">
+            <div className="p-8 min-h-fit">
               {activeTab === 'overview' && (
                 <div className="space-y-8">
                   
