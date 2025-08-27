@@ -215,6 +215,7 @@ const AppContent = () => {
 // Main App Component - FIXED: Proper context hierarchy
 function App() {
   return (
+    <div className="bg-amber-100">
     <AuthProvider>
       {/* FIXED: WalletProvider should wrap the entire app after AuthProvider */}
       <WalletProvider>
@@ -223,6 +224,7 @@ function App() {
         </Router>
       </WalletProvider>
     </AuthProvider>
+    </div>
   );
 }
 
