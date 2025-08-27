@@ -1,231 +1,89 @@
-"use client";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { WalletProvider } from "./context/WalletContext";
-
-// Import your existing components
-import AIAssistantIcon from "./components/AIChatBox/AIAssistantIcon.jsx";
-import StockDetailPage from "./components/comman/stockDetailPage/stockDetailPage";
-import HoldingsCard from "./components/market/holdingCards";
-import TradeWiseLanding from "./components/landing/TradeWiseLanding.jsx";
-import Navigation from "./components/layout/Navbar";
-import Markets from "./pages/Market";
-import Portfolio from "./pages/Portfolio";
-import Wallet from "./pages/Wallet.jsx";
-import Setting from "./pages/Setting";
-import Footer from "./components/layout/Footer";
-
-// Loading component
-const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
-      <p className="text-white text-lg">Loading TradeWise...</p>
-    </div>
-  </div>
-);
-
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const authContext = useAuth();
-
-  if (!authContext) {
-    console.error("❌ PROTECTEDROUTE: AuthContext is null/undefined");
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-red-50">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
-          <p className="text-red-500">AuthContext not available</p>
-        </div>
+return (
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-25 to-orange-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-tr from-orange-400 to-amber-500 rounded-full blur-3xl"></div>
       </div>
-    );
-  }
-
-  const { isLoggedIn, loading } = authContext;
-
-  console.log("🔒 PROTECTEDROUTE: Checking authentication");
-  console.log("  - Loading:", loading);
-  console.log("  - IsLoggedIn:", isLoggedIn);
-
-  // Show loading spinner while checking authentication
-  if (loading) {
-    console.log("🔒 PROTECTEDROUTE: Still loading, showing spinner");
-    return <LoadingSpinner />;
-  }
-
-  // If not logged in, redirect to landing page
-  if (!isLoggedIn) {
-    console.log("🔒 PROTECTEDROUTE: Not logged in, redirecting to /");
-    return <Navigate to="/" replace />;
-  }
-
-  console.log("🔒 PROTECTEDROUTE: Authenticated, showing protected content");
-  return children;
-};
-
-// Public Route Component
-const PublicRoute = ({ children }) => {
-  const authContext = useAuth();
-
-  if (!authContext) {
-    console.error("❌ PUBLICROUTE: AuthContext is null/undefined");
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-red-50">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
-          <p className="text-red-500">AuthContext not available</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { isLoggedIn, loading } = authContext;
-
-  console.log("🌐 PUBLICROUTE: Checking authentication");
-  console.log("  - Loading:", loading);
-  console.log("  - IsLoggedIn:", isLoggedIn);
-
-  // Show loading spinner while checking authentication
-  if (loading) {
-    console.log("🌐 PUBLICROUTE: Still loading, showing spinner");
-    return <LoadingSpinner />;
-  }
-
-  // If logged in, redirect to markets page
-  if (isLoggedIn) {
-    console.log("🌐 PUBLICROUTE: User is logged in, redirecting to /markets");
-    return <Navigate to="/markets" replace />;
-  }
-
-  console.log("🌐 PUBLICROUTE: User not logged in, showing landing page");
-  return children;
-};
-
-// UPDATED: Main App Layout for authenticated users with AI icon
-const AuthenticatedLayout = ({ children }) => (
-  <>
-    <Navigation />
-    <main className="min-h-screen relative">
-      {children}
-      {/* AI Assistant Icon - Positioned in middle-right */}
-      {/* AI Assistant Icon - Positioned in bottom-right */}
-      <div className="fixed right-6 bottom-6 z-40">
-        <AIAssistantIcon />
-      </div>
-    </main>
-    <Footer />
-  </>
-);
-
-// Internal App Component (needs to be inside AuthProvider)
-const AppContent = () => {
-  return (
-    <Routes>
-      {/* Public Route - Landing Page */}
-      <Route
-        path="/"
-        element={
-          <PublicRoute>
-            <TradeWiseLanding />
-          </PublicRoute>
-        }
-      />
-
-      {/* Protected Routes - All dashboard pages */}
-      <Route
-        path="/markets"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <div className="p-8">
-                <h1 className="text-2xl font-bold mb-4">Markets Page</h1>
-                <Markets />
+      
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
+        <div className="space-y-6">
+          
+          {/* Compact Header */}
+          <div className="text-center space-y-2 mb-8">
+            <h1 className="text-3xl font-black bg-gradient-to-r from-amber-800 via-yellow-700 to-orange-800 bg-clip-text text-transparent tracking-tight">
+              Wallet Dashboard
+            </h1>
+            <p className="text-gray-600 font-medium text-sm">Manage your finances with elegance and control</p>
+          </div>
+          
+          {/* Technical Errors - Compact */}
+          {technicalErrors.length > 0 && (
+            <div className="bg-white/90 backdrop-blur-sm border-l-4 border-red-500 rounded-xl shadow-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                    <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-red-900 text-sm">Technical Issues ({technicalErrors.length})</h3>
+                    <p className="text-red-700 text-xs">{technicalErrors[0]?.message}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={clearErrors}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                >
+                  Dismiss
+                </button>
               </div>
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/portfolio"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Portfolio />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/wallet"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Wallet />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/setting"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Setting />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/holdings"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <HoldingsCard />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/stock/:symbol"
-        element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <StockDetailPage />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Catch all route - redirect to landing */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
-};
-
-// Main App Component - FIXED: Proper context hierarchy
-function App() {
-  return (
-    <div className="bg-amber-100">
-    <AuthProvider>
-      {/* FIXED: WalletProvider should wrap the entire app after AuthProvider */}
-      <WalletProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </WalletProvider>
-    </AuthProvider>
-    </div>
-  );
-}
-
-export default App;
+            </div>
+          )}
+          {/* Main Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            {/* Balance Card */}
+            <div className="lg:col-span-3">
+              <div className="bg-gradient-to-br from-white via-amber-50/30 to-yellow-50/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-amber-200/50 overflow-hidden">
+                
+                {/* Balance Section */}
+                <div className="relative p-8">
+                  {/* Subtle Pattern */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-300/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+                  
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-yellow-700 rounded-xl flex items-center justify-center shadow-md">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        </div>
+                        <h2 className="text-lg font-bold text-gray-900">Available Balance</h2>
+                      </div>
+                      
+                      {balanceLoading ? (
+                        <div className="animate-pulse bg-gray-200 h-12 w-64 rounded-xl"></div>
+                      ) : (
+                        <div className="bg-white/70 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg border border-amber-100">
+                          <p className="text-4xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent">
+                            {formatCurrency(balance)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <button
+                      onClick={handleRefresh}
+                      disabled={balanceLoading}
+                      className="bg-white/80 hover:bg-white text-gray-800 px-4 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md border border-gray-200 disabled:opacity-50 flex items-center"
+                    >
+                      <svg className={`w-4 h-4 mr-2 ${balanceLoading ? 'animate-spin' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                      </svg>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
