@@ -142,10 +142,7 @@ const AppContent = () => {
         element={
           <ProtectedRoute>
             <AuthenticatedLayout>
-              <div className="p-8">
-                <h1 className="text-2xl font-bold mb-4">Markets Page</h1>
                 <Markets />
-              </div>
             </AuthenticatedLayout>
           </ProtectedRoute>
         }
