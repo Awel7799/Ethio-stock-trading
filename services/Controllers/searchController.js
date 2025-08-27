@@ -1,6 +1,5 @@
 // controllers/searchController.js
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
-const API_KEY = process.env.FMP_API_KEY;
+const API_KEY = process.env.ALPHA_VANTAGE_KEY;
 
 const STOCK_FALLBACK_LIST = [
   { symbol: 'AAPL', name: 'Apple Inc.' },
@@ -12,12 +11,15 @@ const STOCK_FALLBACK_LIST = [
   { symbol: 'META', name: 'Meta Platforms, Inc.' },
 ];
 
+// =======================
 // Autocomplete handler
+// =======================
 exports.autocompleteStocks = async (req, res) => {
   try {
     const q = (req.query.q || '').trim();
     if (!q) return res.status(400).json({ error: 'q required' });
 
+    // No API key? use fallback
     if (!API_KEY) {
       const regex = new RegExp(q, 'i');
       const suggestions = STOCK_FALLBACK_LIST.filter(
@@ -26,20 +28,25 @@ exports.autocompleteStocks = async (req, res) => {
       return res.json({ results: suggestions });
     }
 
-    const url = new URL(`${FMP_BASE}/search`);
-    url.searchParams.set('query', q);
-    url.searchParams.set('limit', '10');
+    // Alpha Vantage SYMBOL_SEARCH
+    const url = new URL('https://www.alphavantage.co/query');
+    url.searchParams.set('function', 'SYMBOL_SEARCH');
+    url.searchParams.set('keywords', q);
     url.searchParams.set('apikey', API_KEY);
 
     const resp = await fetch(url.toString());
     let results = [];
     if (resp.ok) {
       const data = await resp.json();
-      if (Array.isArray(data) && data.length) {
-        results = data.map((i) => ({ symbol: i.symbol, name: i.name }));
+      if (Array.isArray(data?.bestMatches) && data.bestMatches.length) {
+        results = data.bestMatches.map((i) => ({
+          symbol: i['1. symbol'],
+          name: i['2. name'],
+        }));
       }
     }
 
+    // fallback if no matches
     if (!results.length) {
       const regex = new RegExp(q, 'i');
       results = STOCK_FALLBACK_LIST.filter(
@@ -55,7 +62,9 @@ exports.autocompleteStocks = async (req, res) => {
   }
 };
 
+// =======================
 // Detail handler
+// =======================
 exports.getStockDetail = async (req, res) => {
   try {
     const raw = (req.params.symbol || '').trim();
@@ -63,27 +72,33 @@ exports.getStockDetail = async (req, res) => {
     const symbol = raw.toUpperCase();
 
     let normalized = null;
+
     if (API_KEY) {
-      const url = new URL(`${FMP_BASE}/profile/${encodeURIComponent(symbol)}`);
-      url.searchParams.set('apikey', API_KEY);
-      const resp = await fetch(url.toString());
+      // Get live quote
+      const quoteUrl = new URL('https://www.alphavantage.co/query');
+      quoteUrl.searchParams.set('function', 'GLOBAL_QUOTE');
+      quoteUrl.searchParams.set('symbol', symbol);
+      quoteUrl.searchParams.set('apikey', API_KEY);
+
+      const resp = await fetch(quoteUrl.toString());
       if (resp.ok) {
         const data = await resp.json();
-        if (Array.isArray(data) && data[0]) {
-          const item = data[0];
+        const q = data['Global Quote'];
+        if (q) {
           normalized = {
-            symbol: item.symbol,
-            name: item.companyName,
-            logo: item.image,
-            description: item.description,
-            price: item.price ?? null,
-            changesPercentage: item.changesPercentage ?? null,
-            marketState: item.exchangeShortName || '',
+            symbol: q['01. symbol'],
+            name: symbol, // Alpha Vantage free tier doesn’t return company name
+            logo: '', // not available from Alpha Vantage
+            description: '', // not available from Alpha Vantage
+            price: parseFloat(q['05. price']),
+            changesPercentage: parseFloat(q['10. change percent']),
+            marketState: '', // Alpha Vantage doesn’t provide market state
           };
         }
       }
     }
 
+    // Fallback to static list
     if (!normalized) {
       const fallback = STOCK_FALLBACK_LIST.find((s) => s.symbol === symbol);
       if (fallback) {

@@ -1,53 +1,46 @@
 // services/priceFetcher.js
 const axios = require('axios');
 
-const cache = {}; // { SYMBOL: { price: Number, timestamp: ms } }
-const TTL = 600 * 1000; // 15 seconds cache
+const cache = {};
+const TTL = 15 * 1000; // 15s
 
 async function getQuote(symbol) {
   const upper = symbol.toUpperCase();
   const now = Date.now();
 
-  // Check cache
   if (cache[upper] && now - cache[upper].timestamp < TTL) {
     return cache[upper].price;
   }
 
   try {
-    // Fetch from FMP
-    const url = `https://financialmodelingprep.com/api/v3/quote/${upper}`;
-    const resp = await axios.get(url, {
-      params: { apikey: process.env.FMP_API_KEY },
+    const resp = await axios.get('https://www.alphavantage.co/query', {
+      params: {
+        function: 'GLOBAL_QUOTE',
+        symbol: upper,
+        apikey: process.env.ALPHA_VANTAGE_KEY,
+      },
     });
 
-    if (!Array.isArray(resp.data) || resp.data.length === 0) {
-      throw new Error(`No data for ${upper}`);
-    }
+    const quote = resp.data['Global Quote'];
+    if (!quote || !quote['05. price']) throw new Error(`No data for ${upper}`);
 
-    const price = resp.data[0].price;
-    if (typeof price !== 'number') {
-      throw new Error(`Invalid price for ${upper}`);
-    }
+    const price = parseFloat(quote['05. price']);
+    if (isNaN(price)) throw new Error(`Invalid price for ${upper}`);
 
-    // Cache it
     cache[upper] = { price, timestamp: now };
     return price;
   } catch (err) {
-    console.error(`[priceFetcher] Error fetching price for ${upper}:`, err.message);
-    return null; // Let controller handle null
+    console.error(`[priceFetcher] Error for ${upper}:`, err.message);
+    return null;
   }
 }
 
 async function getQuotes(symbols) {
-  const uniqueSymbols = [...new Set(symbols.map(s => s.toUpperCase()))];
+  const uniqueSymbols = [...new Set(symbols.map((s) => s.toUpperCase()))];
   const results = {};
-
-  await Promise.all(
-    uniqueSymbols.map(async sym => {
-      results[sym] = await getQuote(sym);
-    })
-  );
-
+  await Promise.all(uniqueSymbols.map(async (sym) => {
+    results[sym] = await getQuote(sym);
+  }));
   return results;
 }
 
