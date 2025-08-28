@@ -1,4 +1,171 @@
-return (
+"use client";
+
+import { useState } from "react";
+import { useWallet } from "../../context/WalletContext";
+import BankSelector from "./BankSelector.jsx";
+
+const DepositForm = () => {
+  const { initiateDeposit, depositLoading, supportedBanks, technicalErrors } =
+    useWallet();
+
+  // ✅ FIXED: Changed bankName to bankCode
+  const [formData, setFormData] = useState({
+    amount: "",
+    bankCode: "", // ✅ Changed from bankName
+    bankAccount: "",
+    customerPhone: "",
+    customerEmail: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState("");
+
+  const validateForm = () => {
+    const newErrors = {};
+    // Amount validation
+    if (!formData.amount) {
+      newErrors.amount = "Amount is required";
+    } else if (Number.parseFloat(formData.amount) <= 0) {
+      newErrors.amount = "Amount must be greater than 0";
+    } else if (Number.parseFloat(formData.amount) < 10) {
+      newErrors.amount = "Minimum deposit amount is 10 ETB";
+    } else if (Number.parseFloat(formData.amount) > 1000000) {
+      newErrors.amount = "Maximum deposit amount is 1,000,000 ETB";
+    }
+
+    // ✅ FIXED: Changed bankName to bankCode
+    if (!formData.bankCode) {
+      newErrors.bankCode = "Please select a bank";
+    }
+
+    // Bank account validation
+    if (!formData.bankAccount) {
+      newErrors.bankAccount = "Bank account number is required";
+    } else if (formData.bankAccount.length < 10) {
+      newErrors.bankAccount = "Bank account number must be at least 10 digits";
+    } else if (!/^\d+$/.test(formData.bankAccount)) {
+      newErrors.bankAccount = "Bank account number must contain only digits";
+    }
+
+    // Phone validation
+    if (!formData.customerPhone) {
+      newErrors.customerPhone = "Phone number is required";
+    }
+
+    // Email validation
+    if (!formData.customerEmail) {
+      newErrors.customerEmail = "Email address is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
+    // Clear success message when user modifies form
+    if (success) {
+      setSuccess("");
+    }
+  };
+
+  // ✅ FIXED: Changed to handle bankCode instead of bankName
+  const handleBankSelect = (selectedBankValue) => {
+    // selectedBankValue could be the bank object, or just the code string, or even the name string.
+    // We need to ensure we always get the 'code'.
+
+    let actualBankCode = "";
+    if (
+      typeof selectedBankValue === "object" &&
+      selectedBankValue !== null &&
+      selectedBankValue.code
+    ) {
+      // If it's the full bank object, use its code
+      actualBankCode = selectedBankValue.code;
+    } else if (typeof selectedBankValue === "string") {
+      // If it's a string, it could be either the code or the name.
+      // Try to find it in supportedBanks.
+      const foundBankByCode = supportedBanks.find(
+        (bank) => bank.code === selectedBankValue
+      );
+      const foundBankByName = supportedBanks.find(
+        (bank) => bank.name === selectedBankValue
+      );
+
+      if (foundBankByCode) {
+        actualBankCode = foundBankByCode.code;
+      } else if (foundBankByName) {
+        actualBankCode = foundBankByName.code; // This is the key fix for the current issue
+      } else {
+        // Fallback if not found, or handle error
+        console.warn(
+          "Selected bank value not found in supported banks:",
+          selectedBankValue
+        );
+        actualBankCode = ""; // Or keep the current value, or set an error
+      }
+    }
+
+    setFormData((prev) => ({ ...prev, bankCode: actualBankCode }));
+    if (errors.bankCode) {
+      setErrors((prev) => ({ ...prev, bankCode: "" }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    // ✅ FIXED: Add console log to see what's being sent
+    console.log("🔍 Deposit form data being sent:", {
+      amount: Number.parseFloat(formData.amount),
+      bankCode: formData.bankCode,
+      bankAccount: formData.bankAccount,
+      customerPhone: formData.customerPhone,
+      customerEmail: formData.customerEmail,
+      description: "Stock trading wallet deposit",
+    });
+
+    // ✅ FIXED: Call with correct parameters
+    const result = await initiateDeposit({
+      amount: Number.parseFloat(formData.amount),
+      bankCode: formData.bankCode,
+      bankAccount: formData.bankAccount,
+      customerPhone: formData.customerPhone,
+      customerEmail: formData.customerEmail,
+      description: "Stock trading wallet deposit",
+    });
+
+    if (result.success) {
+      setSuccess(
+        "Deposit initiated successfully! Please check your bank app to complete the transaction."
+      );
+      setFormData({ amount: "", bankCode: "", bankAccount: "", customerPhone: "", customerEmail: "" });
+      setErrors({});
+    } else {
+      setErrors({ submit: result.error || "Failed to initiate deposit" });
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    if (!amount) return "";
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  return (
     <div className="w-full max-w-none">
       {/* Header Section */}
       <div className="text-center mb-8">
@@ -50,6 +217,7 @@ return (
           </div>
         </div>
       )}
+
       {/* Main Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
         
@@ -122,6 +290,7 @@ return (
                 <p className="mt-2 text-sm text-red-600 font-medium">{errors.bankCode}</p>
               )}
             </div>
+
             {/* Bank Account Field */}
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200/50">
               <label htmlFor="bankAccount" className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
@@ -211,7 +380,8 @@ return (
                 <p className="mt-2 text-sm text-red-600 font-medium">{errors.customerEmail}</p>
               )}
             </div>
-             {/* Information Box */}
+
+            {/* Information Box */}
             <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start space-x-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -248,6 +418,7 @@ return (
             </div>
           </div>
         </div>
+
         {/* Submit Error */}
         {errors.submit && (
           <div className="bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-2xl p-6 shadow-lg">
