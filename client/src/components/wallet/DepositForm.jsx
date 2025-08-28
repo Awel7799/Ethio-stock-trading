@@ -122,3 +122,92 @@ return (
                 <p className="mt-2 text-sm text-red-600 font-medium">{errors.bankCode}</p>
               )}
             </div>
+            {/* Bank Account Field */}
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200/50">
+              <label htmlFor="bankAccount" className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center mr-2">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                Your Bank Account Number
+              </label>
+              <input
+                type="text"
+                id="bankAccount"
+                name="bankAccount"
+                value={formData.bankAccount}
+                onChange={handleInputChange}
+                placeholder="Enter your account number"
+                className={`block w-full px-4 py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 bg-white/80 backdrop-blur-sm font-semibold transition-all ${
+                  errors.bankAccount ? "border-red-300" : "border-gray-200 hover:border-amber-300"
+                }`}
+                disabled={depositLoading}
+              />
+              {errors.bankAccount && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.bankAccount}</p>
+              )}
+              <p className="mt-2 text-xs text-gray-600 font-medium">
+                Enter the account number you want to transfer from
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            
+            {/* Phone Number Field */}
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200/50">
+              <label htmlFor="customerPhone" className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg flex items-center justify-center mr-2">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                Phone Number (Required)
+              </label>
+              <input
+                type="tel"
+                id="customerPhone"
+                name="customerPhone"
+                value={formData.customerPhone}
+                onChange={handleInputChange}
+                placeholder="+251 912 345678"
+                required
+                className={`block w-full px-4 py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 bg-white/80 backdrop-blur-sm font-semibold transition-all ${
+                  errors.customerPhone ? "border-red-300" : "border-gray-200 hover:border-amber-300"
+                }`}
+                disabled={depositLoading}
+              />
+              {errors.customerPhone && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.customerPhone}</p>
+              )}
+            </div>
+
+            {/* Email Field */}
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200/50">
+              <label htmlFor="customerEmail" className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center mr-2">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                Email Address (Required)
+              </label>
+              <input
+                type="email"
+                id="customerEmail"
+                name="customerEmail"
+                value={formData.customerEmail}
+                onChange={handleInputChange}
+                placeholder="your@email.com"
+                required
+                className={`block w-full px-4 py-4 border-2 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 bg-white/80 backdrop-blur-sm font-semibold transition-all ${
+                  errors.customerEmail ? "border-red-300" : "border-gray-200 hover:border-amber-300"
+                }`}
+                disabled={depositLoading}
+              />
+              {errors.customerEmail && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{errors.customerEmail}</p>
+              )}
+            </div>
