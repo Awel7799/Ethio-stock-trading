@@ -70,7 +70,7 @@ export default function BankSelector({ banks, selectedBank, onBankSelect, error,
 
       {/* Dropdown */}
       {isOpen && !disabled && (
-        <div className="absolute z-max mt-2 w-full bg-white/95 backdrop-blur-md shadow-2xl max-h-80 rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="absolute z-[9999] mt-2 w-full bg-white/95 backdrop-blur-md shadow-2xl max-h-80 rounded-2xl border border-gray-200 overflow-hidden">
           
           {/* Search Input */}
           <div className="sticky top-0 bg-gradient-to-r from-amber-50/80 to-yellow-50/60 backdrop-blur-sm p-4 border-b border-amber-200/50">
@@ -163,7 +163,7 @@ export default function BankSelector({ banks, selectedBank, onBankSelect, error,
       )}
 
       {/* Overlay to close dropdown when clicking outside */}
-      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
+      {isOpen && <div className="fixed inset-0 z-[9998]" onClick={() => setIsOpen(false)} />}
     </div>
   )
 }
