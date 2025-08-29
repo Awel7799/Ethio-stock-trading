@@ -1,4 +1,156 @@
-return (
+"use client"
+
+import { useState } from "react"
+import { useWallet } from "../../context/WalletContext"
+import BankSelector from "./BankSelector"
+
+const WithdrawForm = () => {
+  const { balance, initiateWithdraw, withdrawLoading, supportedBanks, technicalErrors, user } = useWallet()
+
+  const [formData, setFormData] = useState({
+    amount: "",
+    bankCode: "",
+    bankAccount: "",
+    customerPhone: user?.phone || "",
+    customerEmail: user?.email || "",
+  })
+  const [errors, setErrors] = useState({})
+  const [success, setSuccess] = useState("")
+
+  const validateForm = () => {
+    const newErrors = {}
+    let isValid = true
+
+    // Amount validation
+    if (!formData.amount) {
+      newErrors.amount = "Amount is required"
+      isValid = false
+    } else if (Number.parseFloat(formData.amount) <= 0) {
+      newErrors.amount = "Amount must be greater than 0"
+      isValid = false
+    } else if (Number.parseFloat(formData.amount) < 10) {
+      newErrors.amount = "Minimum withdrawal amount is 10 ETB"
+      isValid = false
+    } else if (Number.parseFloat(formData.amount) > balance) {
+      newErrors.amount = `Insufficient balance. Available: ${formatCurrency(balance)}`
+      isValid = false
+    } else if (Number.parseFloat(formData.amount) > 500000) {
+      newErrors.amount = "Maximum withdrawal amount is 500,000 ETB"
+      isValid = false
+    }
+    // Bank validation
+    if (!formData.bankCode) {
+      newErrors.bankCode = "Please select a bank"
+      isValid = false
+    }
+    // Bank account validation
+    if (!formData.bankAccount) {
+      newErrors.bankAccount = "Bank account number is required"
+      isValid = false
+    } else if (formData.bankAccount.length < 10) {
+      newErrors.bankAccount = "Bank account number must be at least 10 digits"
+      isValid = false
+    } else if (!/^\d+$/.test(formData.bankAccount)) {
+      newErrors.bankAccount = "Bank account number must contain only digits"
+      isValid = false
+    }
+
+    // Phone validation for production mode
+    if (!formData.customerPhone) {
+      newErrors.customerPhone = "Phone number is required"
+      isValid = false
+    } else if (!/^(\+251|0)[0-9]{9}$/.test(formData.customerPhone.replace(/\s/g, ""))) {
+      newErrors.customerPhone = "Invalid Ethiopian phone number format"
+      isValid = false
+    }
+
+    // Email validation for production mode
+    if (!formData.customerEmail) {
+      newErrors.customerEmail = "Email address is required"
+      isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
+      newErrors.customerEmail = "Invalid email format"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }))
+    }
+
+    // Clear success message when user modifies form
+    if (success) {
+      setSuccess("")
+    }
+  }
+
+  const handleBankSelect = (bankCode) => {
+    setFormData((prev) => ({ ...prev, bankCode }))
+    if (errors.bankCode) {
+      setErrors((prev) => ({ ...prev, bankCode: "" }))
+    }
+  }
+
+  const handleMaxAmount = () => {
+    const maxWithdraw = Math.min(balance, 500000)
+    setFormData((prev) => ({ ...prev, amount: maxWithdraw.toString() }))
+    if (errors.amount) {
+      setErrors((prev) => ({ ...prev, amount: "" }))
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    // Construct customerName from the 'user' object
+    const customerName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : ""
+
+    const result = await initiateWithdraw({
+      amount: Number.parseFloat(formData.amount),
+      bankCode: formData.bankCode,
+      bankAccount: formData.bankAccount,
+      description: "Stock trading wallet withdrawal",
+      customerName: customerName,
+      customerPhone: formData.customerPhone,
+      customerEmail: formData.customerEmail,
+    })
+
+    if (result.success) {
+      setSuccess("Withdrawal initiated successfully! Funds will be transferred to your bank account.")
+      setFormData({ 
+        amount: "", 
+        bankCode: "", 
+        bankAccount: "", 
+        customerPhone: user?.phone || "", 
+        customerEmail: user?.email || "" 
+      })
+      setErrors({})
+    } else {
+      setErrors({ submit: result.error || "Failed to initiate withdrawal" })
+    }
+  }
+
+  const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return ""
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
+  }
+
+  return (
     <div className="w-full max-w-none">
       {/* Header Section */}
       <div className="text-center mb-8">
@@ -42,6 +194,7 @@ return (
           </div>
         </div>
       )}
+
       {/* Low Balance Warning */}
       {balance < 100 && (
         <div className="mb-8 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 shadow-lg">
@@ -163,6 +316,7 @@ return (
                 <p className="mt-2 text-sm text-red-600 font-medium">{errors.bankCode}</p>
               )}
             </div>
+
             {/* Bank Account Field */}
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200/50">
               <label htmlFor="bankAccount" className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
@@ -256,6 +410,7 @@ return (
                 Used for transaction receipts and notifications
               </p>
             </div>
+
             {/* Information Box */}
             <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start space-x-4">
@@ -353,5 +508,3 @@ return (
 }
 
 export default WithdrawForm
-
-
