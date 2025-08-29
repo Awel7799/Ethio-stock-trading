@@ -256,5 +256,102 @@ return (
                 Used for transaction receipts and notifications
               </p>
             </div>
+            {/* Information Box */}
+            <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/60 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 shadow-lg">
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                  <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-blue-900 mb-2">Important Notes</h4>
+                  <ul className="text-xs text-blue-800 space-y-1 font-medium">
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Minimum withdrawal: 10 ETB
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Maximum withdrawal: 500,000 ETB per transaction
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Funds will be transferred to your bank account
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Processing time: Usually 1-3 business hours
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Make sure the account number is correct
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-1">•</span>
+                      Phone and email are required for notifications
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Error */}
+        {errors.submit && (
+          <div className="bg-gradient-to-br from-red-50 to-pink-50 border border-red-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
+                <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-bold text-red-900 mb-1">Error</h4>
+                <p className="text-sm text-red-800">{errors.submit}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <div className="flex justify-center pt-4">
+          <button
+            type="submit"
+            disabled={withdrawLoading || balance < 10}
+            className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-800 text-white px-12 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-3"
+          >
+            {withdrawLoading ? (
+              <>
+                <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Processing...</span>
+              </>
+            ) : balance < 10 ? (
+              <>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <span>Insufficient Balance</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+                <span>Initiate Withdrawal</span>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+export default WithdrawForm
 
 
