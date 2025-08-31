@@ -26,7 +26,7 @@ function PersonalInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-4 sm:p-6 flex items-center justify-center relative overflow-hidden">
+    <div className="h-fit bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-4 sm:p-6 flex items-center justify-center relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-amber-200/30 to-yellow-200/30 rounded-full blur-3xl animate-pulse"></div>
@@ -36,11 +36,6 @@ function PersonalInfo() {
       <div className="w-[85%] bg-white/95 backdrop-blur-lg p-2 sm:p-3 md:p-4 shadow-2xl rounded-3xl border border-amber-100/50 relative z-10 transform hover:scale-[1.01] transition-transform duration-500">
         {/* Enhanced header with icon */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-2xl shadow-lg mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-          </div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-600 bg-clip-text text-transparent">
             Personal Information
           </h2>
