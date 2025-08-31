@@ -26,16 +26,21 @@ function PersonalInfo() {
   };
 
   return (
-    <div className="h-fit bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-4 sm:p-6 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-4 sm:p-6 flex items-center justify-center relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-amber-200/30 to-yellow-200/30 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-orange-200/30 to-amber-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
       
-      <div className="w-[85%] bg-white/95 backdrop-blur-lg p-2 sm:p-3 md:p-4 shadow-2xl rounded-3xl border border-amber-100/50 relative z-10 transform hover:scale-[1.01] transition-transform duration-500">
+      <div className="w-[85%] bg-white/95 backdrop-blur-lg p-2 sm:p-3 md:p-4 shadow-2xl rounded-3xl border border-amber-100/50 relative z-10 transform hover:scale-[1.01] transition-transform duration-500 b">
         {/* Enhanced header with icon */}
         <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-2xl shadow-lg mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-600 bg-clip-text text-transparent">
             Personal Information
           </h2>
@@ -51,7 +56,7 @@ function PersonalInfo() {
               onChange={handleChange} 
               onFocus={() => setFocusedField("name")}
               onBlur={() => setFocusedField("")}
-              className="w-full border-2 border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
+              className="w-full border-1 shadow-md border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
             />
             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${focusedField === "name" || form.name ? "scale-110 text-amber-500" : "text-gray-400"}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +73,7 @@ function PersonalInfo() {
               onChange={handleChange} 
               onFocus={() => setFocusedField("dob")}
               onBlur={() => setFocusedField("")}
-              className="w-full border-2 border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white text-sm sm:text-base group-hover:shadow-md"
+              className="w-full border-1 shadow-md border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white text-sm sm:text-base group-hover:shadow-md"
             />
             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${focusedField === "dob" || form.dob ? "scale-110 text-amber-500" : "text-gray-400"}`}>
               <svg className=" pl-9 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +91,7 @@ function PersonalInfo() {
               onChange={handleChange} 
               onFocus={() => setFocusedField("address")}
               onBlur={() => setFocusedField("")}
-              className="w-full border-2 border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
+              className="w-full border-1 shadow-md border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
             />
             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${focusedField === "address" || form.address ? "scale-110 text-amber-500" : "text-gray-400"}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +110,7 @@ function PersonalInfo() {
               onChange={handleChange} 
               onFocus={() => setFocusedField("phone")}
               onBlur={() => setFocusedField("")}
-              className="w-full border-2 border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
+              className="w-full border-1 shadow-md border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
             />
             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${focusedField === "phone" || form.phone ? "scale-110 text-amber-500" : "text-gray-400"}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,7 +128,7 @@ function PersonalInfo() {
               onChange={handleChange} 
               onFocus={() => setFocusedField("email")}
               onBlur={() => setFocusedField("")}
-              className="w-full border-2 border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
+              className="w-full border-1 shadow-md border-gray-200 p-3 sm:p-4 rounded-2xl focus:border-amber-400 focus:ring-4 focus:ring-amber-100 focus:outline-none transition-all duration-300 bg-gradient-to-r from-gray-50/50 to-white hover:from-white hover:to-white placeholder-gray-500 text-sm sm:text-base group-hover:shadow-md"
             />
             <div className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${focusedField === "email" || form.email ? "scale-110 text-amber-500" : "text-gray-400"}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
