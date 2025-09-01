@@ -4,7 +4,7 @@ import PersonalInfo from "../components/setting/PersonalInfo";
 import Profile from "../components/setting/profile";
 import Security from "../components/setting/security";
 import VerifyKYC from "../components/setting/VerifyKYC";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 // Animated Background Component (matching landing page)
 const AnimatedBackground = () => {
@@ -99,11 +99,79 @@ const AnimatedBackground = () => {
   )
 }
 
+// Mobile Dropdown Component
+const MobileDropdown = ({ setActiveSection, activeSection }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navItem = [
+    { id: "Profile", label: "Profile" },
+    { id: "PersonalInfo", label: "Personal Info" },
+    { id: "Security", label: "Security" },
+    { id: "VerifyKYC", label: "Verify KYC" },
+  ];
+
+  const handleItemClick = (itemId) => {
+    setActiveSection(itemId);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="lg:hidden relative">
+      {/* Dropdown Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-white/90 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4 flex items-center justify-between shadow-lg"
+      >
+        <span className="font-medium text-amber-800">
+          {navItem.find(item => item.id === activeSection)?.label || "Settings"}
+        </span>
+        <svg 
+          className={`w-5 h-5 text-amber-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          fill="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path d="M7,10L12,15L17,10H7Z"/>
+        </svg>
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-amber-200/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+          {navItem.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleItemClick(item.id)}
+              className={`w-full text-left p-4 transition-colors duration-200 ${
+                activeSection === item.id
+                  ? "bg-amber-100 text-amber-900 font-medium"
+                  : "hover:bg-amber-50 text-amber-700"
+              } first:rounded-t-xl last:rounded-b-xl`}
+            >
+              {item.label}
+            </button>
+          ))}
+          
+          {/* Logout in dropdown */}
+          <div className="border-t border-amber-200/30">
+            <button
+              onClick={() => {
+                console.log("Logging out...");
+                setIsOpen(false);
+              }}
+              className="w-full text-left p-4 text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-b-xl"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Setting() {
   const [activeSection, setActiveSection] = useState("Profile");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const sidebarRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -111,20 +179,6 @@ export default function Setting() {
     }, 100)
     return () => clearTimeout(timer)
   }, [])
-
-  // Close mobile menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        setIsMobileMenuOpen(false);
-      }
-    }
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const renderSection = () => {
     switch (activeSection) {
@@ -146,57 +200,43 @@ export default function Setting() {
       {/* Animated Background */}
       <AnimatedBackground />
       
-      {/* Mobile menu button */}
-      <button 
-        className="md:hidden fixed top-4 left-4 z-40 bg-amber-500 text-white p-2 rounded-md shadow-lg"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-
+      {/* Mobile Dropdown Header */}
+      <div className="lg:hidden p-4 relative z-20">
+        <MobileDropdown setActiveSection={setActiveSection} activeSection={activeSection} />
+      </div>
+      
       {/* Main Content Container */}
-      <div className="relative z-10 flex flex-col md:flex-row min-h-screen pt-16 md:pt-0">
-        {/* Sidebar Container */}
+      <div className="relative z-10 flex min-h-screen">
+        {/* Desktop Sidebar Container */}
         <div 
-          ref={sidebarRef}
-          className={`fixed md:relative inset-y-0 left-0 z-30 w-64 bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl transform transition-transform duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          } ${isLoaded ? "opacity-100" : "opacity-0"} mt-0 md:mt-3.5`}
+          className={`hidden lg:block transform transition-all duration-1000 ${
+            isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+          }`}
         >
-          <Sidebar 
-            setActiveSection={setActiveSection} 
-            activeSection={activeSection} 
-            onItemClick={() => setIsMobileMenuOpen(false)}
-          />
+          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl mt-3.5">
+            <Sidebar setActiveSection={setActiveSection} activeSection={activeSection} />
+          </div>
         </div>
-
-        {/* Overlay for mobile menu */}
-        {isMobileMenuOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-30 z-20 md:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          ></div>
-        )}
 
         {/* Main Content Area */}
         <div 
-          className={`flex-1 transform transition-all duration-500 ${
-            isLoaded ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
+          className={`flex-1 transform transition-all duration-1200 ${
+            isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
           }`}
-          style={{ transitionDelay: "200ms" }}
+          style={{ transitionDelay: "300ms" }}
         >
-          {/* Content Background */}
-          <div className="p-4 md:p-6 w-full md:w-[90%] lg:w-[80%] m-auto">
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-4 md:p-6 min-h-[500px] md:min-h-[600px]">
-              {renderSection()}
+          {/* Content Area */}
+          <div className="p-3 lg:p-6">
+            <div className="w-full max-w-none mx-auto">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-4 lg:p-8 min-h-[600px]">
+                {renderSection()}
+              </div>
             </div>
           </div>
 
           {/* Footer Section */}
-          <div className="bg-gradient-to-r from-amber-50/50 to-yellow-50/50 backdrop-blur-sm p-4 border-t border-amber-200/50 mt-6">
-            <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-amber-700">
+          <div className="bg-gradient-to-r from-amber-50/50 to-yellow-50/50 backdrop-blur-sm p-4 border-t border-amber-200/50">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-amber-700">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm"></div>
                 <span>All changes saved automatically</span>
