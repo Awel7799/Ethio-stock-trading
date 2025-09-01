@@ -227,11 +227,7 @@ export default function Setting() {
         >
           {/* Content Area */}
           <div className="p-3 lg:p-6">
-            <div className="w-full max-w-none mx-auto">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-4 lg:p-8 min-h-[600px]">
-                {renderSection()}
-              </div>
-            </div>
+            {renderSection()}
           </div>
 
           {/* Footer Section */}
