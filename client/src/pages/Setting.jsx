@@ -209,18 +209,18 @@ export default function Setting() {
       <div className="relative z-10 flex min-h-screen">
         {/* Desktop Sidebar Container */}
         <div 
-          className={`hidden lg:block transform transition-all duration-1000 ${
+          className={`hidden lg:block fixed left-0 top-0 h-screen z-30 transform transition-all duration-1000 ${
             isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
           }`}
         >
-          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl mt-3.5">
+          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl h-full">
             <Sidebar setActiveSection={setActiveSection} activeSection={activeSection} />
           </div>
         </div>
 
         {/* Main Content Area */}
         <div 
-          className={`flex-1 transform transition-all duration-1200 ${
+          className={`flex-1 lg:ml-64 transform transition-all duration-1200 ${
             isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
           }`}
           style={{ transitionDelay: "300ms" }}
