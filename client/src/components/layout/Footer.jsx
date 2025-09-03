@@ -1,5 +1,54 @@
+import { useState, useEffect } from "react"
+
+const TrendingUp = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+    <polyline points="17 6 23 6 23 12"></polyline>
+  </svg>
+)
+
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const [particles, setParticles] = useState([])
+  const currentYear = new Date().getFullYear()
+
+  useEffect(() => {
+    // Generate floating golden particles for footer background
+    const generateFooterParticles = () => {
+      const newParticles = []
+      for (let i = 0; i < 12; i++) {
+        newParticles.push({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 6 + 2,
+          color: ["bg-yellow-400", "bg-amber-400", "bg-orange-400"][Math.floor(Math.random() * 3)],
+          opacity: Math.random() * 0.3 + 0.1,
+          duration: Math.random() * 15 + 10,
+          delay: Math.random() * 3,
+        })
+      }
+      setParticles(newParticles)
+    }
+    generateFooterParticles()
+
+    // Add CSS animations
+    const styleElement = document.createElement('style')
+    styleElement.textContent = `
+      @keyframes floatSlow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-15px) rotate(90deg); }
+        50% { transform: translateY(-8px) rotate(180deg); }
+        75% { transform: translateY(-20px) rotate(270deg); }
+      }
+    `
+    document.head.appendChild(styleElement)
+
+    return () => {
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement)
+      }
+    }
+  }, [])
 
   const socialIcons = {
     facebook: (
@@ -19,96 +68,68 @@ const Footer = () => {
     ),
     instagram: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447c0-1.297.49-2.448 1.297-3.323.875-.807 2.026-1.297 3.323-1.297 1.297 0 2.448.49 3.323 1.297.807.875 1.297 2.026 1.297 3.323 0 1.297-.49 2.448-1.297 3.323-.875.807-2.026 1.297-3.323 1.297zm7.83-9.404c-.49 0-.875-.385-.875-.875 0-.49.385-.875.875-.875.49 0 .875.385.875.875 0 .49-.385.875-.875.875zm-4.262 9.404c-2.448 0-4.427-1.979-4.427-4.427 0-2.448 1.979-4.427 4.427-4.427 2.448 0 4.427 1.979 4.427 4.427 0 2.448-1.979 4.427-4.427 4.427z" />
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
       </svg>
     ),
-  };
+  }
 
   const contactIcons = {
     email: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-        />
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
     phone: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-        />
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
       </svg>
     ),
     location: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-        />
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
-  };
+  }
 
   return (
-    <footer className="bg-gradient-to-b from-white via-green-50 to-white text-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+    <footer className="relative bg-gradient-to-b from-black via-gray-900 to-black text-white overflow-hidden">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            className={`absolute rounded-full ${particle.color} animate-pulse shadow-lg`}
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              opacity: particle.opacity,
+              animationDuration: `${particle.duration}s`,
+              animationDelay: `${particle.delay}s`,
+              boxShadow: "0 0 15px rgba(251, 191, 36, 0.2)",
+              animation: `floatSlow ${particle.duration}s ease-in-out infinite ${particle.delay}s, pulse ${particle.duration * 0.8}s ease-in-out infinite ${particle.delay}s`,
+            }}
+          />
+        ))}
+        
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-transparent to-yellow-900/10" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Company Information */}
-          <div className="space-y-5">
-            {/* Logo */}
-            <div className="flex items-center flex-shrink-0">
-              <a href="/" className="flex items-center space-x-2">
-                <svg
-                  className="h-6 w-6 text-gray-900"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-                <span className="text-xl font-semibold text-gray-900">
-                  TradeWise
-                </span>
-              </a>
+          <div className="space-y-6">
+            {/* Logo matching the header */}
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="text-amber-400 w-8 h-8" />
+              <span className="text-white text-2xl font-bold">TradeWise</span>
             </div>
 
-            <p className="text-black text-sm leading-relaxed">
-              Ethiopia's first stock trading platform, bridging the gap between
-              investors and the emerging capital market.
+            <p className="text-amber-200 text-sm leading-relaxed drop-shadow-sm">
+              Your Gateway to Smart Trading. Experience the future of trading with cutting-edge analytics and professional insights.
             </p>
 
             <div className="flex space-x-4">
@@ -116,7 +137,7 @@ const Footer = () => {
                 <a
                   key={platform}
                   href="#"
-                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 rounded-lg hover:bg-white/50"
+                  className="text-amber-400 hover:text-amber-300 transition-all duration-300 p-3 rounded-full bg-black bg-opacity-30 backdrop-blur-sm hover:bg-opacity-50 hover:scale-110 border border-amber-500/20 hover:border-amber-400/40 shadow-lg"
                   aria-label={`Follow us on ${platform}`}
                 >
                   {icon}
@@ -125,50 +146,50 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Products & Services */}
+          {/* Trading Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
-              Products
+            <h4 className="text-xl font-bold mb-6 text-amber-400 border-b border-amber-500/30 pb-2">
+              Trading Services
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {[
-                "Stock Trading",
-                "Portfolio Management",
-                "Digital Wallet",
-                "Market Analysis",
-                "Educational Resources",
+                "Real-Time Analytics",
+                "Portfolio Management", 
+                "Market Insights",
+                "Trading Signals",
+                "Risk Management",
               ].map((item) => (
                 <li key={item}>
                   <a
                     href="#"
-                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200 text-sm"
+                    className="text-amber-200 hover:text-amber-100 transition-colors duration-300 text-sm hover:translate-x-1 transform block py-1 drop-shadow-sm"
                   >
-                    {item}
+                    • {item}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Learning Resources */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
-              Resources
+            <h4 className="text-xl font-bold mb-6 text-amber-400 border-b border-amber-500/30 pb-2">
+              Learn & Grow
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {[
-                "Market News",
-                "Trading Tutorials",
-                "Investment Guides",
-                "API Documentation",
+                "Market Education",
+                "Trading Tutorials", 
+                "Expert Analysis",
                 "Webinars",
+                "Trading Community",
               ].map((item) => (
                 <li key={item}>
                   <a
                     href="#"
-                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200 text-sm"
+                    className="text-amber-200 hover:text-amber-100 transition-colors duration-300 text-sm hover:translate-x-1 transform block py-1 drop-shadow-sm"
                   >
-                    {item}
+                    • {item}
                   </a>
                 </li>
               ))}
@@ -177,67 +198,82 @@ const Footer = () => {
 
           {/* Contact Information */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 border-b border-gray-300 pb-2">
-              Contact Us
+            <h4 className="text-xl font-bold mb-6 text-amber-400 border-b border-amber-500/30 pb-2">
+              Get In Touch
             </h4>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <div className="mt-1 mr-3 text-gray-600">
+            <ul className="space-y-5">
+              <li className="flex items-start group">
+                <div className="mt-1 mr-4 text-amber-400 group-hover:text-amber-300 transition-colors">
                   {contactIcons.email}
                 </div>
-                <span className="text-sm text-gray-700">
-                  support@ethiotrade.com
+                <span className="text-sm text-amber-200 group-hover:text-amber-100 transition-colors">
+                  support@tradewise.com
                 </span>
               </li>
-              <li className="flex items-start">
-                <div className="mt-1 mr-3 text-gray-600">
+              <li className="flex items-start group">
+                <div className="mt-1 mr-4 text-amber-400 group-hover:text-amber-300 transition-colors">
                   {contactIcons.phone}
                 </div>
-                <span className="text-sm text-gray-700">+251 11 123 4567</span>
+                <span className="text-sm text-amber-200 group-hover:text-amber-100 transition-colors">
+                  +1 (555) 123-4567
+                </span>
               </li>
-              <li className="flex items-start">
-                <div className="mt-1 mr-3 text-gray-600">
+              <li className="flex items-start group">
+                <div className="mt-1 mr-4 text-amber-400 group-hover:text-amber-300 transition-colors">
                   {contactIcons.location}
                 </div>
-                <span className="text-sm text-gray-700">
-                  Bole Road, Addis Ababa, Ethiopia
+                <span className="text-sm text-amber-200 group-hover:text-amber-100 transition-colors">
+                  Financial District, New York
                 </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        {/* Divider with golden accent */}
+        <div className="border-t border-amber-500/30 my-8 relative">
+          <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-500 to-yellow-600 w-16 h-0.5"></div>
+        </div>
 
         {/* Bottom Footer */}
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-gray-600 text-sm">
-            © {currentYear} EthioTrade Inc. All rights reserved.
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+          <div className="text-amber-300 text-sm drop-shadow-sm">
+            © {currentYear} TradeWise Inc. All rights reserved.
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-8">
             {[
               "Privacy Policy",
-              "Terms of Service",
+              "Terms of Service", 
               "Security",
               "Compliance",
-              "EthSwitch",
-              "Fayda ID",
+              "Risk Disclosure",
             ].map((item) => (
               <a
                 key={item}
                 href="#"
-                className="text-gray-600 hover:text-gray-900 text-sm transition-colors duration-200"
+                className="text-amber-200 hover:text-amber-100 text-sm transition-all duration-300 hover:scale-105 drop-shadow-sm"
               >
                 {item}
               </a>
             ))}
           </div>
+
+          {/* Trust indicators */}
+          <div className="flex items-center space-x-4 text-xs text-amber-400">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Secure</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+              <span>Licensed</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
