@@ -13,16 +13,10 @@ function Sidebar({ setActiveSection, activeSection }) {
   };
 
   return (
-    <div className="w-80 min-h-screen bg-gradient-to-b from-white/95 to-yellow-50/95 backdrop-blur-md border-r border-black/10 shadow-2xl">
-      {/* Header */}
-      <div className="p-8 border-b border-black/10 bg-gradient-to-r from-yellow-100/50 to-white/80">
-        <h2 className="text-2xl font-bold text-black mb-2">Settings</h2>
-        <p className="text-black/70 text-sm">Manage your account preferences</p>
-      </div>
-
+    <div className="w-64 min-h-[86%] mt-18 ml-1.5 pb-0 bg-gradient-to-b  from-white/95 to-yellow-50/95 backdrop-blur-md border-r border-black/10 shadow-xl">
       {/* Navigation */}
-      <div className="p-6">
-        <ul className="space-y-2">
+      <div className="p-6 pt-8">
+        <ul className="space-y-3">
           {navItem.map((item) => (
             <li key={item.id}>
               <button
@@ -48,7 +42,7 @@ function Sidebar({ setActiveSection, activeSection }) {
         </ul>
 
         {/* Logout Button */}
-        <div className="mt-12 pt-6 border-t border-black/10">
+        <div className="mt-auto pt-8">
           <button
             onClick={handleLogout}
             className="w-full p-4 rounded-xl bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-700 hover:text-red-800 font-medium transition-all duration-300 flex items-center space-x-3 group hover:shadow-lg"
@@ -64,21 +58,9 @@ function Sidebar({ setActiveSection, activeSection }) {
             </div>
           </button>
         </div>
-
-        {/* User Info Section */}
-        <div className="mt-8 p-4 rounded-xl bg-gradient-to-r from-yellow-50/80 to-white/80 border border-black/10">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-200 to-amber-200 flex items-center justify-center">
-              <span className="text-black font-bold">U</span>
-            </div>
-            <div>
-              <p className="text-black font-medium text-sm">User Account</p>
-              <p className="text-black/60 text-xs">Premium Member</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 }
+
 export default Sidebar;
