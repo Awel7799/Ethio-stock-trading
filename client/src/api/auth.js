@@ -154,17 +154,6 @@ const apiRequest = async (url, options = {}) => {
       const data = await response.json().catch(() => ({}))
       console.log('❌ Response data:', data)
 
-      // Handle rate limiting (429 status)
-      if (response.status === 429) {
-        console.log('⏳ Rate limit exceeded, handling gracefully...')
-        return { 
-          success: false, 
-          message: data.message || 'Too many requests. Please wait before trying again.',
-          code: 'RATE_LIMIT_EXCEEDED',
-          rateLimited: true
-        }
-      }
-
       // Handle token expiration
       if (response.status === 401) {
         if (data.code === "TOKEN_EXPIRED" || (data.message && data.message.includes("expired"))) {
@@ -296,23 +285,6 @@ export const authAPI = {
   login: async (credentials) => {
     try {
       console.log('🔐 Attempting login...')
-      
-      // Check client-side rate limiting before making request
-      if (isRateLimited()) {
-        const remainingTime = getRemainingCooldown()
-        const minutes = Math.ceil(remainingTime / (60 * 1000))
-        console.log('⏳ Client-side rate limit active, blocking request')
-        return { 
-          success: false, 
-          message: `Too many login attempts. Please wait ${minutes} minute(s) before trying again.`,
-          code: 'CLIENT_RATE_LIMIT',
-          rateLimited: true
-        }
-      }
-
-      // Record this login attempt
-      recordLoginAttempt()
-
       const response = await apiRequest("/auth/login", {
         method: "POST",
         body: JSON.stringify(credentials),
@@ -320,9 +292,6 @@ export const authAPI = {
 
       if (response.success) {
         console.log('✅ Login successful')
-        // Clear rate limit data on successful login
-        localStorage.removeItem(RATE_LIMIT_KEY)
-        
         const accessToken = response.token || response.data?.accessToken
         const refreshToken = response.data?.refreshToken
         const user = response.user || response.data?.user
