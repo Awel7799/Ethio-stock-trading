@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext"; // Import the real useAuth hook
 
 function Security() {
   const [password, setPassword] = useState("");
@@ -7,10 +8,8 @@ function Security() {
   const [focusedField, setFocusedField] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Mock logout function since useAuth is not available
-  const logout = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  };
+  // Use the real logout function from AuthContext
+  const { logout } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,9 +26,12 @@ function Security() {
       setIsLoggingOut(true);
       try {
         await logout();
+        // No need to set isLoggingOut back to false - user will be redirected
       } catch (error) {
         console.error("Logout failed:", error);
         setIsLoggingOut(false);
+        // Optionally show error to user
+        setError("Logout failed. Please try again.");
       }
     }
   };
