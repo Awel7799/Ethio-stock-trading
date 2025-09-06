@@ -1,5 +1,5 @@
 // controllers/searchController.js
-const API_KEY = process.env.ALPHA_VANTAGE_KEY;
+const API_KEY = process.env.token;
 
 const STOCK_FALLBACK_LIST = [
   { symbol: 'AAPL', name: 'Apple Inc.' },
@@ -19,7 +19,6 @@ exports.autocompleteStocks = async (req, res) => {
     const q = (req.query.q || '').trim();
     if (!q) return res.status(400).json({ error: 'q required' });
 
-    // No API key? use fallback
     if (!API_KEY) {
       const regex = new RegExp(q, 'i');
       const suggestions = STOCK_FALLBACK_LIST.filter(
@@ -28,25 +27,19 @@ exports.autocompleteStocks = async (req, res) => {
       return res.json({ results: suggestions });
     }
 
-    // Alpha Vantage SYMBOL_SEARCH
-    const url = new URL('https://www.alphavantage.co/query');
-    url.searchParams.set('function', 'SYMBOL_SEARCH');
-    url.searchParams.set('keywords', q);
-    url.searchParams.set('apikey', API_KEY);
-
-    const resp = await fetch(url.toString());
+    const url = `https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${API_KEY}`;
+    const resp = await fetch(url);
     let results = [];
     if (resp.ok) {
       const data = await resp.json();
-      if (Array.isArray(data?.bestMatches) && data.bestMatches.length) {
-        results = data.bestMatches.map((i) => ({
-          symbol: i['1. symbol'],
-          name: i['2. name'],
+      if (Array.isArray(data.result) && data.result.length) {
+        results = data.result.map((i) => ({
+          symbol: i.symbol,
+          name: i.description,
         }));
       }
     }
 
-    // fallback if no matches
     if (!results.length) {
       const regex = new RegExp(q, 'i');
       results = STOCK_FALLBACK_LIST.filter(
@@ -74,43 +67,33 @@ exports.getStockDetail = async (req, res) => {
     let normalized = null;
 
     if (API_KEY) {
-      // Get live quote
-      const quoteUrl = new URL('https://www.alphavantage.co/query');
-      quoteUrl.searchParams.set('function', 'GLOBAL_QUOTE');
-      quoteUrl.searchParams.set('symbol', symbol);
-      quoteUrl.searchParams.set('apikey', API_KEY);
+      const [quoteResp, profileResp] = await Promise.all([
+        fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`),
+        fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${API_KEY}`)
+      ]);
 
-      const resp = await fetch(quoteUrl.toString());
-      if (resp.ok) {
-        const data = await resp.json();
-        const q = data['Global Quote'];
-        if (q) {
+      if (quoteResp.ok && profileResp.ok) {
+        const q = await quoteResp.json();
+        const p = await profileResp.json();
+
+        if (q.c) {
           normalized = {
-            symbol: q['01. symbol'],
-            name: symbol, // Alpha Vantage free tier doesn’t return company name
-            logo: '', // not available from Alpha Vantage
-            description: '', // not available from Alpha Vantage
-            price: parseFloat(q['05. price']),
-            changesPercentage: parseFloat(q['10. change percent']),
-            marketState: '', // Alpha Vantage doesn’t provide market state
+            symbol,
+            name: p.name || symbol,
+            logo: p.logo || '',
+            description: p.finnhubIndustry || '',
+            price: q.c,
+            changesPercentage: q.dp || 0,
+            marketState: '', // Finnhub doesn’t directly expose market open/closed
           };
         }
       }
     }
 
-    // Fallback to static list
     if (!normalized) {
       const fallback = STOCK_FALLBACK_LIST.find((s) => s.symbol === symbol);
       if (fallback) {
-        normalized = {
-          symbol: fallback.symbol,
-          name: fallback.name,
-          logo: '',
-          description: '',
-          price: null,
-          changesPercentage: null,
-          marketState: '',
-        };
+        normalized = { ...fallback, logo: '', description: '', price: null, changesPercentage: null, marketState: '' };
       } else {
         return res.status(404).json({ error: 'not found' });
       }

@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import StockChart from './stockChart';
 import StockPortfolioCard from './StockPortfolioCard';
 import NewsFeed from '../../market/newsFeed';
+
 export default function StockDetailPage() {
   const [editTarget, setEditTarget] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(0);
@@ -17,18 +18,33 @@ export default function StockDetailPage() {
     setEditTarget(null);
     setRefreshFlag((f) => f + 1);
   };
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchStockDetails(symbol);
-        setStock(data);
-      } catch (err) {
-        console.error('Failed to load stock details:', err);
-      }
-    };
-    loadData();
-  }, [symbol, refreshFlag]);
+useEffect(() => {
+  const loadData = async () => {
+    try {
+      const data = await fetchStockDetails(symbol);
+      // Ensure numeric values are valid
+      setStock({
+        ...data,
+        price: data.price != null ? Number(data.price) : 0,
+        changesPercentage:
+          data.changesPercentage != null ? Number(data.changesPercentage) : 0,
+        history: Array.isArray(data.history) ? data.history : [],
+      });
+    } catch (err) {
+      console.error('Failed to load stock details:', err);
+      setStock({
+        name: symbol,
+        price: 0,
+        changesPercentage: 0,
+        history: [],
+        description: 'No data available',
+        logo: null,
+        marketState: 'Closed',
+      });
+    }
+  };
+  loadData();
+}, [symbol, refreshFlag]);
 
   if (!stock) {
     return (
@@ -38,9 +54,7 @@ export default function StockDetailPage() {
     );
   }
 
-  const priceChangePositive = Number(stock.changesPercentage) >= 0;
-  const formattedPrice = Number(stock.price).toFixed(2);
-  const formattedChange = Number(stock.changesPercentage).toFixed(2);
+  const priceChangePositive = stock.changesPercentage >= 0;
 
   return (
     <div className="max-w-4xl ml-5 mx-auto px-4 py-6 space-y-6">
@@ -68,7 +82,7 @@ export default function StockDetailPage() {
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-semibold">{stock.name}</h1>
+            <h1 className="text-2xl font-semibold">{stock.name || symbol}</h1>
             <div className="text-sm text-gray-500 uppercase">{symbol}</div>
           </div>
         </div>
@@ -77,7 +91,7 @@ export default function StockDetailPage() {
       {/* Price card */}
       <div className="bg-transparent rounded-2xl p-6 block flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col">
-          <div className="text-4xl font-bold">${formattedPrice}</div>
+          <div className="text-4xl font-bold">${stock.price.toFixed(2)}</div>
           <div className="flex items-center gap-2 mt-3">
             <div
               className={`text-sm mb-5 font-medium ${
@@ -85,7 +99,7 @@ export default function StockDetailPage() {
               }`}
             >
               {priceChangePositive ? '+' : ''}
-              {formattedChange}%
+              {stock.changesPercentage.toFixed(2)}%
             </div>
             <div className="text-xs text-gray-400">24h</div>
           </div>
@@ -93,18 +107,17 @@ export default function StockDetailPage() {
 
         {/* Chart area */}
         <div className="flex-1">
-          <StockChart history={stock.history || []} />
+          <StockChart history={stock.history} />
         </div>
 
         <div className="flex flex-col gap-2">
           <div className="text-xs text-gray-500">Market status</div>
-          <div className="text-sm font-semibold">{stock.marketState || 'Open'}</div>
+          <div className="text-sm font-semibold">{stock.marketState || 'Closed'}</div>
         </div>
       </div>
 
       {/* Action area */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Buy form */}
         <div className="lg:col-span-1">
           <div className="bg-white shadow rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -114,14 +127,13 @@ export default function StockDetailPage() {
             <BuyStockForm
               onSuccess={handleSuccess}
               symbol={symbol}
-              currentPrice={Number(stock.price)}
+              currentPrice={stock.price}
             />
           </div>
         </div>
 
-        {/* Right: Portfolio + About */}
         <div className="lg:col-span-2 space-y-6">
-          <StockPortfolioCard symbol={symbol} currentPrice={Number(stock.price)} />
+          <StockPortfolioCard symbol={symbol} currentPrice={stock.price} />
           <div className="bg-white shadow rounded-2xl p-5">
             <div className="text-lg font-semibold mb-2">About {stock.name}</div>
             <p className="text-sm text-gray-600 leading-relaxed">

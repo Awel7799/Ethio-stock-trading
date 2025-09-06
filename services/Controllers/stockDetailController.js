@@ -1,51 +1,53 @@
 const axios = require('axios');
-const ALPHA_URL = 'https://www.alphavantage.co/query';
-const API_KEY = process.env.ALPHA_VANTAGE_KEY;
+const API_KEY = process.env.token; // Finnhub API key
 
 const getStockDetails = async (req, res) => {
   const { symbol } = req.params;
   const upper = symbol.toUpperCase();
 
   try {
-    // 1. Quote
-    const quoteResp = await axios.get(ALPHA_URL, {
-      params: { function: 'GLOBAL_QUOTE', symbol: upper, apikey: API_KEY },
+    // 1️⃣ Fetch live quote (current price & change %)
+    const quoteResp = await axios.get('https://finnhub.io/api/v1/quote', {
+      params: { symbol: upper, token: API_KEY },
     });
-    const quote = quoteResp.data['Global Quote'];
-    if (!quote || !quote['05. price']) return res.status(404).json({ error: 'Stock not found' });
+    const quote = quoteResp.data;
 
-    // 2. Company Overview
-    const overviewResp = await axios.get(ALPHA_URL, {
-      params: { function: 'OVERVIEW', symbol: upper, apikey: API_KEY },
+    if (!quote || quote.c === undefined) {
+      return res.status(404).json({ error: 'Stock not found' });
+    }
+
+    // 2️⃣ Fetch company profile
+    const profileResp = await axios.get('https://finnhub.io/api/v1/stock/profile2', {
+      params: { symbol: upper, token: API_KEY },
     });
-    const profile = overviewResp.data || {};
+    const profile = profileResp.data || {};
 
-    // 3. Historical Data
-    const historyResp = await axios.get(ALPHA_URL, {
-      params: {
-        function: 'TIME_SERIES_DAILY_ADJUSTED',
-        symbol: upper,
-        apikey: API_KEY,
-        outputsize: 'compact',
-      },
+    // 3️⃣ Fetch historical data (last 30 days)
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - 30 * 24 * 60 * 60; // 30 days ago
+    const historyResp = await axios.get('https://finnhub.io/api/v1/stock/candle', {
+      params: { symbol: upper, resolution: 'D', from, to: now, token: API_KEY },
     });
 
-    const timeSeries = historyResp.data['Time Series (Daily)'] || {};
-    const history = Object.entries(timeSeries)
-      .slice(0, 30) // last 30 days
-      .map(([date, values]) => ({ date, close: parseFloat(values['4. close']) }))
-      .reverse(); // oldest first for chart
+    const { c: closes, t: timestamps, s: status } = historyResp.data;
+    const history = status === 'ok'
+      ? timestamps.map((ts, i) => ({
+          date: new Date(ts * 1000).toLocaleDateString(),
+          close: closes[i] != null ? Number(closes[i]) : 0,
+        }))
+      : [];
 
-    // Send data
+    // 4️⃣ Return combined data
     return res.json({
-      name: profile.Name || upper,
-      logo: null,
-      price: parseFloat(quote['05. price']),
-      changesPercentage: parseFloat(quote['10. change percent']) || 0,
-      description: profile.Description || 'No description available.',
-      history, // 👈 This fixes the chart
-      marketState: 'Open',
+      name: profile.name || upper,
+      logo: profile.logo || null,
+      price: quote.c != null ? Number(quote.c) : 0,
+      changesPercentage: quote.dp != null ? Number(quote.dp) : 0,
+      description: profile.finnhubIndustry || 'No description available.',
+      history,
+      marketState: quote.t ? 'Open' : 'Closed',
     });
+
   } catch (error) {
     console.error('Error fetching stock data:', error.message);
     return res.status(500).json({ error: 'Internal server error' });

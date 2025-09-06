@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getTopGainersLive } = require('../controllers/stockController');
+const { getStockDetails } = require('../Controllers/stockDetailController');
 
-// GET /api/stocks/gainers?limit=5
-router.get('/gainers', getTopGainersLive);
+router.get('/details/:symbol', getStockDetails);
 
 module.exports = router;

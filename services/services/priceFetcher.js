@@ -3,35 +3,45 @@ const axios = require('axios');
 
 const cache = {};
 const TTL = 15 * 1000; // 15s
+const API_KEY = process.env.token;
 
 async function getQuote(symbol) {
   const upper = symbol.toUpperCase();
   const now = Date.now();
 
+  // Return cached price if not expired
   if (cache[upper] && now - cache[upper].timestamp < TTL) {
     return cache[upper].price;
   }
 
   try {
-    const resp = await axios.get('https://www.alphavantage.co/query', {
-      params: {
-        function: 'GLOBAL_QUOTE',
-        symbol: upper,
-        apikey: process.env.ALPHA_VANTAGE_KEY,
-      },
+    const resp = await axios.get('https://finnhub.io/api/v1/quote', {
+      params: { symbol: upper, token: API_KEY },
     });
 
-    const quote = resp.data['Global Quote'];
-    if (!quote || !quote['05. price']) throw new Error(`No data for ${upper}`);
+    const data = resp.data;
 
-    const price = parseFloat(quote['05. price']);
+    if (!data || data.c === undefined || data.c === 0) {
+      throw new Error(`No valid price for ${upper}`);
+    }
+
+    const price = parseFloat(data.c);
+
     if (isNaN(price)) throw new Error(`Invalid price for ${upper}`);
 
+    // Update cache
     cache[upper] = { price, timestamp: now };
     return price;
   } catch (err) {
     console.error(`[priceFetcher] Error for ${upper}:`, err.message);
-    return null;
+
+    // Fallback to previous cached price if available
+    if (cache[upper]) {
+      return cache[upper].price;
+    }
+
+    // Last resort: return 0
+    return 0;
   }
 }
 
