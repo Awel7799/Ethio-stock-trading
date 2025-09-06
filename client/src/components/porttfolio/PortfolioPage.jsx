@@ -128,7 +128,7 @@ function BalanceCard({ title, amount, icon, isProfit }) {
     <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
       <div className="text-4xl mb-3">{icon}</div>
       <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
-      <p className={`text-3xl font-bold ${isProfit === undefined ? 'text-gray-900' : isProfit ? 'text-green-600' : 'text-red-600'}`}>
+      <p className={`text-3xl font-medium ${isProfit === undefined ? 'text-gray-900' : isProfit ? 'text-green-600' : 'text-red-600'}`}>
         {displayAmount}
       </p>
     </div>
