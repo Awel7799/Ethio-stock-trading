@@ -1,7 +1,7 @@
 import Button from "../components/comman/Button";
 import Sidebar from "../components/setting/Sidebar";
 import PersonalInfo from "../components/setting/PersonalInfo";
-import Profile from "../components/setting/Profile";
+import Profile from "../components/setting/profile";
 import Security from "../components/setting/security";
 import VerifyKYC from "../components/setting/VerifyKYC";
 import { useState, useEffect } from "react";
@@ -99,6 +99,76 @@ const AnimatedBackground = () => {
   )
 }
 
+// Mobile Dropdown Component
+const MobileDropdown = ({ setActiveSection, activeSection }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navItem = [
+    { id: "Profile", label: "Profile" },
+    { id: "PersonalInfo", label: "Personal Info" },
+    { id: "Security", label: "Security" },
+    { id: "VerifyKYC", label: "Verify KYC" },
+  ];
+
+  const handleItemClick = (itemId) => {
+    setActiveSection(itemId);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="lg:hidden relative">
+      {/* Dropdown Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-white/90 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4 flex items-center justify-between shadow-lg"
+      >
+        <span className="font-medium text-amber-800">
+          {navItem.find(item => item.id === activeSection)?.label || "Settings"}
+        </span>
+        <svg 
+          className={`w-5 h-5 text-amber-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          fill="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path d="M7,10L12,15L17,10H7Z"/>
+        </svg>
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-amber-200/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+          {navItem.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleItemClick(item.id)}
+              className={`w-full text-left p-4 transition-colors duration-200 ${
+                activeSection === item.id
+                  ? "bg-amber-100 text-amber-900 font-medium"
+                  : "hover:bg-amber-50 text-amber-700"
+              } first:rounded-t-xl last:rounded-b-xl`}
+            >
+              {item.label}
+            </button>
+          ))}
+          
+          {/* Logout in dropdown */}
+          <div className="border-t border-amber-200/30">
+            <button
+              onClick={() => {
+                console.log("Logging out...");
+                setIsOpen(false);
+              }}
+              className="w-full text-left p-4 text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-b-xl"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Setting() {
   const [activeSection, setActiveSection] = useState("Profile");
   const [isLoaded, setIsLoaded] = useState(false);
@@ -130,50 +200,48 @@ export default function Setting() {
       {/* Animated Background */}
       <AnimatedBackground />
       
+      {/* Mobile Dropdown Header */}
+      <div className="lg:hidden p-4 relative z-20">
+        <MobileDropdown setActiveSection={setActiveSection} activeSection={activeSection} />
+      </div>
+      
       {/* Main Content Container */}
       <div className="relative z-10 flex min-h-screen">
-        {/* Sidebar Container */}
+        {/* Desktop Sidebar Container */}
         <div 
-          className={`transform transition-all duration-1000 ${
+          className={`hidden lg:block fixed left-0 top-0 h-screen z-30 transform transition-all duration-1000 ${
             isLoaded ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
           }`}
         >
-          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl">
+          <div className="bg-black/10 backdrop-blur-sm border-r border-amber-200/50 shadow-xl h-full">
             <Sidebar setActiveSection={setActiveSection} activeSection={activeSection} />
           </div>
         </div>
 
         {/* Main Content Area */}
         <div 
-          className={`flex-1 transform transition-all duration-1200 ${
+          className={`flex-1 lg:ml-64 transform transition-all duration-1200 ${
             isLoaded ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
           }`}
           style={{ transitionDelay: "300ms" }}
         >
-          {/* Content Background */}
-          <div className="min-h-screen bg-white/40 backdrop-blur-sm border border-amber-200/30 shadow-2xl m-4 rounded-2xl overflow-hidden">
+          {/* Content Area */}
+          <div className="p-3 lg:p-6">
+            {renderSection()}
+          </div>
 
-
-            {/* Content Area */}
-            <div className="p-8">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-amber-200/40 shadow-lg p-6 min-h-[600px]">
-                {renderSection()}
+          {/* Footer Section */}
+          <div className="bg-gradient-to-r from-amber-50/50 to-yellow-50/50 backdrop-blur-sm p-4 border-t border-amber-200/50">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-amber-700">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm"></div>
+                <span>All changes saved automatically</span>
               </div>
-            </div>
-
-            {/* Footer Section */}
-            <div className="bg-gradient-to-r from-amber-50/50 to-yellow-50/50 backdrop-blur-sm p-4 border-t border-amber-200/50">
-              <div className="flex items-center justify-center space-x-6 text-sm text-amber-700">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm"></div>
-                  <span>All changes saved automatically</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V18H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
-                  </svg>
-                  <span>Secure & encrypted</span>
-                </div>
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V18H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
+                </svg>
+                <span>Secure & encrypted</span>
               </div>
             </div>
           </div>

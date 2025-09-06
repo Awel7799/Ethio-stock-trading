@@ -77,7 +77,7 @@ const Portfolio = ({ currentPrices }) => {
         </section>
 
         {/* Transactions */}
-        <section className="bg-white rounded-xl shadow-lg p-6">
+        <section className="bg-white rounded-xl shadow-lg p-5">
           <h2 className="text-2xl font-semibold mb-4 text-blue-700 border-b-2 border-blue-300 pb-2">Recent Transactions</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white rounded-lg">
