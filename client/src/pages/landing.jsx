@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-// Custom SVG Icons
+// Custom SVG Iconsss
 const TrendingUp = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
