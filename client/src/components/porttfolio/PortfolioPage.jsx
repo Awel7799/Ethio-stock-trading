@@ -45,117 +45,112 @@ const Portfolio = ({ currentPrices }) => {
   } = portfolio;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section with Key Metrics */}
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Your Portfolio</h1>
-            <p className="text-gray-600">Track your investments and monitor performance</p>
-          </div>
-
-          {/* Main Portfolio Value Display */}
-          <div className="text-center mb-8">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
-              <p className="text-gray-600 text-lg mb-2">Total Portfolio Value</p>
-              <p className="text-5xl font-bold text-gray-900 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+      {/* Elegant Header */}
+      <div className="bg-white shadow-lg border-b border-amber-200">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-6 lg:mb-0">
+              <h1 className="text-4xl font-bold text-black mb-2">My Portfolio</h1>
+              <p className="text-amber-700 text-lg">Track your investments and watch your wealth grow</p>
+            </div>
+            <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl px-8 py-6 border border-amber-200">
+              <p className="text-amber-700 font-medium mb-1">Total Portfolio Value</p>
+              <p className="text-3xl font-bold text-black">
                 {formatCurrency(currentPortfolioValue)}
               </p>
-              <div className="flex items-center justify-center">
-                <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                  profitLoss >= 0 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  <span className="mr-1">{profitLoss >= 0 ? '📈' : '📉'}</span>
-                  {profitLoss >= 0 ? '+' : ''}{formatCurrency(profitLoss)} Total P&L
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <div className="flex items-center">
-                <div className="text-3xl mr-4">💰</div>
-                <div>
-                  <p className="text-blue-900 font-bold text-2xl">{formatCurrency(walletBalance)}</p>
-                  <p className="text-blue-700 text-sm">Available Cash</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-              <div className="flex items-center">
-                <div className="text-3xl mr-4">📊</div>
-                <div>
-                  <p className="text-purple-900 font-bold text-2xl">{formatCurrency(totalInvested)}</p>
-                  <p className="text-purple-700 text-sm">Total Invested</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Portfolio Metrics - Enhanced Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <MetricCard
+            title="Available Cash"
+            value={formatCurrency(walletBalance)}
+            icon="💰"
+            gradient="from-emerald-100 to-teal-100"
+            borderColor="border-emerald-200"
+          />
+          <MetricCard
+            title="Total Invested"
+            value={formatCurrency(totalInvested)}
+            icon="📊"
+            gradient="from-blue-100 to-indigo-100"
+            borderColor="border-blue-200"
+          />
+          <MetricCard
+            title="Profit/Loss"
+            value={formatCurrency(profitLoss)}
+            icon={profitLoss >= 0 ? "📈" : "📉"}
+            gradient={profitLoss >= 0 ? "from-green-100 to-emerald-100" : "from-red-100 to-rose-100"}
+            borderColor={profitLoss >= 0 ? "border-green-200" : "border-red-200"}
+            isProfit={profitLoss >= 0}
+          />
+        </div>
+
+        {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           
-          {/* Holdings Section - Main Content */}
+          {/* Holdings Section - Redesigned as Cards */}
           <div className="xl:col-span-3">
-            <div className="bg-white rounded-2xl shadow-sm border">
-              <div className="px-8 py-6 border-b bg-gray-50 rounded-t-2xl">
+            <div className="bg-white rounded-3xl shadow-xl border border-amber-100">
+              <div className="px-8 py-6 border-b border-amber-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Your Holdings</h2>
-                    <p className="text-gray-600 mt-1">{holdings.length} active positions</p>
+                    <h2 className="text-2xl font-bold text-black mb-1">Your Holdings</h2>
+                    <p className="text-amber-700">Current stock positions in your portfolio</p>
                   </div>
-                  <div className="text-3xl">🏦</div>
+                  <div className="bg-amber-100 rounded-full p-3">
+                    <span className="text-2xl">🏦</span>
+                  </div>
                 </div>
               </div>
               <div className="p-8">
-                <HoldingsGrid holdings={holdings} />
+                <HoldingsShowcase holdings={holdings} />
               </div>
             </div>
           </div>
 
-          {/* Sidebar - Recent Activity */}
+          {/* Side Panel - Recent Activity */}
           <div className="xl:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm border sticky top-6">
-              <div className="px-6 py-4 border-b bg-gray-50 rounded-t-2xl">
-                <div className="flex items-center">
-                  <div className="text-xl mr-2">⚡</div>
+            <div className="bg-white rounded-3xl shadow-xl border border-amber-100">
+              <div className="px-6 py-5 border-b border-amber-100">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-amber-100 rounded-full p-2">
+                    <span className="text-lg">⚡</span>
+                  </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-                    <p className="text-sm text-gray-600">Latest trades</p>
+                    <h2 className="text-xl font-bold text-black">Recent Activity</h2>
+                    <p className="text-amber-700 text-sm">Latest transactions</p>
                   </div>
                 </div>
               </div>
               <div className="p-6">
-                <RecentTransactions transactions={transactions.slice(0, 6)} />
+                <RecentTransactions transactions={transactions.slice(0, 5)} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Full Transaction History */}
-        {transactions.length > 6 && (
-          <div className="mt-8">
-            <div className="bg-white rounded-2xl shadow-sm border">
-              <div className="px-8 py-6 border-b bg-gray-50 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Transaction History</h2>
-                    <p className="text-gray-600 mt-1">Complete record of all your trades</p>
-                  </div>
-                  <div className="text-3xl">📋</div>
+        {/* Full Transactions History */}
+        {transactions.length > 5 && (
+          <div className="mt-8 bg-white rounded-3xl shadow-xl border border-amber-100">
+            <div className="px-8 py-6 border-b border-amber-100">
+              <div className="flex items-center space-x-3">
+                <div className="bg-amber-100 rounded-full p-3">
+                  <span className="text-2xl">📈</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-black">Transaction History</h2>
+                  <p className="text-amber-700">Complete record of all your trades</p>
                 </div>
               </div>
-              <div className="p-8">
-                <TransactionsTimeline transactions={transactions} />
-              </div>
+            </div>
+            <div className="p-8">
+              <TransactionsTimeline transactions={transactions} />
             </div>
           </div>
         )}
@@ -164,56 +159,89 @@ const Portfolio = ({ currentPrices }) => {
   );
 };
 
-// Loading State Component
+// Enhanced Loading State
 function LoadingState({ message }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-3 border-blue-600 border-t-transparent mx-auto mb-6"></div>
-        <p className="text-xl text-gray-600 font-medium">{message}</p>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border border-amber-200">
+        <div className="relative mb-6">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-300 border-t-black mx-auto"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-2xl">💰</span>
+          </div>
+        </div>
+        <p className="text-xl text-amber-700 font-medium">{message}</p>
       </div>
     </div>
   );
 }
 
-// Error State Component
+// Enhanced Error State
 function ErrorState({ error }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-lg border border-red-200 p-8 max-w-md mx-4">
-        <div className="text-center">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Oops! Something went wrong</h2>
-          <p className="text-red-600">{error}</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+      <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md mx-4 text-center border border-red-200">
+        <div className="text-6xl mb-6">⚠️</div>
+        <h2 className="text-2xl font-bold text-black mb-4">Oops! Something went wrong</h2>
+        <p className="text-red-600 bg-red-50 rounded-2xl p-4 border border-red-200">{error}</p>
       </div>
     </div>
   );
 }
 
-// Holdings Grid Component
-function HoldingsGrid({ holdings }) {
+// Enhanced Metric Card
+function MetricCard({ title, value, icon, gradient, borderColor, isProfit }) {
+  return (
+    <div className={`bg-gradient-to-br ${gradient} rounded-2xl border-2 ${borderColor} p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-bold text-black opacity-70 mb-2 uppercase tracking-wide">{title}</p>
+          <p className={`text-2xl font-bold text-black`}>
+            {value}
+          </p>
+        </div>
+        <div className="bg-white rounded-full p-4 shadow-md">
+          <span className="text-3xl">{icon}</span>
+        </div>
+      </div>
+      {isProfit !== undefined && (
+        <div className="mt-4">
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+            isProfit ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+          }`}>
+            {isProfit ? '📈 Profit' : '📉 Loss'}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Redesigned Holdings Showcase (No Table)
+function HoldingsShowcase({ holdings }) {
   if (!holdings || holdings.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="text-6xl mb-6 opacity-60">📈</div>
-        <h3 className="text-2xl font-bold text-gray-600 mb-2">No Holdings Yet</h3>
-        <p className="text-gray-500 text-lg">Start investing to see your positions here</p>
+        <div className="bg-amber-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+          <span className="text-4xl">🏪</span>
+        </div>
+        <h3 className="text-xl font-bold text-black mb-3">No Holdings Yet</h3>
+        <p className="text-amber-700 max-w-sm mx-auto">Start investing to see your stock positions here. Your portfolio is waiting for its first investment!</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       {holdings.map((holding, index) => (
-        <HoldingCard key={index} holding={holding} />
+        <StockHoldingCard key={index} holding={holding} />
       ))}
     </div>
   );
 }
 
-// Individual Holding Card - Enhanced
-function HoldingCard({ holding }) {
+// Individual Stock Card - Completely Redesigned
+function StockHoldingCard({ holding }) {
   const currentValue = holding.currentPrice * holding.quantity;
   const investedValue = holding.averagePrice * holding.quantity;
   const profitLoss = currentValue - investedValue;
@@ -221,46 +249,69 @@ function HoldingCard({ holding }) {
   const isProfit = profitLoss >= 0;
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border-2 border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-200">
-      {/* Header with Stock Symbol and Performance Badge */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h3 className="font-bold text-2xl text-gray-900 mb-1">{holding.stockSymbol}</h3>
-          <p className="text-gray-600 font-medium">{holding.quantity} shares owned</p>
-        </div>
-        <div className={`px-3 py-2 rounded-lg font-bold text-sm ${
-          isProfit 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
-          {isProfit ? '+' : ''}{profitLossPercentage.toFixed(1)}%
-        </div>
-      </div>
-
-      {/* Price Information Grid */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        <div className="text-center p-3 bg-blue-50 rounded-lg">
-          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1">Current Price</p>
-          <p className="text-lg font-bold text-blue-900">{formatCurrency(holding.currentPrice)}</p>
-        </div>
-        <div className="text-center p-3 bg-purple-50 rounded-lg">
-          <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-1">Your Avg Cost</p>
-          <p className="text-lg font-bold text-purple-900">{formatCurrency(holding.averagePrice)}</p>
-        </div>
-      </div>
-
-      {/* Value Summary */}
-      <div className="border-t pt-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Position Value</p>
-            <p className="text-xl font-bold text-gray-900">{formatCurrency(currentValue)}</p>
+    <div className="bg-gradient-to-br from-amber-25 to-white rounded-2xl border-2 border-amber-100 hover:border-amber-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group">
+      {/* Header Section */}
+      <div className="p-6 border-b border-amber-100">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="bg-black rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">
+                {holding.stockSymbol.charAt(0)}
+              </span>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-black group-hover:text-amber-700 transition-colors">
+                {holding.stockSymbol}
+              </h3>
+              <p className="text-amber-600 font-medium">{holding.quantity} shares owned</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-gray-500">Unrealized P&L</p>
-            <p className={`text-xl font-bold ${isProfit ? 'text-green-600' : 'text-red-600'}`}>
-              {isProfit ? '+' : ''}{formatCurrency(profitLoss)}
-            </p>
+          <div className={`px-3 py-1 rounded-full text-sm font-bold border-2 ${
+            isProfit 
+              ? 'bg-green-50 text-green-700 border-green-200' 
+              : 'bg-red-50 text-red-700 border-red-200'
+          }`}>
+            {isProfit ? '+' : ''}{profitLossPercentage.toFixed(1)}%
+          </div>
+        </div>
+      </div>
+
+      {/* Price Information */}
+      <div className="p-6">
+        <div className="space-y-4">
+          {/* Current vs Average Price */}
+          <div className="flex justify-between items-center">
+            <div className="text-center flex-1">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-1">Current Price</p>
+              <p className="text-lg font-bold text-black">{formatCurrency(holding.currentPrice)}</p>
+            </div>
+            <div className="mx-4 border-l border-amber-200 h-8"></div>
+            <div className="text-center flex-1">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-1">Avg. Cost</p>
+              <p className="text-lg font-bold text-black">{formatCurrency(holding.averagePrice)}</p>
+            </div>
+          </div>
+
+          {/* Value Summary */}
+          <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-bold text-amber-700">Market Value</span>
+              <span className="text-xl font-bold text-black">{formatCurrency(currentValue)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-bold text-amber-700">Profit/Loss</span>
+              <span className={`text-xl font-bold ${isProfit ? 'text-green-600' : 'text-red-600'}`}>
+                {isProfit ? '+' : ''}{formatCurrency(profitLoss)}
+              </span>
+            </div>
+          </div>
+
+          {/* Investment Summary */}
+          <div className="pt-2 border-t border-amber-100">
+            <div className="flex justify-between text-sm">
+              <span className="text-amber-700 font-medium">Total Invested:</span>
+              <span className="text-black font-bold">{formatCurrency(investedValue)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -268,13 +319,15 @@ function HoldingCard({ holding }) {
   );
 }
 
-// Recent Transactions Sidebar - Enhanced
+// Enhanced Recent Transactions
 function RecentTransactions({ transactions }) {
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-4xl mb-3 opacity-50">📊</div>
-        <p className="text-gray-500">No recent activity</p>
+        <div className="bg-amber-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">📊</span>
+        </div>
+        <p className="text-amber-700">No recent activity</p>
       </div>
     );
   }
@@ -282,10 +335,10 @@ function RecentTransactions({ transactions }) {
   return (
     <div className="space-y-4">
       {transactions.map((transaction, index) => (
-        <div key={index} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+        <div key={index} className="bg-amber-25 rounded-xl p-4 border border-amber-100 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${
                 transaction.type === 'buy' 
                   ? 'bg-green-500' 
                   : transaction.type === 'sell' 
@@ -295,17 +348,17 @@ function RecentTransactions({ transactions }) {
                 {transaction.type === 'buy' ? 'B' : transaction.type === 'sell' ? 'S' : 'D'}
               </div>
               <div>
-                <p className="font-bold text-gray-900">{transaction.stockSymbol}</p>
-                <p className="text-xs text-gray-500 font-medium">
+                <p className="font-bold text-black">{transaction.stockSymbol}</p>
+                <p className="text-xs text-amber-600">
                   {new Date(transaction.transactionDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-bold text-gray-900">
+              <p className="font-bold text-black">
                 {formatCurrency(toNumber(transaction.price) * transaction.quantity)}
               </p>
-              <p className="text-xs text-gray-500">{transaction.quantity} shares</p>
+              <p className="text-xs text-amber-600">{transaction.quantity} shares</p>
             </div>
           </div>
         </div>
@@ -314,13 +367,13 @@ function RecentTransactions({ transactions }) {
   );
 }
 
-// Full Transactions Timeline - Enhanced
+// Enhanced Transaction Timeline
 function TransactionsTimeline({ transactions }) {
   return (
     <div className="space-y-6">
       {transactions.map((transaction, index) => (
-        <div key={index} className="flex items-start space-x-6 p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border hover:shadow-md transition-shadow">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xs ${
+        <div key={index} className="flex items-start space-x-4 bg-amber-25 rounded-2xl p-6 border border-amber-100 hover:shadow-lg transition-all">
+          <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold shadow-lg ${
             transaction.type === 'buy' 
               ? 'bg-green-500' 
               : transaction.type === 'sell' 
@@ -330,27 +383,26 @@ function TransactionsTimeline({ transactions }) {
             {transaction.type === 'buy' ? 'BUY' : transaction.type === 'sell' ? 'SELL' : 'DEP'}
           </div>
           
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-bold text-xl text-gray-900 mb-1">{transaction.stockSymbol}</h4>
-                <p className="text-gray-600">
-                  <span className="font-semibold">{transaction.quantity}</span> shares @ <span className="font-semibold">{formatCurrency(toNumber(transaction.price))}</span>
-                </p>
-              </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xl font-bold text-black">{transaction.stockSymbol}</h4>
               <div className="text-right">
-                <p className="font-bold text-2xl text-gray-900 mb-1">
+                <p className="text-2xl font-bold text-black">
                   {formatCurrency(toNumber(transaction.price) * transaction.quantity)}
                 </p>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className="text-amber-600 font-medium">
                   {new Date(transaction.transactionDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
-                    year: 'numeric',
-                    weekday: 'short'
+                    year: 'numeric'
                   })}
                 </p>
               </div>
+            </div>
+            <div className="bg-white rounded-xl px-4 py-2 border border-amber-100">
+              <p className="text-amber-700 font-medium">
+                {transaction.quantity} shares @ {formatCurrency(toNumber(transaction.price))} per share
+              </p>
             </div>
           </div>
         </div>
