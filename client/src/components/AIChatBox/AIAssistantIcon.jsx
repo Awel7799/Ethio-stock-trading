@@ -1,3 +1,4 @@
+//components/AIAssistantIcon.jsx
 import { useState } from "react"
 import AIchat from "./AIchat"
 
