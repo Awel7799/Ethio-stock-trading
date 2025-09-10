@@ -2,7 +2,7 @@
 const { Double, ObjectId } = require('mongodb');
 const Holding = require('../models/Holding');
 const StockTransaction = require('../models/StockTransaction');
-const Wallet = require('../models/Wallet'); // ✅ use wallet model
+const Wallet = require('../models/Wallet'); 
 
 const FALLBACK_USER_ID = new ObjectId();
 

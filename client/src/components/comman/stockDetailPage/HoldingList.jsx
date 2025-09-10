@@ -1,31 +1,28 @@
-import { useEffect, useState } from 'react';
-import { getHoldings } from '../../../services/holdings';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext'; // import your AuthContext
+import { useEffect, useState } from "react";
+import { getHoldings } from "../../../services/holdings";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function HoldingList() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
   const navigate = useNavigate();
-  const { user } = useAuth(); // get user from AuthContext
+  const { user } = useAuth();
 
   const fetchAll = async () => {
-  setErr(null);
-  console.log('User:', user);
-  if (!user?._id) {
-    setErr('User not authenticated');
-    setLoading(false);
-    return;
-  }
-  
+    setErr(null);
+    if (!user?._id) {
+      setErr("User not authenticated");
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Pass userId as a parameter to getHoldings service
       const data = await getHoldings(user._id);
-      setList(data);
+      setList(data || []);
     } catch (e) {
-      setErr(e.payload?.error || e.message);
+      setErr(e.payload?.error || e.message || "Failed to fetch holdings");
     } finally {
       setLoading(false);
     }
@@ -40,7 +37,6 @@ export default function HoldingList() {
     return (
       <div className="text-red-600 px-4 py-2 bg-red-50 rounded">{err}</div>
     );
-
   if (!list.length) return <p className="text-center py-4">No holdings yet.</p>;
 
   return (
@@ -55,20 +51,28 @@ export default function HoldingList() {
           </tr>
         </thead>
         <tbody>
-          {list.map((h) => (
-            <tr
-              key={h._id}
-              onClick={() => navigate(`/stock/${h.stockSymbol}`)}
-              className="cursor-pointer hover:bg-gray-100"
-            >
-              <td className="py-3 px-4 font-semibold">{h.stockSymbol}</td>
-              <td className="py-3 px-4">{h.quantity}</td>
-              <td className="py-3 px-4">${Number(h.purchasePrice).toFixed(2)}</td>
-              <td className="py-3 px-4">
-                {new Date(h.purchaseDate).toLocaleDateString()}
-              </td>
-            </tr>
-          ))}
+          {list.map((h) => {
+            const symbol = h.stockSymbol || "N/A";
+            const quantity = h.quantity != null ? h.quantity : 0;
+            const price =
+              h.purchasePrice != null ? Number(h.purchasePrice).toFixed(2) : "N/A";
+            const purchaseDate = h.purchaseDate
+              ? new Date(h.purchaseDate).toLocaleDateString()
+              : "N/A";
+
+            return (
+              <tr
+                key={h._id}
+                onClick={() => navigate(`/stock/${symbol}`)}
+                className="cursor-pointer hover:bg-gray-100"
+              >
+                <td className="py-3 px-4 font-semibold">{symbol}</td>
+                <td className="py-3 px-4">{quantity}</td>
+                <td className="py-3 px-4">${price}</td>
+                <td className="py-3 px-4">{purchaseDate}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

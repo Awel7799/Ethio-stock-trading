@@ -1,7 +1,7 @@
-// components/StockPortfolioCard.jsx
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../../context/AuthContext'; // <-- add this line
 import { fetchStockPortfolio } from '../../../services/portfolioService';
-import { useAuth } from '../../../context/AuthContext';
+
 
 export default function StockPortfolioCard({ symbol, currentPrice }) {
   const { user } = useAuth();
@@ -13,24 +13,25 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
     const loadPortfolio = async () => {
       try {
         const data = await fetchStockPortfolio(user._id, symbol, currentPrice);
-        setPortfolio(data);
+        setPortfolio(data || {});
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    if (user?._id) {
-      loadPortfolio();
-    }
+    if (user?._id) loadPortfolio();
   }, [symbol, currentPrice, user]);
 
   if (loading) return <div>Loading portfolio...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
-  if (!portfolio.holding) return <div>You don’t own any {symbol} yet.</div>;
+  if (!portfolio || !portfolio.holding) return <div>You don’t own any {symbol} yet.</div>;
 
-  const { holding, transactions, profitLoss } = portfolio;
+  const { holding, transactions = [], profitLoss = 0 } = portfolio;
   const profitLossColor = profitLoss >= 0 ? 'text-green-500' : 'text-red-500';
+  const qty = holding?.quantity || 0;
+  const avgPrice = holding?.purchasePrice || 0;
+  const totalValue = qty * (currentPrice || 0);
 
   return (
     <div className="bg-white shadow rounded-2xl p-5 space-y-4">
@@ -38,23 +39,19 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <div className="text-gray-500">Quantity</div>
-          <div className="font-medium">{holding.quantity}</div>
+          <div className="font-medium">{qty}</div>
         </div>
         <div>
           <div className="text-gray-500">Average Price</div>
-          <div className="font-medium">${holding.purchasePrice.toFixed(2)}</div>
+          <div className="font-medium">${avgPrice.toFixed(2)}</div>
         </div>
         <div>
           <div className="text-gray-500">Total Value</div>
-          <div className="font-medium">
-            ${(holding.quantity * currentPrice).toFixed(2)}
-          </div>
+          <div className="font-medium">${totalValue.toFixed(2)}</div>
         </div>
         <div>
           <div className="text-gray-500">Profit/Loss</div>
-          <div className={`font-medium ${profitLossColor}`}>
-            ${profitLoss.toFixed(2)}
-          </div>
+          <div className={`font-medium ${profitLossColor}`}>${profitLoss.toFixed(2)}</div>
         </div>
       </div>
 
@@ -70,7 +67,7 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((tx) => (
+            {(transactions || []).map((tx) => (
               <tr key={tx._id} className="border-b">
                 <td>{new Date(tx.transactionDate).toLocaleDateString()}</td>
                 <td>{tx.type}</td>

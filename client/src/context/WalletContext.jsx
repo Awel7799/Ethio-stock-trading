@@ -1,202 +1,231 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect } from "react"
-import * as walletApi from "../api/walletApi"
-import { useAuth } from "./AuthContext"
-import { isAuthenticated, getAccessToken } from "../api/auth" // Import getAccessToken directly
+import { createContext, useContext, useState, useEffect } from "react";
+import * as walletApi from "../api/walletApi";
+import { useAuth } from "./AuthContext";
+import { isAuthenticated, getAccessToken } from "../api/auth"; // Import getAccessToken directly
 
-const WalletContext = createContext()
+const WalletContext = createContext();
 
 export const useWallet = () => {
-  const context = useContext(WalletContext)
+  const context = useContext(WalletContext);
   if (!context) {
-    throw new Error("useWallet must be used within a WalletProvider")
+    throw new Error("useWallet must be used within a WalletProvider");
   }
-  return context
-}
+  return context;
+};
 
 export const WalletProvider = ({ children }) => {
-  const { user, isLoggedIn, loading: authLoading } = useAuth()
+  const { user, isLoggedIn, loading: authLoading } = useAuth();
 
   // Use the same function from auth.js to get the token
   const getToken = () => {
-    return getAccessToken()
-  }
+    return getAccessToken();
+  };
 
   // Balance State
-  const [balance, setBalance] = useState(0)
-  const [balanceLoading, setBalanceLoading] = useState(false)
-  const [balanceError, setBalanceError] = useState(null)
+  const [balance, setBalance] = useState(0);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState(null);
 
   // Transactions State
-  const [transactions, setTransactions] = useState([])
-  const [transactionsLoading, setTransactionsLoading] = useState(false)
-  const [transactionsError, setTransactionsError] = useState(null)
-  const [pendingTransactions, setPendingTransactions] = useState([])
+  const [transactions, setTransactions] = useState([]);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [transactionsError, setTransactionsError] = useState(null);
+  const [pendingTransactions, setPendingTransactions] = useState([]);
 
   // Form States
-  const [depositLoading, setDepositLoading] = useState(false)
-  const [withdrawLoading, setWithdrawLoading] = useState(false)
+  const [depositLoading, setDepositLoading] = useState(false);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
 
   // Error States (Technical errors for debugging)
-  const [technicalErrors, setTechnicalErrors] = useState([])
+  const [technicalErrors, setTechnicalErrors] = useState([]);
 
   // Banks
   const [supportedBanks, setSupportedBanks] = useState([
     { code: "CBE", name: "Commercial Bank of Ethiopia" },
-    { code: "DB", name: "Dashen Bank" },
-    { code: "AIB", name: "Awash International Bank" },
-    { code: "BOA", name: "Bank of Abyssinia" },
-    { code: "CBO", name: "Cooperative Bank of Oromia" },
+    { code: "DASH", name: "Dashen Bank" },
+    { code: "AWASH", name: "Awash International Bank" },
+    { code: "ABYSS", name: "Bank of Abyssinia" },
+    { code: "COOP", name: "Cooperative Bank of Oromia" },
     { code: "DBE", name: "Development Bank of Ethiopia" },
-    { code: "UB", name: "United Bank S.C." },
-    { code: "LIB", name: "Lion International Bank" },
+    { code: "UNITED", name: "United Bank S.C." },
+    { code: "LION", name: "Lion International Bank" },
     { code: "NIB", name: "Nib International Bank" },
-    { code: "WB", name: "Wegagen Bank" },
-  ])
-  const [banksLoading, setBanksLoading] = useState(false)
+    { code: "WEGAGEN", name: "Wegagen Bank" },
+  ]);
+  const [banksLoading, setBanksLoading] = useState(false);
 
   // Polling interval reference
-  const [pollingInterval, setPollingInterval] = useState(null)
+  const [pollingInterval, setPollingInterval] = useState(null);
 
   // Better token checking
   const checkAuthAndToken = () => {
-    const token = getToken()
-    const authenticated = isAuthenticated() && isLoggedIn && !authLoading
+    const token = getToken();
+    const authenticated = isAuthenticated() && isLoggedIn && !authLoading;
 
     if (!authenticated) {
-      addTechnicalError("User not authenticated")
-      return { valid: false, token: null }
+      addTechnicalError("User not authenticated");
+      return { valid: false, token: null };
     }
 
     if (!token) {
-      addTechnicalError("No authentication token found")
-      return { valid: false, token: null }
+      addTechnicalError("No authentication token found");
+      return { valid: false, token: null };
     }
 
-    return { valid: true, token }
-  }
+    return { valid: true, token };
+  };
 
   // Refresh Balance
   const refreshBalance = async () => {
-    const { valid, token } = checkAuthAndToken()
-    if (!valid) return
+    const { valid, token } = checkAuthAndToken();
+    if (!valid) return;
 
-    setBalanceLoading(true)
-    setBalanceError(null)
+    setBalanceLoading(true);
+    setBalanceError(null);
 
     try {
-      console.log("🔄 Fetching balance with token:", token ? "Present" : "Missing")
-      const response = await walletApi.getBalance(token)
-      console.log("✅ Balance response:", response)
+      console.log(
+        "🔄 Fetching balance with token:",
+        token ? "Present" : "Missing"
+      );
+      const response = await walletApi.getBalance(token);
+      console.log("✅ Balance response:", response);
 
       if (response.success) {
-        setBalance(response.data.balance || 0)
+        setBalance(response.data.balance || 0);
       } else {
-        setBalanceError(response.message || "Failed to fetch balance")
-        addTechnicalError(`Balance fetch failed: ${response.message}`)
+        setBalanceError(response.message || "Failed to fetch balance");
+        addTechnicalError(`Balance fetch failed: ${response.message}`);
       }
     } catch (error) {
-      console.error("❌ Balance fetch error:", error)
-      setBalanceError("Failed to fetch balance")
-      addTechnicalError(`Balance fetch error: ${error.message}`)
+      console.error("❌ Balance fetch error:", error);
+      setBalanceError("Failed to fetch balance");
+      addTechnicalError(`Balance fetch error: ${error.message}`);
     } finally {
-      setBalanceLoading(false)
+      setBalanceLoading(false);
     }
-  }
+  };
 
   // Refresh Transactions
   const refreshTransactions = async () => {
-    const { valid, token } = checkAuthAndToken()
-    if (!valid) return
+    const { valid, token } = checkAuthAndToken();
+    if (!valid) return;
 
-    setTransactionsLoading(true)
-    setTransactionsError(null)
+    setTransactionsLoading(true);
+    setTransactionsError(null);
 
     try {
-      console.log("🔄 Fetching transactions with token:", token ? "Present" : "Missing")
-      const response = await walletApi.getTransactions(token)
-      console.log("✅ Transactions response:", response)
-      console.log("📊 Response data structure:", JSON.stringify(response.data, null, 2))
+      console.log(
+        "🔄 Fetching transactions with token:",
+        token ? "Present" : "Missing"
+      );
+      const response = await walletApi.getTransactions(token);
+      console.log("✅ Transactions response:", response);
+      console.log(
+        "📊 Response data structure:",
+        JSON.stringify(response.data, null, 2)
+      );
 
       if (response.success) {
-        let transactionsList = []
+        let transactionsList = [];
 
         if (Array.isArray(response.data)) {
           // Backend returns transactions directly as array in data field
-          transactionsList = response.data
+          transactionsList = response.data;
         } else if (response.data && Array.isArray(response.data.transactions)) {
           // Backend returns { transactions: [...], pagination: {...} }
-          transactionsList = response.data.transactions
-        } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          transactionsList = response.data.transactions;
+        } else if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
           // Backend returns { data: [...] }
-          transactionsList = response.data.data
+          transactionsList = response.data.data;
         } else {
           // Fallback - empty array
-          transactionsList = []
+          transactionsList = [];
         }
 
-        console.log("📋 Transactions array:", transactionsList)
-        console.log("📋 Transactions count:", transactionsList.length)
-        setTransactions(transactionsList)
+        console.log("📋 Transactions array:", transactionsList);
+        console.log("📋 Transactions count:", transactionsList.length);
+        setTransactions(transactionsList);
 
         // Separate pending transactions
-        const pending = transactionsList.filter((t) => t.status === "initiated" || t.status === "pending")
-        setPendingTransactions(pending)
+        const pending = transactionsList.filter(
+          (t) => t.status === "initiated" || t.status === "pending"
+        );
+        setPendingTransactions(pending);
       } else {
-        setTransactionsError(response.message || "Failed to fetch transactions")
-        addTechnicalError(`Transactions fetch failed: ${response.message}`)
+        setTransactionsError(
+          response.message || "Failed to fetch transactions"
+        );
+        addTechnicalError(`Transactions fetch failed: ${response.message}`);
       }
     } catch (error) {
-      console.error("❌ Transactions fetch error:", error)
-      setTransactionsError("Failed to fetch transactions")
-      addTechnicalError(`Transactions fetch error: ${error.message}`)
+      console.error("❌ Transactions fetch error:", error);
+      setTransactionsError("Failed to fetch transactions");
+      addTechnicalError(`Transactions fetch error: ${error.message}`);
     } finally {
-      setTransactionsLoading(false)
+      setTransactionsLoading(false);
     }
-  }
+  };
 
   // Add Transaction (Optimistic Updates)
   const addTransaction = (transaction) => {
-    setTransactions((prev) => [transaction, ...prev])
-    if (transaction.status === "initiated" || transaction.status === "pending") {
-      setPendingTransactions((prev) => [transaction, ...prev])
+    setTransactions((prev) => [transaction, ...prev]);
+    if (
+      transaction.status === "initiated" ||
+      transaction.status === "pending"
+    ) {
+      setPendingTransactions((prev) => [transaction, ...prev]);
     }
-  }
+  };
 
   // Update Transaction Status
   const updateTransaction = (ethswitchTransactionId, newStatus) => {
     setTransactions((prev) =>
       prev.map((t) =>
-        t.ethswitch_transaction_id === ethswitchTransactionId ? { ...t, status: newStatus, updated_at: new Date() } : t,
-      ),
-    )
+        t.ethswitch_transaction_id === ethswitchTransactionId
+          ? { ...t, status: newStatus, updated_at: new Date() }
+          : t
+      )
+    );
     // Update pending transactions
     if (newStatus === "completed" || newStatus === "failed") {
-      setPendingTransactions((prev) => prev.filter((t) => t.ethswitch_transaction_id !== ethswitchTransactionId))
+      setPendingTransactions((prev) =>
+        prev.filter(
+          (t) => t.ethswitch_transaction_id !== ethswitchTransactionId
+        )
+      );
 
       // Refresh balance if transaction completed
       if (newStatus === "completed") {
-        refreshBalance()
+        refreshBalance();
       }
     }
-  }
+  };
 
   // Initiate Deposit
   const initiateDeposit = async (depositData) => {
     // Changed to accept an object
-    const { valid, token } = checkAuthAndToken()
+    const { valid, token } = checkAuthAndToken();
     if (!valid) {
-      return { success: false, error: "Authentication required" }
+      return { success: false, error: "Authentication required" };
     }
-    setDepositLoading(true)
+    setDepositLoading(true);
 
     try {
-      console.log("🔄 Initiating deposit with token:", token ? "Present" : "Missing")
+      console.log(
+        "🔄 Initiating deposit with token:",
+        token ? "Present" : "Missing"
+      );
       // Pass depositData directly to the API call
-      const response = await walletApi.initiateDeposit(token, depositData)
+      const response = await walletApi.initiateDeposit(token, depositData);
 
-      console.log("✅ Deposit response:", response)
+      console.log("✅ Deposit response:", response);
       if (response.success) {
         // Add optimistic transaction
         const optimisticTransaction = {
@@ -211,40 +240,46 @@ export const WalletProvider = ({ children }) => {
           description: `Deposit from ${depositData.bankCode}`, // Changed to use bankCode
           created_at: new Date(),
           updated_at: new Date(),
-        }
+        };
 
-        addTransaction(optimisticTransaction)
-        startPolling()
+        addTransaction(optimisticTransaction);
+        startPolling();
 
-        return { success: true, transaction_id: response.data.transaction_id }
+        return { success: true, transaction_id: response.data.transaction_id };
       } else {
-        addTechnicalError(`Deposit initiation failed: ${response.message}`)
-        return { success: false, error: response.message || "Failed to initiate deposit" }
+        addTechnicalError(`Deposit initiation failed: ${response.message}`);
+        return {
+          success: false,
+          error: response.message || "Failed to initiate deposit",
+        };
       }
     } catch (error) {
-      console.error("❌ Deposit API error:", error)
-      addTechnicalError(`Deposit API error: ${error.message}`)
-      return { success: false, error: "Failed to initiate deposit" }
+      console.error("❌ Deposit API error:", error);
+      addTechnicalError(`Deposit API error: ${error.message}`);
+      return { success: false, error: "Failed to initiate deposit" };
     } finally {
-      setDepositLoading(false)
+      setDepositLoading(false);
     }
-  }
+  };
 
   // Initiate Withdraw
   const initiateWithdraw = async (withdrawData) => {
     // Changed to accept an object
-    const { valid, token } = checkAuthAndToken()
+    const { valid, token } = checkAuthAndToken();
     if (!valid) {
-      return { success: false, error: "Authentication required" }
+      return { success: false, error: "Authentication required" };
     }
-    setWithdrawLoading(true)
+    setWithdrawLoading(true);
 
     try {
-      console.log("🔄 Initiating withdrawal with token:", token ? "Present" : "Missing")
+      console.log(
+        "🔄 Initiating withdrawal with token:",
+        token ? "Present" : "Missing"
+      );
       // Pass withdrawData directly to the API call
-      const response = await walletApi.initiateWithdraw(token, withdrawData)
+      const response = await walletApi.initiateWithdraw(token, withdrawData);
 
-      console.log("✅ Withdrawal response:", response)
+      console.log("✅ Withdrawal response:", response);
       if (response.success) {
         // Add optimistic transaction
         const optimisticTransaction = {
@@ -259,35 +294,38 @@ export const WalletProvider = ({ children }) => {
           description: `Withdrawal to ${withdrawData.bankCode}`, // Changed to use bankCode
           created_at: new Date(),
           updated_at: new Date(),
-        }
+        };
 
-        addTransaction(optimisticTransaction)
+        addTransaction(optimisticTransaction);
 
         // Update balance optimistically (subtract withdrawal amount)
-        setBalance((prev) => prev - withdrawData.amount) // Use withdrawData.amount
+        setBalance((prev) => prev - withdrawData.amount); // Use withdrawData.amount
 
-        startPolling()
+        startPolling();
 
-        return { success: true, transaction_id: response.data.transaction_id }
+        return { success: true, transaction_id: response.data.transaction_id };
       } else {
-        addTechnicalError(`Withdrawal initiation failed: ${response.message}`)
-        return { success: false, error: response.message || "Failed to initiate withdrawal" }
+        addTechnicalError(`Withdrawal initiation failed: ${response.message}`);
+        return {
+          success: false,
+          error: response.message || "Failed to initiate withdrawal",
+        };
       }
     } catch (error) {
-      console.error("❌ Withdrawal API error:", error)
-      addTechnicalError(`Withdrawal API error: ${error.message}`)
-      return { success: false, error: "Failed to initiate withdrawal" }
+      console.error("❌ Withdrawal API error:", error);
+      addTechnicalError(`Withdrawal API error: ${error.message}`);
+      return { success: false, error: "Failed to initiate withdrawal" };
     } finally {
-      setWithdrawLoading(false)
+      setWithdrawLoading(false);
     }
-  }
+  };
 
   // Clear Errors
   const clearErrors = () => {
-    setTechnicalErrors([])
-    setBalanceError(null)
-    setTransactionsError(null)
-  }
+    setTechnicalErrors([]);
+    setBalanceError(null);
+    setTransactionsError(null);
+  };
 
   // Add Technical Error
   const addTechnicalError = (error) => {
@@ -295,81 +333,85 @@ export const WalletProvider = ({ children }) => {
       id: Date.now(),
       message: error,
       timestamp: new Date(),
-    }
-    setTechnicalErrors((prev) => [errorObj, ...prev.slice(0, 4)]) // Keep only last 5 errors
-    console.error("🔧 Technical Error:", error)
-  }
+    };
+    setTechnicalErrors((prev) => [errorObj, ...prev.slice(0, 4)]); // Keep only last 5 errors
+    console.error("🔧 Technical Error:", error);
+  };
 
   // Poll Pending Transactions
   const pollPendingTransactions = async () => {
-    const { valid, token } = checkAuthAndToken()
-    if (!valid || pendingTransactions.length === 0) return
+    const { valid, token } = checkAuthAndToken();
+    if (!valid || pendingTransactions.length === 0) return;
 
     try {
-      const response = await walletApi.getTransactions(token)
+      const response = await walletApi.getTransactions(token);
       if (response.success) {
-        const latestTransactions = response.data.transactions || []
+        const latestTransactions = response.data.transactions || [];
 
         // Check for status updates in pending transactions
         pendingTransactions.forEach((pendingTx) => {
           const updatedTx = latestTransactions.find(
-            (t) => t.ethswitch_transaction_id === pendingTx.ethswitch_transaction_id,
-          )
+            (t) =>
+              t.ethswitch_transaction_id === pendingTx.ethswitch_transaction_id
+          );
 
           if (updatedTx && updatedTx.status !== pendingTx.status) {
-            updateTransaction(updatedTx.ethswitch_transaction_id, updatedTx.status)
+            updateTransaction(
+              updatedTx.ethswitch_transaction_id,
+              updatedTx.status
+            );
           }
-        })
+        });
       }
     } catch (error) {
       // Silent polling error - don't add to technical errors for polling failures
-      console.warn("⚠️ Polling error:", error.message)
+      console.warn("⚠️ Polling error:", error.message);
     }
-  }
+  };
 
   // Start Polling
   const startPolling = () => {
-    if (pollingInterval) return // Already polling
+    if (pollingInterval) return; // Already polling
 
-    const interval = setInterval(pollPendingTransactions, 5000) // Poll every 5 seconds
-    setPollingInterval(interval)
-    console.log("🔄 Started transaction polling")
-  }
+    const interval = setInterval(pollPendingTransactions, 5000); // Poll every 5 seconds
+    setPollingInterval(interval);
+    console.log("🔄 Started transaction polling");
+  };
 
   // Stop Polling
   const stopPolling = () => {
     if (pollingInterval) {
-      clearInterval(pollingInterval)
-      setPollingInterval(null)
-      console.log("⏹️ Stopped transaction polling")
+      clearInterval(pollingInterval);
+      setPollingInterval(null);
+      console.log("⏹️ Stopped transaction polling");
     }
-  }
+  };
 
   // Effects
   useEffect(() => {
     // Wait for auth to finish loading before making API calls
     if (!authLoading && isLoggedIn && user) {
-      console.log("🚀 Auth loaded, initializing wallet data")
-      refreshBalance()
-      refreshTransactions()
+      console.log("🚀 Auth loaded, initializing wallet data");
+      refreshBalance();
+      refreshTransactions();
     }
-  }, [authLoading, isLoggedIn, user])
+  }, [authLoading, isLoggedIn, user]);
 
   // Start/stop polling based on pending transactions
   useEffect(() => {
     if (pendingTransactions.length > 0) {
-      startPolling()
+      startPolling();
     } else {
-      stopPolling()
+      stopPolling();
     }
 
-    return () => stopPolling() // Cleanup on unmount
-  }, [pendingTransactions.length])
+    return () => stopPolling(); // Cleanup on unmount
+  }, [pendingTransactions.length]);
 
   // Stop polling on unmount
   useEffect(() => {
-    return () => stopPolling()
-  }, [])
+    return () => stopPolling();
+  }, []);
 
   const value = {
     // Balance State
@@ -405,7 +447,9 @@ export const WalletProvider = ({ children }) => {
     initiateDeposit,
     initiateWithdraw,
     clearErrors,
-  }
+  };
 
-  return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
-}
+  return (
+    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
+  );
+};
