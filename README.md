@@ -237,6 +237,7 @@ in the Software without restriction...
 
 ### 👨‍💻 Developer
 **Awel** - [@Awel7799](https://github.com/Awel7799)
+**Aschalew** - [@Aschio12]([https://github.com/Aschio12)
 
 ### 🔗 Project Links
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/Awel7799/Ethio-stock-trading)
