@@ -33,26 +33,19 @@ export default function Markets() {
             <TotalInvestmentCard />
           </div>
 
-          {/* Chart and Holdings Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl border-2 border-yellow-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-yellow-100 to-white px-6 py-4 border-b-2 border-yellow-200">
-                <h2 className="text-xl font-bold text-black">Performance Analytics</h2>
-              </div>
-              <PerformanceChart />
+          {/* Holdings Section */}
+          <div className="bg-white rounded-2xl shadow-2xl shadow-yellow-200/50 overflow-hidden">
+            <div className="bg-gradient-to-r from-yellow-100 to-white px-6 py-4 shadow-sm">
+              <h2 className="text-xl font-bold text-black">Holdings Overview</h2>
             </div>
-            
-            <div className="lg:col-span-1 bg-white rounded-2xl shadow-xl border-2 border-yellow-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-yellow-100 to-white px-6 py-4 border-b-2 border-yellow-200">
-                <h2 className="text-xl font-bold text-black">Holdings Overview</h2>
-              </div>
+            <div className="p-6">
               <HoldingList />
             </div>
           </div>
 
           {/* Market Movers */}
-          <div className="bg-white rounded-2xl shadow-xl border-2 border-yellow-200 p-6">
-            <div className="bg-gradient-to-r from-yellow-100 to-white rounded-xl p-4 mb-6">
+          <div className="bg-white rounded-2xl shadow-2xl shadow-yellow-200/50 p-6">
+            <div className="bg-gradient-to-r from-yellow-100 to-white rounded-xl p-4 mb-6 shadow-lg shadow-yellow-100/40">
               <h2 className="text-2xl font-bold text-black">Market Activity</h2>
               <p className="text-gray-700 font-medium">Today's top performing stocks</p>
             </div>
@@ -60,9 +53,9 @@ export default function Markets() {
           </div>
 
           {/* Enhanced News Section */}
-          <div className="bg-gradient-to-br from-black via-gray-900 to-gray-800 rounded-2xl shadow-2xl border-2 border-yellow-300 overflow-hidden">
+          <div className="bg-gradient-to-br from-black via-gray-900 to-gray-800 rounded-2xl shadow-2xl shadow-gray-500/30 overflow-hidden">
             {/* News Header */}
-            <div className="bg-gradient-to-r from-yellow-200 via-yellow-100 to-white px-8 py-6 border-b-2 border-yellow-300">
+            <div className="bg-gradient-to-r from-yellow-200 via-yellow-100 to-white px-8 py-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-3xl font-bold text-black mb-2">Market News & Insights</h2>
@@ -70,7 +63,7 @@ export default function Markets() {
                 </div>
                 <div className="hidden md:flex items-center space-x-3">
                   <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-lg"></div>
-                  <span className="text-sm font-bold text-black bg-yellow-100 px-3 py-1 rounded-full">Live Updates</span>
+                  <span className="text-sm font-bold text-black bg-yellow-100 px-3 py-1 rounded-full shadow-sm">Live Updates</span>
                 </div>
               </div>
             </div>
@@ -85,7 +78,7 @@ export default function Markets() {
               <div className="flex items-center justify-center">
                 <div className="flex items-center space-x-4">
                   <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-                  <span className="text-yellow-100 font-bold text-sm tracking-wide">POWERED BY PROFESSIONAL MARKET ANALYSIS</span>
+                  <span className="text-yellow-100 font-bold text-sm tracking-wide">Real-time Market Intelligence</span>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
                 </div>
               </div>
