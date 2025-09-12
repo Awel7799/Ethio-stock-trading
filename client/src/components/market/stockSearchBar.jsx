@@ -70,8 +70,8 @@ export default function StockSearchBar() {
         <input
           type="text"
           aria-label="Search stocks"
-          className="flex-1 px-4 py-2 border border-yellow-200 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
-          placeholder="Search stocks by name or symbol..."
+          className="flex-1 z-50 px-4 py-2 border border-yellow-200 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
+          placeholder="Search stocks by name..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           onFocus={() => {
