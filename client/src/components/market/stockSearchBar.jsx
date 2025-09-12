@@ -70,7 +70,7 @@ export default function StockSearchBar() {
         <input
           type="text"
           aria-label="Search stocks"
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          className="flex-1 px-4 py-2 border border-yellow-200 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
           placeholder="Search stocks by name or symbol..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
@@ -80,32 +80,32 @@ export default function StockSearchBar() {
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition"
+          className="px-4 py-2 bg-black text-white rounded-r-md hover:bg-gray-800 transition"
         >
           {loading ? 'Searching...' : 'Search'}
         </button>
       </form>
 
       {showDropdown && suggestions.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-20 mt-1 w-full bg-white border border-yellow-200 rounded-md shadow-lg max-h-60 overflow-auto">
           {suggestions.map((s) => (
             <div
               key={s.symbol}
               onClick={() => handleSelect(s.symbol)}
-              className="flex justify-between items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              className="flex justify-between items-center px-4 py-2 hover:bg-yellow-50 cursor-pointer"
             >
               <div>
-                <div className="font-medium">{s.symbol}</div>
-                <div className="text-xs text-gray-500">{s.name}</div>
+                <div className="font-medium text-black">{s.symbol}</div>
+                <div className="text-xs text-gray-600">{s.name}</div>
               </div>
-              <div className="text-indigo-500">›</div>
+              <div className="text-black">›</div>
             </div>
           ))}
         </div>
       )}
 
       {showDropdown && !loading && suggestions.length === 0 && keyword.trim() && (
-        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow p-3 text-sm text-gray-600">
+        <div className="absolute z-20 mt-1 w-full bg-white border border-yellow-200 rounded-md shadow p-3 text-sm text-gray-600">
           No results for "{keyword}"
         </div>
       )}

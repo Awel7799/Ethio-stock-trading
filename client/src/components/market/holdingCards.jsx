@@ -16,30 +16,44 @@ const HoldingsCard = () => {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 w-full top-20 ml-5">
-      <h2 className="text-md font-semibold mb-3">Your Holdings</h2>
-      <div className="flex flex-col gap-4">
+    <div className="bg-white shadow-lg rounded-xl border border-yellow-200 p-6 w-full">
+      <div className="bg-gradient-to-r from-yellow-100 to-white rounded-lg p-4 mb-4">
+        <h2 className="text-lg font-bold text-black tracking-wide">Your Holdings</h2>
+        <p className="text-sm text-gray-700 font-medium">Portfolio Overview</p>
+      </div>
+      
+      <div className="space-y-3">
         {holdings.map((stock, index) => (
           <div
             key={index}
-            className="flex justify-between items-center border-b pb-2 cursor-pointer hover:bg-gray-100 p-2 rounded"
+            className="flex justify-between items-center border-b border-yellow-100 pb-3 cursor-pointer hover:bg-gradient-to-r hover:from-yellow-50 hover:to-white p-3 rounded-lg transition-all duration-200"
             onClick={() => handleClick(stock.symbol)}
           >
             <div>
-              <h3 className="text-sm font-bold">{stock.symbol}</h3>
-              <p className="text-xs text-gray-500">{stock.quantity} shares</p>
+              <h3 className="text-base font-bold text-black">{stock.symbol}</h3>
+              <p className="text-sm text-gray-600 font-medium">{stock.quantity} shares</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold">${stock.currentValue}</p>
+              <p className="text-base font-bold text-black">${stock.currentValue.toLocaleString()}</p>
               <p
-                className={`text-xs ${stock.gainLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                className={`text-sm font-semibold ${
+                  stock.gainLoss >= 0 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}
               >
                 {stock.gainLoss >= 0 ? '+' : ''}
-                {stock.gainLoss} ({stock.percentage}%)
+                ${Math.abs(stock.gainLoss)} ({stock.percentage}%)
               </p>
             </div>
           </div>
         ))}
+      </div>
+      
+      <div className="mt-4 pt-3 border-t border-yellow-200">
+        <button className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:from-gray-800 hover:to-black transition-all duration-200">
+          View All Holdings
+        </button>
       </div>
     </div>
   );
