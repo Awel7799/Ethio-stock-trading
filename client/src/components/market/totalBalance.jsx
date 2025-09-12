@@ -60,7 +60,7 @@ const TotalInvestmentCard = () => {
 
   return (
     <div className="bg-transparent p-6 w-full max-w-md mx-auto rounded-2xl mb-15 mt-10 ml-0">
-      {loading && <p className="text-sm text-gray-500 mt-2">Loading...</p>}
+      {loading && <p className="text-sm text-gray-600 mt-2">Loading...</p>}
       {error && (
         <p className="text-sm text-red-600 mt-2">
           Error: {error}
@@ -70,17 +70,17 @@ const TotalInvestmentCard = () => {
       {!loading && !error && summary && (
         <>
           <div className="mt-4">
-            <p className="text-sm text-gray-500">Total Invested</p>
-            <p className="text-lg font-medium">{formatCurrency(totalInvested)}</p>
+            <p className="text-sm text-gray-600">Total Invested</p>
+            <p className="text-lg font-medium text-black">{formatCurrency(totalInvested)}</p>
           </div>
 
           <div className="mt-2">
-            <p className="text-sm text-gray-500">Current Value</p>
-            <p className="text-lg font-medium">{formatCurrency(totalCurrentValue)}</p>
+            <p className="text-sm text-gray-600">Current Value</p>
+            <p className="text-lg font-medium text-black">{formatCurrency(totalCurrentValue)}</p>
           </div>
 
           <div className="mt-4 flex items-baseline gap-3">
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-bold text-black">
               {formatCurrency(gainLoss.dollar)}
             </p>
             <p
@@ -94,14 +94,14 @@ const TotalInvestmentCard = () => {
             </p>
           </div>
 
-          <p className="text-sm mt-1">
+          <p className="text-sm mt-1 text-black">
             {positive ? 'Gain' : 'Loss'} {positive ? '▲' : '▼'}
           </p>
         </>
       )}
 
       {!summary && !loading && !error && (
-        <p className="text-sm text-gray-500 mt-2">No investment data available.</p>
+        <p className="text-sm text-gray-600 mt-2">No investment data available.</p>
       )}
     </div>
   );
