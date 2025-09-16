@@ -18,7 +18,6 @@ async function getQuote(symbol) {
     const resp = await axios.get('https://finnhub.io/api/v1/quote', {
       params: { symbol: upper, token: API_KEY },
     });
-
     const data = resp.data;
 
     if (!data || data.c === undefined || data.c === 0) {
@@ -26,7 +25,6 @@ async function getQuote(symbol) {
     }
 
     const price = parseFloat(data.c);
-
     if (isNaN(price)) throw new Error(`Invalid price for ${upper}`);
 
     // Update cache
@@ -34,12 +32,10 @@ async function getQuote(symbol) {
     return price;
   } catch (err) {
     console.error(`[priceFetcher] Error for ${upper}:`, err.message);
-
     // Fallback to previous cached price if available
     if (cache[upper]) {
       return cache[upper].price;
     }
-
     // Last resort: return 0
     return 0;
   }

@@ -1,3 +1,4 @@
+// src/components/stock/StockDetailPage.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchStockDetails } from '../../../services/stockAPI';
@@ -8,43 +9,40 @@ import StockPortfolioCard from './StockPortfolioCard';
 import NewsFeed from '../../market/newsFeed';
 
 export default function StockDetailPage() {
-  const [editTarget, setEditTarget] = useState(null);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const { symbol } = useParams();
   const [stock, setStock] = useState(null);
   const navigate = useNavigate();
 
   const handleSuccess = () => {
-    setEditTarget(null);
     setRefreshFlag((f) => f + 1);
   };
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      const data = await fetchStockDetails(symbol);
-      // Ensure numeric values are valid
-      setStock({
-        ...data,
-        price: data.price != null ? Number(data.price) : 0,
-        changesPercentage:
-          data.changesPercentage != null ? Number(data.changesPercentage) : 0,
-        history: Array.isArray(data.history) ? data.history : [],
-      });
-    } catch (err) {
-      console.error('Failed to load stock details:', err);
-      setStock({
-        name: symbol,
-        price: 0,
-        changesPercentage: 0,
-        history: [],
-        description: 'No data available',
-        logo: null,
-        marketState: 'Closed',
-      });
-    }
-  };
-  loadData();
-}, [symbol, refreshFlag]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchStockDetails(symbol);
+        setStock({
+          ...data,
+          price: data.price != null ? Number(data.price) : 0,
+          changesPercentage: data.changesPercentage != null ? Number(data.changesPercentage) : 0,
+          history: Array.isArray(data.history) ? data.history : [],
+        });
+      } catch (err) {
+        console.error('Failed to load stock details:', err);
+        setStock({
+          name: symbol,
+          price: 0,
+          changesPercentage: 0,
+          history: [],
+          description: 'No data available',
+          logo: null,
+          marketState: 'Closed',
+        });
+      }
+    };
+    loadData();
+  }, [symbol, refreshFlag]);
 
   if (!stock) {
     return (
@@ -94,9 +92,7 @@ useEffect(() => {
           <div className="text-4xl font-bold">${stock.price.toFixed(2)}</div>
           <div className="flex items-center gap-2 mt-3">
             <div
-              className={`text-sm mb-5 font-medium ${
-                priceChangePositive ? 'text-green-500' : 'text-red-500'
-              }`}
+              className={`text-sm mb-5 font-medium ${priceChangePositive ? 'text-green-500' : 'text-red-500'}`}
             >
               {priceChangePositive ? '+' : ''}
               {stock.changesPercentage.toFixed(2)}%
@@ -107,7 +103,7 @@ useEffect(() => {
 
         {/* Chart area */}
         <div className="flex-1">
-          <StockChart history={stock.history} />
+          {stock.history && <StockChart history={stock.history} />}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -140,8 +136,8 @@ useEffect(() => {
               {stock.description || 'No description available.'}
             </p>
           </div>
+          <NewsFeed symbol={symbol} /> {/* Corrected: pass the symbol prop */}
         </div>
-        <NewsFeed />
       </div>
     </div>
   );

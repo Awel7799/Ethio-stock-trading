@@ -1,3 +1,4 @@
+// routes/stockRoutes.js
 const express = require('express');
 const router = express.Router();
 const { getStockDetails } = require('../Controllers/stockDetailController');
