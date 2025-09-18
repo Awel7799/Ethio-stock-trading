@@ -115,6 +115,7 @@ console.log("🔧 Registering wallet routes...")
 app.use("/api/wallet", walletRoutes)
 console.log("✅ Wallet routes registered successfully")
 // === Routes ===
+
 const stockRoutes = require("./routes/stockRoutes");
 const stockDetailRoutes = require("./routes/detailStockDetailRouter");
 const holdingRoutes = require("./routes/holdingRoutes");
@@ -128,11 +129,13 @@ const stockPortfolioRouter = require('./routes/stockPortfolioRouter');
 const portfolioRouter = require('./routes/portfolioRouter');
 const newsRoutes = require('./routes/newsRoutes.Js');
 
-//const performanceRoutes = require('./routes/performanceRoutes');
+const performanceRoutes = require('./routes/performanceRoutes');
 
 //const { runDailySnapshotJob } = require('./jobs/savePerformanceSnapshots');
 //runDailySnapshotJob();
 
+
+// Add these middleware
 app.use('/api/auth', authRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/stocks", stockDetailRoutes);
@@ -145,8 +148,7 @@ app.use("/api/chat", chatRouter);
 app.use('/api', stockPortfolioRouter);
 app.use('/api', portfolioRouter);
 app.use('/api/news', newsRoutes);
-
-//app.use('/api/performance', performanceRoutes);
+app.use('/api/performance', performanceRoutes);
 // ============================================
 // Auth Routes (Re-added)
 // ============================================
