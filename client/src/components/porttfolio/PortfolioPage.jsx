@@ -47,7 +47,7 @@ const Portfolio = ({ currentPrices }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Elegant Header */}
-      <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 shadow-xl border-b-2 border-amber-300">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 shadow-xl border-b-2 border-amber-300 m-auto">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-8 lg:mb-0 lg:w-1/2">

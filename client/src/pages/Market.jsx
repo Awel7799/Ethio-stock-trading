@@ -32,14 +32,12 @@ export default function Markets() {
           </div>
 
           {/* Investment Summary + Chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-gradient-to-r from-white to-yellow-50 rounded-2xl shadow-2xl shadow-yellow-200/50 p-6">
+          <div className="flex  gap-12">
+            <div className="bg-gradient-to-r from-white w-fit to-yellow-50 rounded-2xl shadow-2xl shadow-yellow-200/50 p-4">
               <TotalInvestmentCard />
             </div>
-            <div className="bg-white rounded-2xl shadow-2xl shadow-yellow-200/50 overflow-hidden">
-              <div className="bg-gradient-to-r from-yellow-100 to-white px-6 py-4 shadow-lg shadow-yellow-100/50">
-                <h2 className="text-xl font-bold text-black">Performance Analytics</h2>
-              </div>
+            <div className="bg-white rounded-2xl shadow-2xl mr-20 w-[95vw] shadow-yellow-200/50 overflow-hidden">
+              
               <PerformanceChart />
             </div>
           </div>

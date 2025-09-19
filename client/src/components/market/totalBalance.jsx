@@ -59,7 +59,7 @@ const TotalInvestmentCard = () => {
   const positive = gainLoss.dollar >= 0;
 
   return (
-    <div className="bg-transparent p-6 w-full max-w-md mx-auto rounded-2xl mb-15 mt-10 ml-0">
+    <div className="bg-transparent p-6 w-fit max-w-md mx-auto rounded-2xl mb-15 mt-10 ml-0">
       {loading && <p className="text-sm text-gray-600 mt-2">Loading...</p>}
       {error && (
         <p className="text-sm text-red-600 mt-2">
