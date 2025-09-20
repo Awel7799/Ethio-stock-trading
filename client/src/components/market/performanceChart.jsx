@@ -54,7 +54,7 @@ function PerformanceChart() {
       const profit = payload[0].payload.profit || 0;
       const isProfit = profit >= 0;
       return (
-        <div className="bg-white border border-amber-200 rounded-xl shadow-lg p-4">
+        <div className="bg-white border border-amber-200 rounded-xl shadow-xl p-4">
           <p className="text-amber-800 text-sm font-medium mb-2">{label}</p>
           <div className="space-y-1">
             <p className="text-lg font-bold text-black">
@@ -73,28 +73,28 @@ function PerformanceChart() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border  border-amber-200 flex justify-center">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-amber-200 flex justify-center">
       <div className="w-4/3">
         {/* Header */}
-        <div className="bg-amber-600 p-6 text-white">
+        <div className="bg-gradient-to-r from-amber-100 via-wheat-100 to-amber-50 p-6">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-4xl font-bold mb-1">
+              <div className="text-4xl font-bold mb-1 text-amber-900">
                 ${currentValue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </div>
-              <div className={`flex items-center text-lg font-semibold ${isPositive ? "text-green-100" : "text-red-100"}`}>
+              <div className={`flex items-center text-lg font-semibold ${isPositive ? "text-green-700" : "text-red-700"}`}>
                 {isPositive ? "+" : ""}${totalGain.toFixed(2)} ({isPositive ? "+" : ""}{percentageGain.toFixed(2)}%)
               </div>
             </div>
 
             {/* Timeframe Selector */}
-            <div className="flex bg-amber-700 rounded-lg p-1">
+            <div className="flex bg-wheat-50 rounded-lg p-1 border border-wheat-200">
               {["1W", "1M", "3M", "6M", "1Y"].map((period) => (
                 <button
                   key={period}
                   onClick={() => setTimeframe(period)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    timeframe === period ? "bg-amber-100 text-amber-900 shadow-lg" : "text-amber-50 hover:text-white hover:bg-amber-500"
+                    timeframe === period ? "bg-amber-200 text-amber-900 shadow-lg" : "text-amber-700 hover:text-amber-900 hover:bg-amber-100"
                   }`}
                 >
                   {period}
@@ -112,7 +112,7 @@ function PerformanceChart() {
                 <defs>
                   <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#D97706" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#FCD34D" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#FEF3C7" stopOpacity={0.3} />
                   </linearGradient>
                   <linearGradient id="investedGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.6} />
@@ -120,9 +120,9 @@ function PerformanceChart() {
                   </linearGradient>
                 </defs>
 
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#78350F", fontWeight: 500 }} tickMargin={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#78350F", fontWeight: 500 }} tickFormatter={(val) => `$${val.toLocaleString()}`} tickMargin={10} />
-                <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" opacity={0.5} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#92400E", fontWeight: 500 }} tickMargin={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#92400E", fontWeight: 500 }} tickFormatter={(val) => `${val.toLocaleString()}`} tickMargin={10} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#F59E0B" opacity={0.4} />
                 <Tooltip content={<CustomTooltip />} />
 
                 {/* Portfolio Value */}
@@ -141,7 +141,7 @@ function PerformanceChart() {
                 <Line
                   type="monotone"
                   dataKey="totalInvested"
-                  stroke="#10B981"
+                  stroke="#059669"
                   strokeWidth={2}
                   dot={false}           // removed dots
                   strokeDasharray="5 5"

@@ -64,7 +64,8 @@ export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
     <div
       style={{
         fontFamily: "system-ui, sans-serif",
-        background: "white",
+        background: "linear-gradient(to bottom right, #fffbeb, #ffffff)"
+,
         padding: 16,
         borderRadius: 8,
         boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
@@ -80,7 +81,7 @@ export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
           style={{
             flex: 1,
             padding: "8px",
-            background: isBuy ? "#2563eb" : "#e5e7eb",
+            background: isBuy ? "blue" : "#e5e7eb",
             color: isBuy ? "white" : "#111",
             border: "none",
             borderRadius: 6,
@@ -114,7 +115,7 @@ export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
 
       <form
         onSubmit={handleSubmit}
-        style={{ display: "grid", gap: 12, marginTop: 8 }}
+        style={{ display: "grid", gap: 12, marginTop: 8, color:"#8B4513"}}
       >
         <label>
           Quantity
