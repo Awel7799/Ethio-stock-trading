@@ -16,6 +16,29 @@
 
 ---
 
+## 📸 Application Screenshots
+
+<div align="center">
+
+### 🏠 Landing Page
+<img width="1899" height="835" alt="TradeWise Landing Page" src="https://github.com/user-attachments/assets/e0e5e572-b420-4e6f-8eb4-72a5d6b88390" />
+
+### 📊 Market Dashboard
+<img width="1885" height="837" alt="Market Dashboard" src="https://github.com/user-attachments/assets/1033b77d-a47e-45a8-97a1-43547180b0d4" />
+
+### 💹 Trading Interface
+<img width="1524" height="823" alt="Trading Interface" src="https://github.com/user-attachments/assets/ff0eca3d-77a9-4ecf-9f04-5149e772c119" />
+
+### 💰 Wallet Page
+<img width="714" height="825" alt="Wallet Management" src="https://github.com/user-attachments/assets/9adb6245-0dba-445c-b1eb-af9ba4472d6a" />
+
+### ⚙️ Settings Panel
+<img width="1890" height="828" alt="Settings and Configuration" src="https://github.com/user-attachments/assets/f4b4efb2-8d45-425e-bf77-e2c8b9d5287f" />
+
+</div>
+
+---
+
 ## 🌟 Overview
 
 **TradeWise** is a cutting-edge, full-stack stock trading platform built as a monorepo architecture, specifically tailored for Ethiopian financial markets. With its modern React frontend, robust microservices backend, and sophisticated API gateway, TradeWise delivers a seamless trading experience with real-time market data, advanced analytics, and secure transaction processing.
@@ -33,13 +56,13 @@
 
 ## 🏗️ Architecture
 
-\`\`\`
+```
 📦 TradeWise (Monorepo)
 ├── 🎨 client/          # React Frontend Application
 ├── 🔧 api-gateway/     # API Gateway & Load Balancer
 ├── 🛠️ services/        # Microservices Backend
 └── ⚙️ .vscode/         # Development Configuration
-\`\`\`
+```
 
 ### 🎯 Core Components
 
@@ -109,13 +132,13 @@
 ### 🔧 Quick Start
 
 1. **Clone the repository**
-   \`\`\`bash
+   ```bash
    git clone https://github.com/Awel7799/Ethio-stock-trading.git
    cd Ethio-stock-trading
-   \`\`\`
+   ```
 
 2. **Install dependencies for all services**
-   \`\`\`bash
+   ```bash
    # Install client dependencies
    cd client
    npm install
@@ -127,17 +150,17 @@
    # Install services dependencies
    cd ../services
    npm install
-   \`\`\`
+   ```
 
 3. **Environment Setup**
-   \`\`\`bash
+   ```bash
    # Create environment files
    cp .env.example .env
    # Configure your environment variables
-   \`\`\`
+   ```
 
 4. **Start the development servers**
-   \`\`\`bash
+   ```bash
    # Terminal 1: Start API Gateway
    cd api-gateway
    npm run dev
@@ -149,29 +172,12 @@
    # Terminal 3: Start Client
    cd client
    npm start
-   \`\`\`
+   ```
 
 5. **Access the application**
    - 🌐 Frontend: `http://localhost:3000`
    - 🔧 API Gateway: `http://localhost:8000`
    - 🛠️ Services: `http://localhost:5000`
-
----
-
-## 📸 Screenshots
-
-<div align="center">
-
-### 🏠 Dashboard Overview
-![Dashboard](https://via.placeholder.com/800x400/1a1a2e/ffffff?text=TradeWise+Dashboard)
-
-### 📊 Trading Interface
-![Trading](https://via.placeholder.com/800x400/16213e/ffffff?text=Real-time+Trading+Interface)
-
-### ⚙️ Settings Panel
-![Settings](https://via.placeholder.com/800x400/0f3460/ffffff?text=Advanced+Settings+Panel)
-
-</div>
 
 ---
 
@@ -183,18 +189,18 @@ We welcome contributions from the community! Here's how you can help:
 
 1. **Fork the repository**
 2. **Create a feature branch**
-   \`\`\`bash
+   ```bash
    git checkout -b feature/amazing-feature
-   \`\`\`
+   ```
 3. **Make your changes**
 4. **Commit your changes**
-   \`\`\`bash
+   ```bash
    git commit -m 'Add some amazing feature'
-   \`\`\`
+   ```
 5. **Push to the branch**
-   \`\`\`bash
+   ```bash
    git push origin feature/amazing-feature
-   \`\`\`
+   ```
 6. **Open a Pull Request**
 
 ### 📋 Contribution Guidelines
@@ -210,7 +216,7 @@ We welcome contributions from the community! Here's how you can help:
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-\`\`\`
+```
 MIT License
 
 Copyright (c) 2024 TradeWise
@@ -218,7 +224,7 @@ Copyright (c) 2024 TradeWise
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction...
-\`\`\`
+```
 
 ---
 
@@ -237,7 +243,7 @@ in the Software without restriction...
 
 ### 👨‍💻 Developer
 **Awel** - [@Awel7799](https://github.com/Awel7799)
-**Aschalew** - [@Aschio12]([https://github.com/Aschio12)
+**Aschalew** - [@Aschio12](https://github.com/Aschio12)
 
 ### 🔗 Project Links
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/Awel7799/Ethio-stock-trading)
