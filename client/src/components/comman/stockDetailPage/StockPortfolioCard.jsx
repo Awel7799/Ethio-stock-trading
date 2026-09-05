@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../../context/AuthContext'; // <-- add this line
-import { fetchStockPortfolio } from '../../../services/portfolioService';
-
+// commom/stockDetailPage/StockPortfolioCard.jsx
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
+import { fetchStockPortfolio } from "../../../services/portfolioService";
 
 export default function StockPortfolioCard({ symbol, currentPrice }) {
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadPortfolio = async () => {
@@ -25,58 +25,74 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
 
   if (loading) return <div>Loading portfolio...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
-  if (!portfolio || !portfolio.holding) return <div>You don’t own any {symbol} yet.</div>;
+  if (!portfolio || !portfolio.holding)
+    return <div>You don’t own any {symbol} yet.</div>;
 
   const { holding, transactions = [], profitLoss = 0 } = portfolio;
-  const profitLossColor = profitLoss >= 0 ? 'text-green-500' : 'text-red-500';
+  const profitLossColor = profitLoss >= 0 ? "text-green-600" : "text-red-600";
   const qty = holding?.quantity || 0;
   const avgPrice = holding?.purchasePrice || 0;
   const totalValue = qty * (currentPrice || 0);
 
   return (
-    <div className="bg-white shadow rounded-2xl p-5 space-y-4">
-      <h3 className="text-lg font-semibold">Your {symbol} Holdings</h3>
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <div className="text-gray-500">Quantity</div>
-          <div className="font-medium">{qty}</div>
+    <div className="bg-gradient-to-br from-wheat-100 to-amber-50 shadow-lg rounded-2xl p-4 space-y-4 border border-yellow-200">
+      {/* Header */}
+      <h3 className="text-lg font-bold text-yellow-800">
+        Your {symbol} Holdings
+      </h3>
+
+      {/* Holdings Overview */}
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-2 rounded-lg shadow-sm">
+          <div className="text-yellow-700 text-xs">Quantity</div>
+          <div className="font-semibold text-yellow-900">{qty}</div>
         </div>
-        <div>
-          <div className="text-gray-500">Average Price</div>
-          <div className="font-medium">${avgPrice.toFixed(2)}</div>
+        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-2 rounded-lg shadow-sm">
+          <div className="text-yellow-700 text-xs">Average Price</div>
+          <div className="font-semibold text-yellow-900">
+            ${avgPrice.toFixed(2)}
+          </div>
         </div>
-        <div>
-          <div className="text-gray-500">Total Value</div>
-          <div className="font-medium">${totalValue.toFixed(2)}</div>
+        <div className="bg-gradient-to-l from-yellow-50 to bg-yellow-100 p-2 rounded-lg shadow-sm">
+          <div className="text-yellow-700 text-xs">Total Value</div>
+          <div className="font-semibold text-yellow-900">
+            ${totalValue.toFixed(2)}
+          </div>
         </div>
-        <div>
-          <div className="text-gray-500">Profit/Loss</div>
-          <div className={`font-medium ${profitLossColor}`}>${profitLoss.toFixed(2)}</div>
+        <div className="bg-gradient-to-l from-yellow-50 to bg-yellow-100  p-2 rounded-lg shadow-sm">
+          <div className="text-yellow-700 text-xs">Profit / Loss</div>
+          <div className={`font-semibold ${profitLossColor}`}>
+            ${profitLoss.toFixed(2)}
+          </div>
         </div>
       </div>
 
+      {/* Transactions */}
       <div>
-        <h4 className="text-md font-semibold mt-4">Transaction History</h4>
-        <table className="w-full text-sm mt-2">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-1">Date</th>
-              <th className="text-left">Type</th>
-              <th className="text-left">Qty</th>
-              <th className="text-left">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(transactions || []).map((tx) => (
-              <tr key={tx._id} className="border-b">
-                <td>{new Date(tx.transactionDate).toLocaleDateString()}</td>
-                <td>{tx.type}</td>
-                <td>{tx.quantity}</td>
-                <td>${tx.price.toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <h4 className="text-md font-semibold text-yellow-800 mt-2">
+          Transaction History
+        </h4>
+        <div className="mt-3 space-y-2">
+          {(transactions || []).map((tx) => (
+            <div
+              key={tx._id}
+              className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm"
+            >
+              <div>
+                <p className="text-yellow-900 font-medium">{tx.type}</p>
+                <p className="text-yellow-700 text-xs">
+                  {new Date(tx.transactionDate).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex gap-4 mt-2 sm:mt-0">
+                <span className="text-yellow-800">Qty: {tx.quantity}</span>
+                <span className="text-yellow-900 font-semibold">
+                  ${tx.price.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

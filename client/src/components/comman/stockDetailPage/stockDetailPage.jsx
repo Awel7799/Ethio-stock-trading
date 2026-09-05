@@ -102,20 +102,28 @@ export default function StockDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl ml-5 mx-auto px-4 py-6">
-        <div className="animate-pulse">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-            <div>
-              <div className="h-6 bg-gray-200 rounded w-32 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-16"></div>
+      <div className="min-h-screen bg-gradient-to-br from-white via-wheat-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="animate-pulse space-y-8">
+            <div className="bg-wheat-100 rounded-3xl p-8 shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-wheat-200 rounded-full"></div>
+                <div className="w-16 h-16 bg-wheat-200 rounded-full"></div>
+                <div className="flex-1">
+                  <div className="h-6 bg-wheat-200 rounded w-48 mb-2"></div>
+                  <div className="h-4 bg-wheat-200 rounded w-24"></div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="bg-gray-200 h-64 rounded-2xl mb-6"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-gray-200 h-96 rounded-2xl"></div>
-            <div className="lg:col-span-2 bg-gray-200 h-96 rounded-2xl"></div>
+            
+            <div className="bg-wheat-100 rounded-3xl p-8 shadow-xl">
+              <div className="h-80 bg-wheat-200 rounded-2xl"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+              <div className="bg-wheat-100 h-96 rounded-3xl shadow-xl"></div>
+              <div className="xl:col-span-3 bg-wheat-100 h-96 rounded-3xl shadow-xl"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -124,12 +132,12 @@ export default function StockDetailPage() {
 
   if (!stock) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="text-gray-500 mb-4">Failed to load stock details</div>
+      <div className="min-h-screen bg-gradient-to-br from-white via-wheat-50 to-white flex items-center justify-center">
+        <div className="text-center bg-white rounded-3xl shadow-xl p-8 border border-wheat-200">
+          <div className="text-black mb-6 text-lg">Failed to load stock details</div>
           <button 
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors shadow-lg"
           >
             Go Back
           </button>
@@ -141,135 +149,151 @@ export default function StockDetailPage() {
   const priceChangePositive = stock.changesPercentage >= 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl ml-5 mx-auto px-4 py-6 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-wheat-50 to-white">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between bg-white rounded-2xl shadow-lg p-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-3 rounded-full hover:bg-gray-100 transition-colors border border-gray-200"
-            >
-              <ArrowLeft size={20} className="text-gray-600" />
-            </button>
-            
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-wheat-100 to-amber-100 rounded-2xl shadow-2xl p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {stock.logo ? (
-                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden shadow-md">
-                  <img
-                    src={stock.logo}
-                    alt={`${stock.name} logo`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                  {symbol[0]}
-                </div>
-              )}
+              <button
+                onClick={() => navigate(-1)}
+                className="p-3 rounded-xl bg-wheat-200 hover:bg-wheat-300 transition-colors shadow-lg"
+              >
+                <ArrowLeft size={20} className="text-black" />
+              </button>
               
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">{stock.name || symbol}</h1>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-lg text-gray-600 font-semibold">{symbol}</span>
-                  <div className={`flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                    stock.marketState === 'Open' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    <div className={`w-2 h-2 rounded-full mr-1 ${
-                      stock.marketState === 'Open' ? 'bg-green-500' : 'bg-red-500'
-                    }`}></div>
-                    {stock.marketState || 'Closed'}
+              <div className="flex items-center gap-4">
+                {stock.logo ? (
+                  <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-lg">
+                    <img
+                      src={stock.logo}
+                      alt={`${stock.name} logo`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-300 to-wheat-300 flex items-center justify-center text-xl font-bold text-black shadow-lg">
+                    {symbol[0]}
+                  </div>
+                )}
+                
+                <div>
+                  <h1 className="text-2xl font-bold text-black mb-1">{stock.name || symbol}</h1>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg text-gray-800 font-semibold">{symbol}</span>
+                    <div className={`flex items-center px-2 py-1 rounded-lg text-xs font-semibold shadow-md ${
+                      stock.marketState === 'Open' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full mr-1 ${
+                        stock.marketState === 'Open' ? 'bg-green-500' : 'bg-red-500'
+                      }`}></div>
+                      {stock.marketState || 'Closed'}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-yellow-800 text-sm">
-                <strong>Demo Mode:</strong> Real-time data unavailable
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Enhanced Price Section */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 text-white">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="text-5xl font-bold mb-4">
-                  ${stock.price.toFixed(2)}
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className={`flex items-center px-4 py-2 rounded-full text-lg font-semibold ${
-                    priceChangePositive ? 'bg-green-500/20 text-green-100' : 'bg-red-500/20 text-red-100'
-                  }`}>
-                    {priceChangePositive ? (
-                      <TrendingUp size={20} className="mr-2" />
-                    ) : (
-                      <TrendingDown size={20} className="mr-2" />
-                    )}
-                    {priceChangePositive ? '+' : ''}
-                    ${Math.abs(stock.change || 0).toFixed(2)} ({stock.changesPercentage.toFixed(2)}%)
-                  </div>
-                  <div className="text-sm text-white/70">24h Change</div>
-                </div>
-              </div>
-              
-              {/* Key Stats */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-white/10 rounded-lg p-3">
-                  <div className="text-white/70">Volume</div>
-                  <div className="font-bold">{(stock.volume || 0).toLocaleString()}</div>
-                </div>
-                <div className="bg-white/10 rounded-lg p-3">
-                  <div className="text-white/70">Market Cap</div>
-                  <div className="font-bold">${((stock.marketCap || 0) / 1e9).toFixed(1)}B</div>
-                </div>
-                <div className="bg-white/10 rounded-lg p-3">
-                  <div className="text-white/70">Day Range</div>
-                  <div className="font-bold">${(stock.dayLow || 0).toFixed(2)} - ${(stock.dayHigh || 0).toFixed(2)}</div>
-                </div>
-                <div className="bg-white/10 rounded-lg p-3">
-                  <div className="text-white/70">52W Range</div>
-                  <div className="font-bold">${(stock.low52w || 0).toFixed(2)} - ${(stock.high52w || 0).toFixed(2)}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Chart Section */}
-          <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="text-gray-600" size={20} />
-              <h3 className="text-lg font-semibold text-gray-900">Price Chart</h3>
-            </div>
-            {stock.history && stock.history.length > 0 ? (
-              <StockChart history={stock.history} />
-            ) : (
-              <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-                <p className="text-gray-500">Chart data unavailable</p>
+            {error && (
+              <div className="bg-gradient-to-r from-amber-200 to-wheat-200 rounded-xl p-3 shadow-lg">
+                <p className="text-amber-900 text-sm">
+                  <strong>Demo Mode:</strong> Real-time data unavailable
+                </p>
               </div>
             )}
           </div>
         </div>
 
+        {/* Price Overview & Chart Section - Combined Container */}
+        <div className="bg-gradient-to-br from-amber-50 to-wheat-100 rounded-2xl shadow-2xl p-6">
+          <div className="grid grid-cols-1 xl:grid-cols-7 gap-6">
+            {/* Price Info - Left Side - Smaller */}
+            <div className="xl:col-span-2">
+              <div className="bg-gradient-to-br from-wheat-100 to-amber-50 rounded-xl shadow-xl p-4">
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-3xl font-bold text-black mb-2">
+                      ${stock.price.toFixed(2)}
+                    </div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`flex items-center px-3 py-2 rounded-lg text-sm font-semibold shadow-lg ${
+                        priceChangePositive 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {priceChangePositive ? (
+                          <TrendingUp size={16} className="mr-1" />
+                        ) : (
+                          <TrendingDown size={16} className="mr-1" />
+                        )}
+                        {priceChangePositive ? '+' : ''}
+                        ${Math.abs(stock.change || 0).toFixed(2)} ({stock.changesPercentage.toFixed(2)}%)
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-700 mb-4">24h Change</div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="bg-gradient-to-r from-wheat-200 to-amber-100 rounded-lg p-3 shadow-lg">
+                      <div className="text-gray-700 text-xs mb-1">Volume</div>
+                      <div className="text-sm font-bold text-black">{(stock.volume || 0).toLocaleString()}</div>
+                    </div>
+                    <div className="bg-gradient-to-r from-amber-100 to-wheat-200 rounded-lg p-3 shadow-lg">
+                      <div className="text-gray-700 text-xs mb-1">Market Cap</div>
+                      <div className="text-sm font-bold text-black">${((stock.marketCap || 0) / 1e9).toFixed(1)}B</div>
+                    </div>
+                    <div className="bg-gradient-to-r from-wheat-200 to-amber-100 rounded-lg p-3 shadow-lg">
+                      <div className="text-gray-700 text-xs mb-1">Day Range</div>
+                      <div className="text-sm font-bold text-black">${(stock.dayLow || 0).toFixed(2)} - ${(stock.dayHigh || 0).toFixed(2)}</div>
+                    </div>
+                    <div className="bg-gradient-to-r from-amber-100 to-wheat-200 rounded-lg p-3 shadow-lg">
+                      <div className="text-gray-700 text-xs mb-1">52W Range</div>
+                      <div className="text-sm font-bold text-black">${(stock.low52w || 0).toFixed(2)} - ${(stock.high52w || 0).toFixed(2)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Chart - Right Side - Much Larger */}
+            <div className="xl:col-span-5">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <Activity className="text-black" size={20} />
+                  <h3 className="text-xl font-semibold text-black">Price Chart</h3>
+                </div>
+                {stock.history && stock.history.length > 0 ? (
+                  <div className="rounded-xl shadow-xl bg-neutral-50 p-3">
+                    <div style={{ height: '400px', width: '100%' }}>
+                      <StockChart history={stock.history} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-[350px] bg-wheat-200 rounded-xl flex items-center justify-center shadow-xl">
+                    <p className="text-gray-700">Chart data unavailable</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           
           {/* Trading Panel */}
           <div className="xl:col-span-1">
-            <div className="bg-white shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-green-500 to-blue-500 p-4 text-white">
+            <div className="bg-gradient-to-br from-wheat-100 to-amber-100 shadow-2xl rounded-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-wheat-200 to-amber-200 p-4 shadow-lg">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Trade {symbol}</h3>
-                  <div className="text-xs bg-white/20 px-2 py-1 rounded">Simulated</div>
+                  <h3 className="text-lg font-semibold text-black">Trade {symbol}</h3>
+                  <div className="text-xs bg-black text-white px-2 py-1 rounded-lg shadow-md">Simulated</div>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <BuyStockForm
                   onSuccess={handleSuccess}
                   symbol={symbol}
@@ -279,40 +303,39 @@ export default function StockDetailPage() {
             </div>
           </div>
 
-          {/* Portfolio & Info */}
-          <div className="xl:col-span-2 space-y-8">
+          {/* Portfolio & Info Section */}
+          <div className="xl:col-span-3 space-y-8">
             <StockPortfolioCard symbol={symbol} currentPrice={stock.price} />
             
-            <div className="bg-white shadow-lg rounded-2xl p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">About {stock.name}</h3>
-              <p className="text-gray-600 leading-relaxed">
-                {stock.description || `${stock.name || symbol} is a publicly traded company. Real-time company information is currently unavailable.`}
-              </p>
+            <div className="bg-gradient-to-br from-wheat-100 to-amber-100 shadow-2xl rounded-2xl p-4">
+              <h3 className="text-xl font-semibold  text-amber-700">About {stock.name}</h3>
+
               
-              {/* Additional Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
-                <div className="text-center">
-                  <p className="text-sm text-gray-500 font-medium">P/E Ratio</p>
-                  <p className="text-lg font-bold text-gray-900">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-6 outline-none">
+                <div className="text-center bg-gradient-to-br from-wheat-200 to-amber-200 rounded-xl p-4 shadow-lg">
+                  <p className="text-xs text-gray-800 font-medium mb-1">P/E Ratio</p>
+                  <p className="text-lg font-bold text-black">
                     {stock.peRatio ? stock.peRatio.toFixed(2) : 'N/A'}
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-500 font-medium">Volume</p>
-                  <p className="text-lg font-bold text-gray-900">
+                <div className="text-center bg-gradient-to-br from-amber-200 to-wheat-200 rounded-xl p-4 shadow-lg">
+                  <p className="text-xs text-gray-800 font-medium mb-1">Volume</p>
+                  <p className="text-lg font-bold text-black">
                     {(stock.volume || 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-500 font-medium">Market Cap</p>
-                  <p className="text-lg font-bold text-gray-900">
+                <div className="text-center bg-gradient-to-br from-wheat-200 to-amber-200 rounded-xl p-4 shadow-lg">
+                  <p className="text-xs text-gray-800 font-medium mb-1">Market Cap</p>
+                  <p className="text-lg font-bold text-black">
                     ${((stock.marketCap || 0) / 1e9).toFixed(1)}B
                   </p>
                 </div>
               </div>
             </div>
             
-            <NewsFeed symbol={symbol} />
+            <div className="bg-gradient-to-br from-amber-50 to-wheat-100 shadow-2xl rounded-2xl overflow-hidden">
+              <NewsFeed symbol={symbol} />
+            </div>
           </div>
         </div>
       </div>

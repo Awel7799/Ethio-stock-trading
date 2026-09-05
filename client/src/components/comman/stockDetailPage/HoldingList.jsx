@@ -1,3 +1,4 @@
+// src/components/common/stcoDetailPage/HoldinngList.jsx
 import { useEffect, useState } from "react";
 import { getHoldings } from "../../../services/holdings";
 import { useNavigate } from "react-router-dom";
@@ -32,49 +33,58 @@ export default function HoldingList() {
     fetchAll();
   }, [user?._id]);
 
-  if (loading) return <p className="text-center py-4">Loading...</p>;
+  if (loading)
+    return <p className="text-center py-6 text-black text-lg">Loading...</p>;
   if (err)
     return (
-      <div className="text-red-600 px-4 py-2 bg-red-50 rounded">{err}</div>
+      <div className="text-red-700 px-4 py-3 bg-wheat-light rounded text-center">
+        {err}
+      </div>
     );
-  if (!list.length) return <p className="text-center py-4">No holdings yet.</p>;
+  if (!list.length)
+    return (
+      <p className="text-center py-6 text-black text-lg">
+        No holdings yet.
+      </p>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto mt-6 p-4 bg-white rounded-lg shadow">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="border-b border-gray-300">
-            <th className="py-3 px-4 text-gray-600">Symbol</th>
-            <th className="py-3 px-4 text-gray-600">Shares</th>
-            <th className="py-3 px-4 text-gray-600">Avg. Price</th>
-            <th className="py-3 px-4 text-gray-600">Purchase Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.map((h) => {
-            const symbol = h.stockSymbol || "N/A";
-            const quantity = h.quantity != null ? h.quantity : 0;
-            const price =
-              h.purchasePrice != null ? Number(h.purchasePrice).toFixed(2) : "N/A";
-            const purchaseDate = h.purchaseDate
-              ? new Date(h.purchaseDate).toLocaleDateString()
-              : "N/A";
+    <div className="max-w-4xl mx-auto mt-6 space-y-4">
+      {list.map((h) => {
+        const symbol = h.stockSymbol || "N/A";
+        const quantity = h.quantity != null ? h.quantity : 0;
+        const price =
+          h.purchasePrice != null ? Number(h.purchasePrice).toFixed(2) : "N/A";
+        const purchaseDate = h.purchaseDate
+          ? new Date(h.purchaseDate).toLocaleDateString()
+          : "N/A";
 
-            return (
-              <tr
-                key={h._id}
-                onClick={() => navigate(`/stock/${symbol}`)}
-                className="cursor-pointer hover:bg-gray-100"
-              >
-                <td className="py-3 px-4 font-semibold">{symbol}</td>
-                <td className="py-3 px-4">{quantity}</td>
-                <td className="py-3 px-4">${price}</td>
-                <td className="py-3 px-4">{purchaseDate}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+        return (
+          <div
+            key={h._id}
+            onClick={() => navigate(`/stock/${symbol}`)}
+            className="cursor-pointer bg-gradient-to-l from-orange-200  to-yellow-50 shadow-md rounded-xl p-6 hover:shadow-lg transition duration-300 flex justify-between items-center border border-[#F5DEB3]"
+          >
+            {/* Left Section */}
+            <div>
+              <h3 className="text-black text-xl font-bold">{symbol}</h3>
+              <p className="text-black text-sm mt-1">Purchased on: {purchaseDate}</p>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex space-x-6 items-center">
+              <div className="text-center">
+                <p className="text-black font-semibold">{quantity}</p>
+                <p className="text-sm text-black/70">Shares</p>
+              </div>
+              <div className="text-center">
+                <p className="text-black font-semibold">${price}</p>
+                <p className="text-sm text-black/70">Avg. Price</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

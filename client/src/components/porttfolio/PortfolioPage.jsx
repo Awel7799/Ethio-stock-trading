@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchUserPortfolio } from "../../services/portfolioServices";
 import { useAuth } from "../../context/AuthContext";
+import HoldingsCard from "../market/holdingCards";
 
 const Portfolio = ({ currentPrices }) => {
   const { user, loading: authLoading } = useAuth();
@@ -47,7 +48,7 @@ const Portfolio = ({ currentPrices }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Elegant Header */}
-      <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 shadow-xl border-b-2 border-amber-300">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 shadow-xl border-b-2 border-amber-300 m-auto">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-8 lg:mb-0 lg:w-1/2">
@@ -135,9 +136,6 @@ const Portfolio = ({ currentPrices }) => {
                         My Holdings
                       </h2>
                     </div>
-                    <p className="text-amber-800 text-lg font-semibold mb-2">
-                      Your Active Stock Positions
-                    </p>
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -341,16 +339,6 @@ function StockHoldingCard({ holding }) {
               </p>
             </div>
           </div>
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-bold border-2 ${
-              isProfit
-                ? "bg-green-50 text-green-700 border-green-200"
-                : "bg-red-50 text-red-700 border-red-200"
-            }`}
-          >
-            {isProfit ? "+" : ""}
-            {profitLossPercentage.toFixed(1)}%
-          </div>
         </div>
       </div>
 
@@ -368,14 +356,7 @@ function StockHoldingCard({ holding }) {
               </p>
             </div>
             <div className="mx-4 border-l border-amber-200 h-8"></div>
-            <div className="text-center flex-1">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-1">
-                Avg. Cost
-              </p>
-              <p className="text-lg font-bold text-black">
-                {formatCurrency(holding.averagePrice)}
-              </p>
-            </div>
+           
           </div>
 
           {/* Value Summary */}
@@ -388,30 +369,11 @@ function StockHoldingCard({ holding }) {
                 {formatCurrency(currentValue)}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-bold text-amber-700">
-                Profit/Loss
-              </span>
-              <span
-                className={`text-xl font-bold ${isProfit ? "text-green-600" : "text-red-600"}`}
-              >
-                {isProfit ? "+" : ""}
-                {formatCurrency(profitLoss)}
-              </span>
-            </div>
+            
           </div>
 
           {/* Investment Summary */}
-          <div className="pt-2 border-t border-amber-100">
-            <div className="flex justify-between text-sm">
-              <span className="text-amber-700 font-medium">
-                Total Invested:
-              </span>
-              <span className="text-black font-bold">
-                {formatCurrency(investedValue)}
-              </span>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
