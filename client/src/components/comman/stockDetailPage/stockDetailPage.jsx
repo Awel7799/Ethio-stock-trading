@@ -94,7 +94,8 @@ export default function StockDetailPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-wheat-50 to-white flex items-center justify-center">
         <div className="text-center bg-white rounded-3xl shadow-xl p-8 border border-wheat-200">
-          <div className="text-black mb-6 text-lg">Failed to load stock details</div>
+          <div className="text-black mb-2 text-lg">Unable to load {symbol} details</div>
+          <p className="text-gray-600 mb-6">{error || "Market data is temporarily unavailable."}</p>
           <button 
             onClick={() => navigate(-1)}
             className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors shadow-lg"

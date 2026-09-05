@@ -10,7 +10,8 @@ const Portfolio = ({ currentPrices }) => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || !user._id) {
+    const userId = user?.id || user?._id || user?.userId;
+    if (!userId) {
       setError("User not logged in");
       setPortfolio(null);
       return;
@@ -19,7 +20,7 @@ const Portfolio = ({ currentPrices }) => {
     setError(null);
     setPortfolio(null);
 
-    fetchUserPortfolio(user._id, currentPrices)
+    fetchUserPortfolio(userId, currentPrices)
       .then(setPortfolio)
       .catch((err) => setError(err.message));
   }, [user, authLoading, currentPrices]);
@@ -46,7 +47,7 @@ const Portfolio = ({ currentPrices }) => {
   } = portfolio;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <div className="portfolio-page">
       {/* Elegant Header */}
       <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 shadow-xl border-b-2 border-amber-300 m-auto">
         <div className="max-w-7xl mx-auto px-6 py-12">
@@ -314,10 +315,6 @@ function HoldingsShowcase({ holdings }) {
 // Individual Stock Card - Completely Redesigned
 function StockHoldingCard({ holding }) {
   const currentValue = holding.currentPrice * holding.quantity;
-  const investedValue = holding.averagePrice * holding.quantity;
-  const profitLoss = currentValue - investedValue;
-  const profitLossPercentage = (profitLoss / investedValue) * 100;
-  const isProfit = profitLoss >= 0;
 
   return (
     <div className="bg-gradient-to-br from-amber-25 to-white rounded-2xl border-2 border-amber-100 hover:border-amber-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group">

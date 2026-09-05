@@ -37,8 +37,17 @@ const getIndividualInvestment = async (req, res) => {
 
     const prices = await getQuotes([stockSymbol]);
     const currentPrice = prices[stockSymbol];
-    if (currentPrice === null || typeof currentPrice !== 'number') {
-      return res.status(502).json({ message: `Failed to fetch current price for ${stockSymbol}` });
+    if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
+      return res.status(200).json({
+        symbol: stockSymbol,
+        quantity: holding.quantity,
+        purchasePrice: holding.purchasePrice,
+        currentPrice: null,
+        invested: holding.purchasePrice * holding.quantity,
+        currentValue: null,
+        gainLoss: null,
+        error: 'Live price unavailable',
+      });
     }
 
     const { invested, currentValue, profitLoss, percent } = computeGainLoss(
@@ -96,7 +105,7 @@ const getTotalInvestment = async (req, res) => {
       const currentPrice = prices[sym];
       const invested = h.purchasePrice * h.quantity;
 
-      if (currentPrice === null || typeof currentPrice !== 'number') {
+      if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
         breakdown.push({
           symbol: sym,
           quantity: h.quantity,

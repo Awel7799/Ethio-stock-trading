@@ -1,18 +1,19 @@
 import { API_BASE_URL } from "../config/api";
+import { getAccessToken } from "../api/auth";
 
-export async function sellStock({ stockSymbol, quantity, sellPrice, userId, purchaseDate }) {
+export async function sellStock({ stockSymbol, quantity, sellPrice, purchaseDate }) {
   const payload = {
     stockSymbol,
     quantity,
     sellPrice,
     purchaseDate: purchaseDate || new Date().toISOString(),
-    ...(userId ? { userId } : {}), // optional if backend can get from auth
   };
 
   const res = await fetch(`${API_BASE_URL}/sell`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${getAccessToken()}`,
     },
     body: JSON.stringify(payload),
   });

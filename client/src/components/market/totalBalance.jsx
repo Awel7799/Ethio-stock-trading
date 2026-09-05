@@ -18,7 +18,7 @@ const formatPercent = (n) => {
 
 const TotalInvestmentCard = () => {
   const { user } = useAuth(); // 🔹 get user from AuthContext
-  const userId = user?._id;   // 🔹 safely extract userId
+  const userId = user?.id || user?._id || user?.userId;
 
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);

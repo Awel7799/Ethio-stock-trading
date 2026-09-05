@@ -12,7 +12,8 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
   useEffect(() => {
     const loadPortfolio = async () => {
       try {
-        const data = await fetchStockPortfolio(user._id, symbol, currentPrice);
+        const userId = user?.id || user?._id || user?.userId
+        const data = await fetchStockPortfolio(userId, symbol, currentPrice);
         setPortfolio(data || {});
       } catch (err) {
         setError(err.message);
@@ -20,7 +21,7 @@ export default function StockPortfolioCard({ symbol, currentPrice }) {
         setLoading(false);
       }
     };
-    if (user?._id) loadPortfolio();
+    if (user?.id || user?._id || user?.userId) loadPortfolio();
   }, [symbol, currentPrice, user]);
 
   if (loading) return <div>Loading portfolio...</div>;

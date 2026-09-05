@@ -11,17 +11,14 @@ function toNumber(value) {
   return Number(value);
 }
 
-function toObjectId(id) {
-  try {
-    if (id) return new ObjectId(id);
-  } catch (e) {}
-  return new ObjectId(); // fallback
-}
-
 exports.buyStock = async (req, res) => {
   try {
     // 1. Extract inputs
-    const userId = toObjectId(req.body.userId);
+    const userIdValue = req.user?.userId;
+    if (!userIdValue || !ObjectId.isValid(userIdValue)) {
+      return res.status(401).json({ error: "Authenticated user is required" });
+    }
+    const userId = new ObjectId(userIdValue);
     const stockSymbol = (req.body.stockSymbol || "").trim().toUpperCase();
     const quantity = Number(req.body.quantity);
     const purchasePriceNum = Number(req.body.purchasePrice);

@@ -30,13 +30,8 @@ const Wallett = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-25 to-orange-50 relative overflow-hidden">
+    <div className="wallet-page">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-tr from-orange-400 to-amber-500 rounded-full blur-3xl"></div>
-      </div>
-      
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
         <div className="space-y-6">
           

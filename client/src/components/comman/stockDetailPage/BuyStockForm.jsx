@@ -19,12 +19,19 @@ export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
     setError("");
     setResult(null);
 
-    if (!user || !user._id) {
+    const userId = user?.id || user?._id || user?.userId
+    if (!userId) {
       setError("You must be logged in to trade.");
       return;
     }
-    if (quantity < 1) {
-      setError("Quantity must be at least 1.");
+    const numericQuantity = Number(quantity)
+    const numericPrice = Number(currentPrice)
+    if (!Number.isInteger(numericQuantity) || numericQuantity < 1) {
+      setError("Quantity must be a whole number greater than 0.");
+      return;
+    }
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+      setError("A valid live stock price is required before trading.");
       return;
     }
 
@@ -33,17 +40,17 @@ export default function TradeStockForm({ symbol, currentPrice, onSuccess }) {
       let data;
       if (isBuy) {
         data = await buyStock({
-          userId: user._id,
+          userId,
           stockSymbol: symbol,
-          quantity: Number(quantity),
-          purchasePrice: Number(currentPrice),
+          quantity: numericQuantity,
+          purchasePrice: numericPrice,
         });
       } else {
         data = await sellStock({
-          userId: user._id,
+          userId,
           stockSymbol: symbol,
-          quantity: Number(quantity),
-          sellPrice: Number(currentPrice),
+          quantity: numericQuantity,
+          sellPrice: numericPrice,
         });
       }
 

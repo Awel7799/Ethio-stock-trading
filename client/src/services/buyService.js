@@ -1,17 +1,19 @@
 import { API_BASE_URL } from "../config/api";
 
-export async function buyStock({ stockSymbol, quantity, purchasePrice, userId }) {
+import { getAccessToken } from "../api/auth";
+
+export async function buyStock({ stockSymbol, quantity, purchasePrice }) {
   const payload = {
     stockSymbol,
     quantity,
     purchasePrice,
-    ...(userId ? { userId } : {}), // optional if using fallback in backend
   };
 
   const res = await fetch(`${API_BASE_URL}/buy`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${getAccessToken()}`,
     },
     body: JSON.stringify(payload),
   });

@@ -1,104 +1,75 @@
-// controllers/sellController.js
-const { Double, ObjectId } = require('mongodb');
-const Holding = require('../models/Holding');
-const StockTransaction = require('../models/StockTransaction');
-const Wallet = require('../models/Wallet'); 
+const { Double, ObjectId } = require("mongodb")
+const Holding = require("../models/Holding")
+const StockTransaction = require("../models/StockTransaction")
+const Wallet = require("../models/Wallet")
 
-const FALLBACK_USER_ID = new ObjectId();
+const toNumber = (value) => (value && typeof value.toNumber === "function" ? value.toNumber() : Number(value))
 
-function toNumber(value) {
-  if (value && typeof value.toNumber === 'function') {
-    return value.toNumber();
-  }
-  return Number(value);
-}
-
-function toObjectId(id) {
+const sellStock = async (req, res) => {
   try {
-    if (id) return new ObjectId(id);
-  } catch (e) {}
-  return FALLBACK_USER_ID;
-}
-
-exports.sellStock = async (req, res) => {
-  try {
-    const userId = toObjectId(req.body.userId);
-    const stockSymbol = (req.body.stockSymbol || '').trim().toUpperCase();
-    const quantity = Number(req.body.quantity);
-    const sellPriceNum = Number(req.body.sellPrice);
-    const sellDate = req.body.sellDate ? new Date(req.body.sellDate) : new Date();
-
-    // 🔹 Validate
-    if (!stockSymbol) return res.status(400).json({ error: 'stockSymbol is required' });
-    if (!Number.isFinite(quantity) || quantity < 1) {
-      return res.status(400).json({ error: 'quantity must be >= 1' });
-    }
-    if (!Number.isFinite(sellPriceNum) || sellPriceNum <= 0) {
-      return res.status(400).json({ error: 'sellPrice must be positive' });
+    const userIdValue = req.user?.userId
+    if (!userIdValue || !ObjectId.isValid(userIdValue)) {
+      return res.status(401).json({ error: "Authenticated user is required" })
     }
 
-    const sellPriceDouble = new Double(sellPriceNum);
-    const totalValue = sellPriceNum * quantity;
+    const userId = new ObjectId(userIdValue)
+    const stockSymbol = String(req.body.stockSymbol || "").trim().toUpperCase()
+    const quantity = Number(req.body.quantity)
+    const sellPrice = Number(req.body.sellPrice)
+    const sellDate = req.body.sellDate ? new Date(req.body.sellDate) : new Date()
 
-    // 🔹 Find holding
-    let holding = await Holding.findOne({ userId, stockSymbol });
-    if (!holding) {
-      return res.status(400).json({ error: 'You do not own this stock' });
+    if (!stockSymbol) return res.status(400).json({ error: "stockSymbol is required" })
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      return res.status(400).json({ error: "quantity must be a whole number greater than 0" })
     }
+    if (!Number.isFinite(sellPrice) || sellPrice <= 0) {
+      return res.status(400).json({ error: "sellPrice must be a positive number" })
+    }
+    if (Number.isNaN(sellDate.getTime())) {
+      return res.status(400).json({ error: "sellDate must be a valid date" })
+    }
+
+    const holding = await Holding.findOne({ userId, stockSymbol })
+    if (!holding) return res.status(400).json({ error: "You do not own this stock" })
     if (holding.quantity < quantity) {
-      return res.status(400).json({
-        error: 'Not enough quantity to sell',
-        ownedQuantity: holding.quantity,
-      });
+      return res.status(400).json({ error: "Not enough quantity to sell", ownedQuantity: holding.quantity })
     }
 
-    // 🔹 Profit/loss calculation
-    const profitLoss =
-      (sellPriceNum - toNumber(holding.purchasePrice)) * quantity;
+    const wallet = await Wallet.findByUserId(userId)
+    if (!wallet) return res.status(400).json({ error: "Wallet not found for user" })
 
-    // 🔹 Update/remove holding
-    if (holding.quantity === quantity) {
-      await Holding.deleteOne({ _id: holding._id });
-      holding = null;
-    } else {
-      holding.quantity -= quantity;
-      await holding.save();
-    }
-
-    // 🔹 Update wallet (deposit sale proceeds)
-    let wallet = await Wallet.findOne({ userId });
-    if (!wallet) {
-      // if user has no wallet, create one
-      wallet = await Wallet.createWallet(userId, 0);
-    }
-    await wallet.deposit(totalValue);
-
-    // 🔹 Save transaction
+    const totalValue = sellPrice * quantity
+    const profitLoss = (sellPrice - toNumber(holding.purchasePrice)) * quantity
     const transaction = new StockTransaction({
       userId,
       stockSymbol,
-      type: 'sell',
+      type: "sell",
       quantity,
-      price: sellPriceDouble,
+      price: new Double(sellPrice),
       transactionDate: sellDate,
-      profitLoss,
-    });
-    await transaction.save();
+    })
 
-    res.json({
-      message: 'Sell executed successfully',
-      holding,
+    await wallet.deposit(totalValue)
+    const remainingQuantity = holding.quantity - quantity
+    if (remainingQuantity === 0) {
+      await Holding.deleteOne({ _id: holding._id })
+    } else {
+      holding.quantity = remainingQuantity
+      await holding.save()
+    }
+    await transaction.save()
+
+    return res.json({
+      message: "Sell executed successfully",
+      holding: remainingQuantity === 0 ? null : { ...holding.toObject(), quantity: remainingQuantity },
       walletBalance: wallet.balance,
       transaction,
       profitLoss,
-    });
-  } catch (err) {
-    console.error('sellStock error:', err);
-
-    if (err.message?.includes('Wallet')) {
-      return res.status(400).json({ error: err.message });
-    }
-
-    return res.status(500).json({ error: 'Internal server error' });
+    })
+  } catch (error) {
+    console.error("sellStock error:", error)
+    return res.status(500).json({ error: "Unable to complete sale" })
   }
-};
+}
+
+module.exports = { sellStock }
