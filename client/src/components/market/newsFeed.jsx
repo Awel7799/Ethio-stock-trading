@@ -22,7 +22,7 @@ const NewsFeed = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="w-[90vw] rounded-lg p-1  mx-0 mt-6 shadow-lg">
+    <div className="w-full rounded-lg p-1 mx-0 mt-6">
       <h2 className="text-4xl font-semibold mb-6 text-black border-b border-yellow-200 pb-2">Market News</h2>
       <div className="flex  flex-col gap-6">
         {news.map((article, index) => (
@@ -31,7 +31,7 @@ const NewsFeed = () => {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex w-[90vw] items-start gap-5 shadow-md rounded-md p-4 hover:shadow-xl transition duration-300 bg-white border border-yellow-200 hover:bg-yellow-50"
+            className="flex w-full items-start gap-5 shadow-md rounded-md p-4 hover:shadow-xl transition duration-300 bg-white border border-yellow-200 hover:bg-yellow-50"
           >
             <img
               src={article.urlToImage || "https://via.placeholder.com/150?text=No+Image"}

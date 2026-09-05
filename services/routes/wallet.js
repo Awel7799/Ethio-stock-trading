@@ -2,7 +2,8 @@ const express = require("express")
 const router = express.Router()
 
 // ============================================
-// IMMEDIATE DEBUG ROUTES (FIRST PRIORITY)
+if (process.env.NODE_ENV === "development") {
+// Development-only diagnostic routes
 // These routes are placed BEFORE any global authentication middleware
 // ============================================
 
@@ -80,6 +81,7 @@ router.post("/debug-deposit", async (req, res) => {
     })
   }
 })
+}
 
 // ============================================
 // Middleware and Controllers Imports (Existing)

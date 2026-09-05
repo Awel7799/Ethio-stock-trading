@@ -68,8 +68,8 @@ export const initiateWithdraw = async (token, withdrawData) => {
 
 // Get transaction status (for polling)
 export const getTransactionStatus = async (token, transactionId) => {
-  return await apiRequest(`/wallet/transaction/${transactionId}/status`, {
-    method: "GET",
+  return await apiRequest(`/wallet/transactions/${transactionId}/status`, {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
     },

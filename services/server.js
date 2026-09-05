@@ -154,7 +154,7 @@ const performanceRoutes = require('./routes/performanceRoutes');
 
 
 // Add these middleware
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/stocks", stockDetailRoutes);
 app.use("/api/holdings", holdingRoutes);
@@ -168,7 +168,8 @@ app.use('/api', portfolioRouter);
 app.use('/api/news', newsRoutes);
 app.use('/api/performance', performanceRoutes);
 // ============================================
-// Auth Routes (Re-added)
+if (process.env.NODE_ENV === "development") {
+// Auth Routes (legacy development compatibility)
 // ============================================
 console.log("🔧 Registering auth routes...")
 // Signup route
@@ -345,6 +346,7 @@ app.get("/api/auth/verify-token", authLimiter, authenticate, (req, res) => {
   })
 })
 console.log("✅ All auth routes registered successfully")
+}
 
 // ============================================
 // Health Check & Test Endpoints
@@ -361,7 +363,8 @@ app.get("/health", (req, res) => {
   })
 })
 
-// Test route
+if (process.env.NODE_ENV === "development") {
+// Development-only test and debug routes
 app.get("/test", (req, res) => {
   res.json({ message: "Basic routing works!" })
 })
@@ -483,6 +486,7 @@ app.get("/api/debug/list-users", async (req, res) => {
     })
   }
 })
+}
 
 // ============================================
 // Global Error Handling

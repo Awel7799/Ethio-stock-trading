@@ -2,29 +2,8 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const StockChart = ({ history }) => {
-  // Format and validate the data
   const chartData = React.useMemo(() => {
-    if (!history || !Array.isArray(history) || history.length === 0) {
-      console.log('No history data available, using mock data for chart');
-      // Generate mock data if no history available
-      const mockData = [];
-      let basePrice = 150;
-      
-      for (let i = 29; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        basePrice += (Math.random() - 0.5) * 10;
-        basePrice = Math.max(basePrice, 100); // minimum price
-        
-        mockData.push({
-          date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          price: parseFloat(basePrice.toFixed(2)),
-          fullDate: date.toLocaleDateString()
-        });
-      }
-      return mockData;
-    }
+    if (!Array.isArray(history) || history.length === 0) return [];
 
     // Process real history data
     return history.map(item => ({
@@ -35,7 +14,7 @@ const StockChart = ({ history }) => {
     })).filter(item => item.price > 0); // Filter out invalid prices
   }, [history]);
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

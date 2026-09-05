@@ -42,18 +42,7 @@ export const WalletProvider = ({ children }) => {
   const [technicalErrors, setTechnicalErrors] = useState([]);
 
   // Banks
-  const [supportedBanks, setSupportedBanks] = useState([
-    { code: "CBE", name: "Commercial Bank of Ethiopia" },
-    { code: "DASH", name: "Dashen Bank" },
-    { code: "AWASH", name: "Awash International Bank" },
-    { code: "ABYSS", name: "Bank of Abyssinia" },
-    { code: "COOP", name: "Cooperative Bank of Oromia" },
-    { code: "DBE", name: "Development Bank of Ethiopia" },
-    { code: "UNITED", name: "United Bank S.C." },
-    { code: "LION", name: "Lion International Bank" },
-    { code: "NIB", name: "Nib International Bank" },
-    { code: "WEGAGEN", name: "Wegagen Bank" },
-  ]);
+  const [supportedBanks, setSupportedBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(false);
 
   // Polling interval reference
@@ -394,6 +383,22 @@ export const WalletProvider = ({ children }) => {
       console.log("🚀 Auth loaded, initializing wallet data");
       refreshBalance();
       refreshTransactions();
+
+      const loadSupportedBanks = async () => {
+        const token = getToken();
+        setBanksLoading(true);
+        try {
+          const response = await walletApi.getSupportedBanks(token);
+          const banks = Array.isArray(response.data) ? response.data : [];
+          setSupportedBanks(banks);
+        } catch (error) {
+          addTechnicalError(`Bank list fetch error: ${error.message}`);
+        } finally {
+          setBanksLoading(false);
+        }
+      };
+
+      loadSupportedBanks();
     }
   }, [authLoading, isLoggedIn, user]);
 

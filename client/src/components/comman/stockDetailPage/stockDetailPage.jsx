@@ -50,25 +50,6 @@ export default function StockDetailPage() {
         console.error('Failed to load stock details:', err);
         setError(err.message);
         
-        // Fallback with real-looking mock data
-        setStock({
-          symbol: symbol,
-          name: `${symbol} Inc.`,
-          price: Math.random() * 200 + 50, // Random price between 50-250
-          changesPercentage: (Math.random() - 0.5) * 10, // Random change -5% to +5%
-          change: (Math.random() - 0.5) * 20, // Random dollar change
-          history: generateMockHistory(),
-          description: `${symbol} is a publicly traded company.`,
-          logo: null,
-          marketState: 'Open',
-          volume: Math.floor(Math.random() * 10000000),
-          marketCap: Math.floor(Math.random() * 1000000000000),
-          peRatio: Math.random() * 30 + 10,
-          high52w: Math.random() * 300 + 100,
-          low52w: Math.random() * 100 + 20,
-          dayHigh: Math.random() * 250 + 75,
-          dayLow: Math.random() * 200 + 50,
-        });
       } finally {
         setLoading(false);
       }
@@ -78,27 +59,6 @@ export default function StockDetailPage() {
       loadData();
     }
   }, [symbol, refreshFlag]);
-
-  const generateMockHistory = () => {
-    const history = [];
-    const basePrice = 150;
-    let currentPrice = basePrice;
-    
-    for (let i = 30; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      
-      currentPrice += (Math.random() - 0.5) * 10;
-      currentPrice = Math.max(currentPrice, 50); // Minimum price
-      
-      history.push({
-        date: date.toISOString(),
-        price: currentPrice,
-        volume: Math.floor(Math.random() * 1000000)
-      });
-    }
-    return history;
-  };
 
   if (loading) {
     return (
