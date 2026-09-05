@@ -1,4 +1,4 @@
-const { fetchMarketNews } = require("../services/newsService.Js");
+const { fetchMarketNews } = require("../services/newsService.JS");
 
 async function getMarketNews(req, res) {
   try {
