@@ -1,5 +1,5 @@
 const express = require("express");
-const { getMarketNews } = require("../controllers/newsController.Js");
+const { getMarketNews } = require("../Controllers/newsController.JS");
 
 const router = express.Router();
 

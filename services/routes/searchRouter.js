@@ -2,7 +2,7 @@ const express = require('express');
 const {
   autocompleteStocks,
   getStockDetail,
-} = require('../controllers/searchController');
+} = require('../Controllers/searchController');
 
 const router = express.Router();
 

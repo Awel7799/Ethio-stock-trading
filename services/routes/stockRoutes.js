@@ -1,8 +1,8 @@
 // routes/stockRoutes.js
 const express = require('express');
 const router = express.Router();
-const { getStockDetails } = require('../controllers/stockDetailController');
-const { getTopGainersLive } = require('../controllers/stockController');
+const { getStockDetails } = require('../Controllers/stockDetailController');
+const { getTopGainersLive } = require('../Controllers/stockController');
 
 // Existing route for stock details
 router.get('/details/:symbol', getStockDetails);
