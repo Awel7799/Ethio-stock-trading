@@ -138,7 +138,7 @@ const authRoutes = require('./routes/auth');
 const chatRouter = require('./routes/chatRoutes'); 
 const stockPortfolioRouter = require('./routes/stockPortfolioRouter');
 const portfolioRouter = require('./routes/portfolioRouter');
-const newsRoutes = require('./routes/newsRoutes.Js');
+const newsRoutes = require('./routes/newsRoutes.JS');
 
 const performanceRoutes = require('./routes/performanceRoutes');
 
