@@ -20,6 +20,8 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // CORS middleware
 const allowedOrigins = ("https://ethio-stock-trading.vercel.app/")
+  .split(",")
+  .map((origin) => origin.replace(/\/+$/, ""))
   .filter(Boolean)
 
 const corsOptions = {
