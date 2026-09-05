@@ -1,9 +1,9 @@
-const API_BASE = "http://localhost:3000";
+import { API_BASE_URL } from "../config/api";
 
 export async function fetchUserPortfolio(userId, currentPrices = {}) {
   if (!userId) throw new Error("Invalid userId");
 
-  let url = `${API_BASE}/api/portfolio/${userId}`;
+  let url = `${API_BASE_URL}/portfolio/${userId}`;
   if (Object.keys(currentPrices).length > 0) {
     const pricesQuery = encodeURIComponent(JSON.stringify(currentPrices));
     url += `?currentPrices=${pricesQuery}`;

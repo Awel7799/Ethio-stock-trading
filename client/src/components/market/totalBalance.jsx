@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext'; // make sure this path is correct
+import { API_BASE_URL } from '../../config/api';
 
 const formatCurrency = (n) => {
   if (n == null || isNaN(n)) return '-';
@@ -31,7 +32,7 @@ const TotalInvestmentCard = () => {
       setLoading(true);
       setError(null);
       try {
-        const resp = await fetch(`http://localhost:3000/api/investments/user/${userId}`);
+        const resp = await fetch(`${API_BASE_URL}/investments/user/${userId}`);
         if (!resp.ok) {
           const text = await resp.text();
           throw new Error(`Fetch failed: ${resp.status} ${text}`);

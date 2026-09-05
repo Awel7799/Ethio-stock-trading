@@ -1,4 +1,5 @@
-// src/services/sellService.js
+import { API_BASE_URL } from "../config/api";
+
 export async function sellStock({ stockSymbol, quantity, sellPrice, userId, purchaseDate }) {
   const payload = {
     stockSymbol,
@@ -8,7 +9,7 @@ export async function sellStock({ stockSymbol, quantity, sellPrice, userId, purc
     ...(userId ? { userId } : {}), // optional if backend can get from auth
   };
 
-  const res = await fetch('http://localhost:3000/api/sell', {
+  const res = await fetch(`${API_BASE_URL}/sell`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../config/api";
 
 const TopMovers = () => {
   const [movers, setMovers] = useState([]);
@@ -11,7 +12,7 @@ const TopMovers = () => {
     const fetchMovers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/stocks/gainers?limit=5"
+          `${API_BASE_URL}/stocks/gainers?limit=5`
         );
         console.log("API Response:", response.data);
         setMovers(response.data);

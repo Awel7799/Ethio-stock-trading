@@ -1,4 +1,5 @@
-// src/services/buyService.js
+import { API_BASE_URL } from "../config/api";
+
 export async function buyStock({ stockSymbol, quantity, purchasePrice, userId }) {
   const payload = {
     stockSymbol,
@@ -7,7 +8,7 @@ export async function buyStock({ stockSymbol, quantity, purchasePrice, userId })
     ...(userId ? { userId } : {}), // optional if using fallback in backend
   };
 
-  const res = await fetch('http://localhost:3000/api/buy', {
+  const res = await fetch(`${API_BASE_URL}/buy`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

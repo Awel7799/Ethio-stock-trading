@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FiPlus, FiSend, FiX, FiMaximize2, FiMinimize2, FiRotateCcw } from "react-icons/fi";
 import axios from "axios";
+import { API_BASE_URL } from "../../config/api";
 
 export default function AIchat({ isOpen, onClose }) {
   const [messages, setMessages] = useState([
@@ -51,7 +52,7 @@ export default function AIchat({ isOpen, onClose }) {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/api/chat/advice", {
+      const res = await axios.post(`${API_BASE_URL}/chat/advice`, {
         question: userMessage.text,
       });
 

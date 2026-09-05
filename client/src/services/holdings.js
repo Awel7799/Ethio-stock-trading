@@ -1,4 +1,6 @@
-const BASE = 'http://localhost:3000/api/holdings';
+import { API_BASE_URL } from "../config/api";
+
+const BASE = `${API_BASE_URL}/holdings`;
 
 async function request(path = '', options = {}) {
   const url = `${BASE}${path}`;

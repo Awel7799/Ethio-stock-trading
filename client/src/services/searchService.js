@@ -1,10 +1,10 @@
-// src/api/searchService.js
+import { API_BASE_URL } from "../config/api";
 
-const BASE =  'http://localhost:3000';
+const BASE = API_BASE_URL;
 
 export async function autocompleteStocks(query) {
   if (!query || !query.trim()) return [];
-  const url = `${BASE}/api/search?q=${encodeURIComponent(query.trim())}`;
+  const url = `${BASE}/search?q=${encodeURIComponent(query.trim())}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error('Failed to fetch autocomplete');
@@ -15,7 +15,7 @@ export async function autocompleteStocks(query) {
 
 export async function fetchStockDetail(symbol) {
   if (!symbol) throw new Error('Symbol required');
-  const url = `${BASE}/api/search/${encodeURIComponent(symbol)}`;
+  const url = `${BASE}/search/${encodeURIComponent(symbol)}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error('Failed to fetch stock detail');
