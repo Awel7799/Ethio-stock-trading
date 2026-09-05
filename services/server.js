@@ -19,23 +19,25 @@ app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // CORS middleware
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,http://localhost:3000")
+const allowedOrigins = (process.env.CLIENT_URL || "https://ethio-stock-trading.vercel.app,http://localhost:5173,http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean)
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true)
-      }
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
 
-      return callback(new Error("Not allowed by CORS"))
-    },
-    credentials: true,
-  }),
-)
+    return callback(new Error("Not allowed by CORS"))
+  },
+  credentials: true,
+  optionsSuccessStatus: 204,
+}
+
+app.use(cors(corsOptions))
+app.options("*", cors(corsOptions))
 
 // ============================================
 // Database Connection
