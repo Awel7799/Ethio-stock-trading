@@ -21,6 +21,9 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 // CORS middleware
 const allowedOrigins = new Set([
   "https://ethio-stock-trading.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
   ...(process.env.CLIENT_URL
     ? process.env.CLIENT_URL.split(",").map((origin) => origin.replace(/\/+$/, ""))
     : []),
@@ -518,7 +521,7 @@ const server = app.listen(PORT, () => {
   console.log(`💳 Wallet Mode: ${process.env.ETHSWITCH_MODE || "test"}`)
   console.log(`🌐 Health check: http://localhost:${PORT}/health`)
   console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`)
-  console.log(`🔗 Allowed origins: http://localhost:5173, http://localhost:3000`)
+  console.log(`🔗 Allowed origins: ${Array.from(allowedOrigins).join(", ")}`)
 
   if (process.env.NODE_ENV === "development") {
     console.log(`💰 Wallet API docs: http://localhost:${PORT}/api/wallet/docs`)
