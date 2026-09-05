@@ -19,9 +19,9 @@ app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // CORS middleware
-const allowedOrigins = (process.env.CLIENT_URL || "https://ethio-stock-trading.vercel.app/,http://localhost:5173,http://localhost:3000")
+const allowedOrigins = (process.env.CLIENT_URL || "https://ethio-stock-trading.vercel.app,http://localhost:5173,http://localhost:3000")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean)
 
 const corsOptions = {
