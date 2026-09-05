@@ -3,7 +3,7 @@ import Sidebar from "../components/setting/Sidebar";
 import PersonalInfo from "../components/setting/PersonalInfo";
 import Profile from "../components/setting/profile";
 import Security from "../components/setting/security";
-import VerifyKYC from "../components/setting/VerifyKYC";
+import VerifyKYC from "../components/setting/verifyKYC";
 import { useState, useEffect } from "react";
 
 // Animated Background Component (matching landing page)
